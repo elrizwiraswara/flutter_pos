@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = AppTheme().init(context);
+    final theme = AppTheme().init();
 
     return MultiProvider(
       providers: providers,

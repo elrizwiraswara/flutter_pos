@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pos/app/themes/app_sizes.dart';
-import 'package:flutter_pos/app/themes/app_theme.dart';
 import 'package:flutter_pos/app/utilities/console_log.dart';
 
 class ErrorHandlerWidget extends StatefulWidget {
@@ -32,18 +31,20 @@ class ErrorHandlerWidgetState extends State<ErrorHandlerWidget> {
               children: [
                 Text(
                   'Oops!',
-                  style: AppTheme().textTheme.displaySmall?.copyWith(color: AppTheme().colorScheme.onError),
+                  style:
+                      Theme.of(context).textTheme.displaySmall?.copyWith(color: Theme.of(context).colorScheme.onError),
                 ),
                 const SizedBox(height: AppSizes.padding),
                 Text(
                   'Something went wrong. Please try again later.',
-                  style: AppTheme().textTheme.bodyLarge,
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 // Only show error details to UI on Debug Mode
                 if (kDebugMode)
                   Text(
                     errorDetails.toString(),
-                    style: AppTheme().textTheme.bodySmall?.copyWith(color: AppTheme().colorScheme.surface),
+                    style:
+                        Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.surface),
                   ),
               ],
             ),

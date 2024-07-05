@@ -3,7 +3,6 @@ import 'package:flutter_pos/app/assets/app_assets.dart';
 import 'package:flutter_pos/app/routes/app_routes.dart';
 import 'package:flutter_pos/app/services/auth/sign_in_with_google.dart';
 import 'package:flutter_pos/app/themes/app_sizes.dart';
-import 'package:flutter_pos/app/themes/app_theme.dart';
 import 'package:flutter_pos/presentation/widgets/app_button.dart';
 import 'package:flutter_pos/presentation/widgets/app_dialog.dart';
 import 'package:flutter_pos/presentation/widgets/app_image.dart';
@@ -46,12 +45,12 @@ class _SignInScreenState extends State<SignInScreen> {
             const SizedBox(height: AppSizes.padding),
             Text(
               'Welcome!',
-              style: AppTheme().textTheme.displaySmall?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.bold),
             ),
             Text(
               'Welcome to Flutter POS app',
               textAlign: TextAlign.center,
-              style: AppTheme().textTheme.bodyLarge,
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
           ],
         ),

@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pos/app/routes/app_routes.dart';
 import 'package:flutter_pos/app/themes/app_sizes.dart';
-import 'package:flutter_pos/app/themes/app_theme.dart';
 import 'package:flutter_pos/presentation/widgets/app_progress_indicator.dart';
 
 import 'app_button.dart';
@@ -70,7 +69,7 @@ class AppDialog {
                 Text(
                   message ?? 'Something went wrong, please contact your system administrator or try restart the app',
                   textAlign: TextAlign.center,
-                  style: AppTheme().textTheme.bodySmall,
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
                 if (error != null)
                   Padding(
@@ -78,9 +77,9 @@ class AppDialog {
                     child: Text(
                       error.toString().length > 35 ? error.toString().substring(0, 35) : error.toString(),
                       textAlign: TextAlign.center,
-                      style: AppTheme().textTheme.bodySmall?.copyWith(
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: AppTheme().colorScheme.outline,
+                            color: Theme.of(context).colorScheme.outline,
                           ),
                     ),
                   ),
@@ -163,8 +162,8 @@ class AppDialogWidget extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                dialogTitle(),
-                dialogBody(),
+                dialogTitle(context),
+                dialogBody(context),
                 dialogButtons(context),
               ],
             ),
@@ -174,7 +173,7 @@ class AppDialogWidget extends StatelessWidget {
     );
   }
 
-  Widget dialogTitle() {
+  Widget dialogTitle(BuildContext context) {
     return title != null
         ? Container(
             padding: const EdgeInsets.all(24),
@@ -182,13 +181,13 @@ class AppDialogWidget extends StatelessWidget {
             child: Text(
               title!,
               textAlign: TextAlign.center,
-              style: AppTheme().textTheme.titleMedium,
+              style: Theme.of(context).textTheme.titleMedium,
             ),
           )
         : const SizedBox.shrink();
   }
 
-  Widget dialogBody() {
+  Widget dialogBody(BuildContext context) {
     return Container(
       padding: padding ?? const EdgeInsets.all(AppSizes.padding),
       alignment: Alignment.center,
@@ -196,7 +195,7 @@ class AppDialogWidget extends StatelessWidget {
           ? Text(
               text!,
               textAlign: TextAlign.center,
-              style: AppTheme().textTheme.bodySmall,
+              style: Theme.of(context).textTheme.bodySmall,
             )
           : child ?? const SizedBox.shrink(),
     );
@@ -236,7 +235,7 @@ class AppDialogWidget extends StatelessWidget {
                         ),
                         height: 18,
                         width: 1,
-                        color: AppTheme().colorScheme.outline,
+                        color: Theme.of(context).colorScheme.outline,
                       )
                     : const SizedBox.shrink(),
                 rightButtonText != null
