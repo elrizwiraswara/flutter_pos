@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_pos/app/routes/app_routes.dart';
 import 'package:flutter_pos/app/themes/app_sizes.dart';
 import 'package:flutter_pos/app/themes/app_theme.dart';
 import 'package:flutter_pos/presentation/widgets/app_progress_indicator.dart';
@@ -7,8 +8,7 @@ import 'package:flutter_pos/presentation/widgets/app_progress_indicator.dart';
 import 'app_button.dart';
 
 class AppDialog {
-  static Future<dynamic> show(
-    NavigatorState navigator, {
+  static Future<dynamic> show({
     String? title,
     Widget? child,
     String? text,
@@ -24,7 +24,7 @@ class AppDialog {
     double? elevation,
   }) async {
     return await showDialog(
-      context: navigator.context,
+      context: AppRoutes.router.configuration.navigatorKey.currentContext!,
       barrierDismissible: dismissible ?? true,
       builder: (context) {
         return PopScope(
@@ -48,8 +48,7 @@ class AppDialog {
     );
   }
 
-  static Future<void> showErrorDialog(
-    NavigatorState navigator, {
+  static Future<void> showErrorDialog({
     String? title,
     String? message,
     String? error,
@@ -57,7 +56,7 @@ class AppDialog {
     Function()? onTapButton,
   }) async {
     return await showDialog(
-      context: navigator.context,
+      context: AppRoutes.router.configuration.navigatorKey.currentContext!,
       barrierDismissible: false,
       builder: (context) {
         return PopScope(
@@ -93,20 +92,24 @@ class AppDialog {
     );
   }
 
-  static Future<void> showDialogProgress(
-    NavigatorState navigator, {
+  static Future<void> showDialogProgress({
     bool dismissible = false,
   }) async {
     showDialog(
-      context: navigator.context,
+      context: AppRoutes.router.configuration.navigatorKey.currentContext!,
       builder: (context) {
         return AppDialogWidget(
           dismissible: kDebugMode ? true : dismissible,
           elevation: 0,
+          backgroundColor: Colors.transparent,
           child: const AppProgressIndicator(),
         );
       },
     );
+  }
+
+  static void closeDialog() {
+    AppRoutes.router.pop();
   }
 }
 
@@ -122,6 +125,7 @@ class AppDialogWidget extends StatelessWidget {
   final bool enableRightButton;
   final bool enableLeftButton;
   final double? elevation;
+  final Color? backgroundColor;
   final Function()? onTapLeftButton;
   final Function()? onTapRightButton;
 
@@ -139,6 +143,7 @@ class AppDialogWidget extends StatelessWidget {
     this.enableRightButton = true,
     this.enableLeftButton = true,
     this.elevation,
+    this.backgroundColor,
   });
 
   @override
@@ -147,8 +152,9 @@ class AppDialogWidget extends StatelessWidget {
       canPop: dismissible,
       child: Dialog(
         elevation: elevation,
+        backgroundColor: backgroundColor,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppSizes.radius),
         ),
         child: Container(
           constraints: const BoxConstraints(maxWidth: 512),
