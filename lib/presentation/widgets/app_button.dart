@@ -9,6 +9,9 @@ class AppButton extends StatelessWidget {
   final EdgeInsets padding;
   final bool enabled;
   final String text;
+  final Color? buttonColor;
+  final Color? borderColor;
+  final Color? textColor;
   final Function() onTap;
 
   const AppButton({
@@ -19,6 +22,9 @@ class AppButton extends StatelessWidget {
     this.borderRadius,
     this.padding = const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
     this.enabled = true,
+    this.buttonColor,
+    this.borderColor,
+    this.textColor,
     required this.text,
     required this.onTap,
   });
@@ -30,21 +36,27 @@ class AppButton extends StatelessWidget {
       child: InkWell(
         onTap: enabled ? onTap : null,
         splashFactory: InkRipple.splashFactory,
-        borderRadius: borderRadius ?? BorderRadius.circular(4),
+        borderRadius: borderRadius ?? BorderRadius.circular(AppSizes.radius),
         child: Ink(
           width: width,
           height: height,
           padding: padding,
           decoration: BoxDecoration(
-            color: enabled ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surfaceDim,
+            color: enabled
+                ? buttonColor ?? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.surfaceDim,
             borderRadius: BorderRadius.circular(AppSizes.radius),
+            border: Border.all(width: 1, color: borderColor ?? Theme.of(context).colorScheme.primary),
           ),
           child: Center(
             child: Text(
               text,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w500,
                     fontSize: fontSize,
-                    color: enabled ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.outline,
+                    color: enabled
+                        ? textColor ?? Theme.of(context).colorScheme.onPrimary
+                        : Theme.of(context).colorScheme.outline,
                   ),
             ),
           ),

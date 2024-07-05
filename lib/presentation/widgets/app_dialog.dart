@@ -20,6 +20,8 @@ class AppDialog {
     bool? showButtons,
     bool? enableRightButton,
     bool? enableLeftButton,
+    Color? leftButtonColor,
+    Color? rightButtonColor,
     double? elevation,
   }) async {
     return await showDialog(
@@ -40,6 +42,8 @@ class AppDialog {
             enableRightButton: enableRightButton ?? true,
             enableLeftButton: enableLeftButton ?? true,
             elevation: elevation,
+            leftButtonColor: leftButtonColor,
+            rightButtonColor: rightButtonColor,
             child: child,
           ),
         );
@@ -69,7 +73,7 @@ class AppDialog {
                 Text(
                   message ?? 'Something went wrong, please contact your system administrator or try restart the app',
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodySmall,
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 if (error != null)
                   Padding(
@@ -77,9 +81,9 @@ class AppDialog {
                     child: Text(
                       error.toString().length > 35 ? error.toString().substring(0, 35) : error.toString(),
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.outline,
+                            color: Theme.of(context).colorScheme.outlineVariant,
                           ),
                     ),
                   ),
@@ -125,6 +129,8 @@ class AppDialogWidget extends StatelessWidget {
   final bool enableLeftButton;
   final double? elevation;
   final Color? backgroundColor;
+  final Color? leftButtonColor;
+  final Color? rightButtonColor;
   final Function()? onTapLeftButton;
   final Function()? onTapRightButton;
 
@@ -143,6 +149,8 @@ class AppDialogWidget extends StatelessWidget {
     this.enableLeftButton = true,
     this.elevation,
     this.backgroundColor,
+    this.leftButtonColor,
+    this.rightButtonColor,
   });
 
   @override
@@ -175,27 +183,30 @@ class AppDialogWidget extends StatelessWidget {
 
   Widget dialogTitle(BuildContext context) {
     return title != null
-        ? Container(
-            padding: const EdgeInsets.all(24),
-            alignment: Alignment.center,
+        ? Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSizes.padding,
+              AppSizes.padding * 1.5,
+              AppSizes.padding,
+              AppSizes.padding / 2,
+            ),
             child: Text(
               title!,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleMedium,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
           )
         : const SizedBox.shrink();
   }
 
   Widget dialogBody(BuildContext context) {
-    return Container(
+    return Padding(
       padding: padding ?? const EdgeInsets.all(AppSizes.padding),
-      alignment: Alignment.center,
       child: text != null
           ? Text(
               text!,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodySmall,
+              style: Theme.of(context).textTheme.bodyMedium,
             )
           : child ?? const SizedBox.shrink(),
     );
@@ -205,17 +216,16 @@ class AppDialogWidget extends StatelessWidget {
     return leftButtonText == null && rightButtonText == null
         ? const SizedBox.shrink()
         : Padding(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(AppSizes.padding),
             child: Row(
               children: <Widget>[
                 leftButtonText != null
                     ? Expanded(
                         child: AppButton(
                           text: leftButtonText!,
-                          padding: const EdgeInsets.symmetric(
-                            vertical: AppSizes.padding,
-                            horizontal: AppSizes.padding / 2,
-                          ),
+                          buttonColor: Theme.of(context).colorScheme.surface,
+                          borderColor: leftButtonColor ?? Theme.of(context).colorScheme.primary,
+                          textColor: leftButtonColor ?? Theme.of(context).colorScheme.primary,
                           onTap: () async {
                             if (enableLeftButton) {
                               if (onTapLeftButton != null) {
@@ -229,23 +239,12 @@ class AppDialogWidget extends StatelessWidget {
                       )
                     : const SizedBox.shrink(),
                 leftButtonText != null && rightButtonText != null
-                    ? Container(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                        ),
-                        height: 18,
-                        width: 1,
-                        color: Theme.of(context).colorScheme.outline,
-                      )
+                    ? const SizedBox(width: AppSizes.padding / 2)
                     : const SizedBox.shrink(),
                 rightButtonText != null
                     ? Expanded(
                         child: AppButton(
                           text: rightButtonText!,
-                          padding: const EdgeInsets.symmetric(
-                            vertical: AppSizes.padding,
-                            horizontal: AppSizes.padding / 2,
-                          ),
                           onTap: () async {
                             if (enableRightButton) {
                               if (onTapRightButton != null) {
