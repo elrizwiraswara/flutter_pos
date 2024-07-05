@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "406037321591",
+    "project_id": "flutter-pos-478ed",
+    "storage_bucket": "flutter-pos-478ed.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:406037321591:android:dd6f394a021c2220a3b372",
+        "android_client_info": {
+          "package_name": "com.elriztechnology.flutter_pos"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA67wagaW8U8yRKDMx5W5f2S0IPDTlVQSg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

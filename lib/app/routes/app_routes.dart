@@ -22,12 +22,12 @@ class AppRoutes {
     initialLocation: '/',
     navigatorKey: rootNavigatorKey,
     routes: [
-      _main,
+      _root,
       _auth,
     ],
   );
 
-  static final _main = GoRoute(
+  static final _root = GoRoute(
     path: '/',
     builder: (context, state) {
       return const RootScreen();
@@ -42,7 +42,7 @@ class AppRoutes {
       }
     },
     routes: [
-      _navigation,
+      _main,
     ],
   );
 
@@ -69,7 +69,7 @@ class AppRoutes {
     },
   );
 
-  static final _navigation = ShellRoute(
+  static final _main = ShellRoute(
     navigatorKey: navNavigatorKey,
     builder: (BuildContext context, GoRouterState state, Widget child) {
       return MainScreen(child: child);

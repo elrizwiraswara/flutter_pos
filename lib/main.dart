@@ -1,7 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pos/app/themes/app_theme.dart';
+import 'package:flutter_pos/firebase_options.dart';
 import 'package:flutter_pos/presentation/widgets/error_handler_widget.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
@@ -23,9 +25,9 @@ void main() async {
   // Initialize multiple futures
   await Future.wait([
     // Initialize Firebase (google-service.json required)
-    // Firebase.initializeApp(
-    //   options: DefaultFirebaseOptions.currentPlatform,
-    // );
+    Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    ),
   ]);
 
   // Set/lock orientationgvhvgj
@@ -44,7 +46,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: providers,
       child: MaterialApp.router(
-        title: 'Flutter Template',
+        title: 'Flutter POS',
         theme: theme,
         debugShowCheckedModeBanner: kDebugMode,
         routerConfig: AppRoutes.router,
