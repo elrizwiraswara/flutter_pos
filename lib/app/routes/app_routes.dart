@@ -33,13 +33,15 @@ class AppRoutes {
       return const RootScreen();
     },
     redirect: (context, state) async {
+      return null;
+
       // if isAuthenticated = false, go to login screen
       // else continue to current intended route screen
-      if (!await AuthService().isAuthenticated()) {
-        return '/auth/sign-in';
-      } else {
-        return null;
-      }
+      // if (!await AuthService().isAuthenticated()) {
+      //   return '/auth/sign-in';
+      // } else {
+      //   return null;
+      // }
     },
     routes: [
       _main,
