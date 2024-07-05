@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import '../errors/errors.dart';
+
 abstract class UseCase<Result, Params> {
   Future<Result> call(Params params);
 }
