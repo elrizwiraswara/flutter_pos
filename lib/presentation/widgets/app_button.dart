@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_pos/app/themes/app_sizes.dart';
 import 'package:flutter_pos/app/themes/app_theme.dart';
 
 class AppButton extends StatelessWidget {
@@ -17,7 +18,7 @@ class AppButton extends StatelessWidget {
     this.height,
     this.fontSize,
     this.borderRadius,
-    this.padding = const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+    this.padding = const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
     this.enabled = true,
     required this.text,
     required this.onTap,
@@ -26,7 +27,7 @@ class AppButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      borderRadius: BorderRadius.circular(4),
+      borderRadius: BorderRadius.circular(AppSizes.radius),
       child: InkWell(
         onTap: enabled ? onTap : null,
         splashFactory: InkRipple.splashFactory,
@@ -37,7 +38,7 @@ class AppButton extends StatelessWidget {
           padding: padding,
           decoration: BoxDecoration(
             color: enabled ? AppTheme().colorScheme.primary : AppTheme().colorScheme.surfaceDim,
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(AppSizes.radius),
           ),
           child: Center(
             child: Text(

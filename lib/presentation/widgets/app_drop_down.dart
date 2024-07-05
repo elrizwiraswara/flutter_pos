@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_pos/app/themes/app_sizes.dart';
 import 'package:flutter_pos/app/themes/app_theme.dart';
 
 class AppDropDown<T> extends StatelessWidget {
@@ -45,7 +46,7 @@ class AppDropDown<T> extends StatelessWidget {
             size: 22,
           ),
           dropdownColor: Colors.white,
-          borderRadius: const BorderRadius.all(Radius.circular(4.0)),
+          borderRadius: const BorderRadius.all(Radius.circular(AppSizes.radius)),
           decoration: InputDecoration(
             enabled: enabled,
             isDense: true,
@@ -59,7 +60,7 @@ class AppDropDown<T> extends StatelessWidget {
             contentPadding: const EdgeInsets.fromLTRB(12, 16, 12, 8),
             focusedBorder: OutlineInputBorder(
               borderRadius: const BorderRadius.all(
-                Radius.circular(4.0),
+                Radius.circular(AppSizes.radius),
               ),
               borderSide: BorderSide(
                 width: 0.5,
@@ -68,7 +69,7 @@ class AppDropDown<T> extends StatelessWidget {
             ),
             border: OutlineInputBorder(
               borderRadius: const BorderRadius.all(
-                Radius.circular(4.0),
+                Radius.circular(AppSizes.radius),
               ),
               borderSide: BorderSide(
                 width: 0.5,
@@ -77,7 +78,7 @@ class AppDropDown<T> extends StatelessWidget {
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: const BorderRadius.all(
-                Radius.circular(4.0),
+                Radius.circular(AppSizes.radius),
               ),
               borderSide: BorderSide(
                 width: 0.5,
@@ -86,7 +87,7 @@ class AppDropDown<T> extends StatelessWidget {
             ),
             disabledBorder: OutlineInputBorder(
               borderRadius: const BorderRadius.all(
-                Radius.circular(4.0),
+                Radius.circular(AppSizes.radius),
               ),
               borderSide: BorderSide(
                 width: 0.5,

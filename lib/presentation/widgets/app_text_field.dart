@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_pos/app/themes/app_sizes.dart';
 import 'package:flutter_pos/app/themes/app_theme.dart';
 
 class AppTextField extends StatelessWidget {
@@ -94,7 +95,7 @@ class AppTextField extends StatelessWidget {
             focusedBorder: showBorder
                 ? OutlineInputBorder(
                     borderRadius: const BorderRadius.all(
-                      Radius.circular(4.0),
+                      Radius.circular(AppSizes.radius),
                     ),
                     borderSide: BorderSide(
                       width: 1,
@@ -105,7 +106,7 @@ class AppTextField extends StatelessWidget {
             enabledBorder: showBorder
                 ? OutlineInputBorder(
                     borderRadius: const BorderRadius.all(
-                      Radius.circular(4.0),
+                      Radius.circular(AppSizes.radius),
                     ),
                     borderSide: BorderSide(
                       width: 0.5,
@@ -116,7 +117,7 @@ class AppTextField extends StatelessWidget {
             disabledBorder: showBorder
                 ? OutlineInputBorder(
                     borderRadius: const BorderRadius.all(
-                      Radius.circular(4.0),
+                      Radius.circular(AppSizes.radius),
                     ),
                     borderSide: BorderSide(
                       width: 0.5,
