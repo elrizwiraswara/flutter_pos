@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_pos/app/themes/app_sizes.dart';
-import 'package:flutter_pos/app/themes/app_theme.dart';
 
 class AppButton extends StatelessWidget {
   final double? width;
@@ -37,15 +36,15 @@ class AppButton extends StatelessWidget {
           height: height,
           padding: padding,
           decoration: BoxDecoration(
-            color: enabled ? AppTheme().colorScheme.primary : AppTheme().colorScheme.surfaceDim,
+            color: enabled ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surfaceDim,
             borderRadius: BorderRadius.circular(AppSizes.radius),
           ),
           child: Center(
             child: Text(
               text,
-              style: AppTheme().textTheme.bodyMedium?.copyWith(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontSize: fontSize,
-                    color: enabled ? AppTheme().colorScheme.onPrimary : AppTheme().colorScheme.outline,
+                    color: enabled ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.outline,
                   ),
             ),
           ),

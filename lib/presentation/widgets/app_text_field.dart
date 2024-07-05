@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pos/app/themes/app_sizes.dart';
-import 'package:flutter_pos/app/themes/app_theme.dart';
 
 class AppTextField extends StatelessWidget {
   final TextEditingController? controller;
@@ -59,7 +58,7 @@ class AppTextField extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 8.0),
             child: Text(
               labelText!,
-              style: AppTheme().textTheme.bodyMedium?.copyWith(fontSize: fontSize),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: fontSize),
             ),
           ),
         TextField(
@@ -67,8 +66,8 @@ class AppTextField extends StatelessWidget {
           onChanged: onChanged,
           onEditingComplete: onEditingComplete,
           enabled: enabled,
-          style: AppTheme().textTheme.bodyMedium?.copyWith(fontSize: fontSize),
-          cursorColor: AppTheme().colorScheme.primary,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: fontSize),
+          cursorColor: Theme.of(context).colorScheme.primary,
           cursorWidth: 1.5,
           autofocus: autofocus,
           obscureText: obscureText,
@@ -83,13 +82,14 @@ class AppTextField extends StatelessWidget {
             counterText: showCounter ? null : '',
             isDense: true,
             filled: true,
-            fillColor: enabled ? AppTheme().colorScheme.secondaryContainer : AppTheme().colorScheme.surfaceDim,
+            fillColor:
+                enabled ? Theme.of(context).colorScheme.secondaryContainer : Theme.of(context).colorScheme.surfaceDim,
             prefixIcon: prefixIcon,
             suffixIcon: suffixIcon,
             hintText: hintText,
-            hintStyle: AppTheme().textTheme.bodyMedium?.copyWith(
+            hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontSize: fontSize,
-                  color: AppTheme().colorScheme.outline,
+                  color: Theme.of(context).colorScheme.outline,
                 ),
             contentPadding: contentPadding,
             focusedBorder: showBorder
@@ -99,7 +99,7 @@ class AppTextField extends StatelessWidget {
                     ),
                     borderSide: BorderSide(
                       width: 1,
-                      color: AppTheme().colorScheme.primary,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   )
                 : InputBorder.none,
@@ -110,7 +110,7 @@ class AppTextField extends StatelessWidget {
                     ),
                     borderSide: BorderSide(
                       width: 0.5,
-                      color: AppTheme().colorScheme.outlineVariant,
+                      color: Theme.of(context).colorScheme.outlineVariant,
                     ),
                   )
                 : InputBorder.none,
@@ -121,7 +121,7 @@ class AppTextField extends StatelessWidget {
                     ),
                     borderSide: BorderSide(
                       width: 0.5,
-                      color: AppTheme().colorScheme.surfaceDim,
+                      color: Theme.of(context).colorScheme.surfaceDim,
                     ),
                   )
                 : InputBorder.none,

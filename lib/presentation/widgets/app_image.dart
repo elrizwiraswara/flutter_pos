@@ -4,7 +4,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pos/app/assets/app_assets.dart';
-import 'package:flutter_pos/app/themes/app_theme.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
@@ -98,7 +97,7 @@ class _AppImageState extends State<AppImage> {
               ? null
               : Border.all(
                   width: widget.borderWidth!,
-                  color: widget.borderColor ?? AppTheme().colorScheme.outline,
+                  color: widget.borderColor ?? Theme.of(context).colorScheme.outline,
                 ),
         ),
         child: ClipRRect(
@@ -229,7 +228,7 @@ class _AppImageState extends State<AppImage> {
     return Center(
       child: Icon(
         Icons.broken_image_rounded,
-        color: AppTheme().colorScheme.outline,
+        color: Theme.of(context).colorScheme.outline,
       ),
     );
   }

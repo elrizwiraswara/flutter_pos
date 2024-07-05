@@ -10,8 +10,6 @@ class AppTheme {
 
   AppTheme._();
 
-  static late BuildContext _context;
-
   Color _primaryColor = AppColors.orange;
   Color? _secondaryColor = AppColors.charcoal;
   Color? _tertiaryColor = AppColors.plum;
@@ -19,12 +17,7 @@ class AppTheme {
   TextTheme _primaryTextTheme = GoogleFonts.montserratTextTheme();
   TextTheme _secondaryTextTheme = GoogleFonts.poppinsTextTheme();
 
-  TextTheme get textTheme => Theme.of(_context).textTheme;
-
-  ColorScheme get colorScheme => Theme.of(_context).colorScheme;
-
-  ThemeData init(
-    BuildContext context, {
+  ThemeData init({
     Color? primaryColor,
     Color? secondaryColor,
     Color? tertiaryColor,
@@ -33,7 +26,6 @@ class AppTheme {
     TextTheme? primaryTextTheme,
     TextTheme? secondaryTextTheme,
   }) {
-    _context = context;
     _primaryColor = primaryColor ?? _primaryColor;
     _secondaryColor = secondaryColor ?? _secondaryColor;
     _tertiaryColor = tertiaryColor ?? _tertiaryColor;

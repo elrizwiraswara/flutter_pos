@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/app/themes/app_theme.dart';
 
 class AppIconButton extends StatelessWidget {
   final double? width;
@@ -37,13 +36,13 @@ class AppIconButton extends StatelessWidget {
           height: height,
           padding: padding,
           decoration: BoxDecoration(
-            color: enabled ? AppTheme().colorScheme.primaryContainer : AppTheme().colorScheme.surfaceDim,
+            color: enabled ? Theme.of(context).colorScheme.primaryContainer : Theme.of(context).colorScheme.surfaceDim,
             borderRadius: BorderRadius.circular(borderRadius),
           ),
           child: Icon(
             icon,
             size: iconSize,
-            color: enabled ? AppTheme().colorScheme.primary : AppTheme().colorScheme.outline,
+            color: enabled ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.outline,
           ),
         ),
       ),

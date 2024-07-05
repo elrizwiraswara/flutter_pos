@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_pos/app/themes/app_sizes.dart';
-import 'package:flutter_pos/app/themes/app_theme.dart';
 
 class AppDropDown<T> extends StatelessWidget {
   final T? selectedValue;
@@ -32,17 +31,17 @@ class AppDropDown<T> extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 8.0),
             child: Text(
               labelText!,
-              style: AppTheme().textTheme.bodyMedium?.copyWith(fontSize: fontSize),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: fontSize),
             ),
           ),
         DropdownButtonFormField<T>(
           value: selectedValue,
           onChanged: onChanged,
           items: dropdownItems,
-          style: AppTheme().textTheme.bodyMedium?.copyWith(fontSize: fontSize),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: fontSize),
           icon: Icon(
             Icons.keyboard_arrow_down_rounded,
-            color: AppTheme().colorScheme.outline,
+            color: Theme.of(context).colorScheme.outline,
             size: 22,
           ),
           dropdownColor: Colors.white,
@@ -51,11 +50,12 @@ class AppDropDown<T> extends StatelessWidget {
             enabled: enabled,
             isDense: true,
             filled: true,
-            fillColor: enabled ? AppTheme().colorScheme.secondaryContainer : AppTheme().colorScheme.surfaceDim,
+            fillColor:
+                enabled ? Theme.of(context).colorScheme.secondaryContainer : Theme.of(context).colorScheme.surfaceDim,
             hintText: hintText,
-            hintStyle: AppTheme().textTheme.bodyMedium?.copyWith(
+            hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontSize: fontSize,
-                  color: AppTheme().colorScheme.outline,
+                  color: Theme.of(context).colorScheme.outline,
                 ),
             contentPadding: const EdgeInsets.fromLTRB(12, 16, 12, 8),
             focusedBorder: OutlineInputBorder(
@@ -64,7 +64,7 @@ class AppDropDown<T> extends StatelessWidget {
               ),
               borderSide: BorderSide(
                 width: 0.5,
-                color: AppTheme().colorScheme.primary,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
             border: OutlineInputBorder(
@@ -73,7 +73,7 @@ class AppDropDown<T> extends StatelessWidget {
               ),
               borderSide: BorderSide(
                 width: 0.5,
-                color: AppTheme().colorScheme.outlineVariant,
+                color: Theme.of(context).colorScheme.outlineVariant,
               ),
             ),
             enabledBorder: OutlineInputBorder(
@@ -82,7 +82,7 @@ class AppDropDown<T> extends StatelessWidget {
               ),
               borderSide: BorderSide(
                 width: 0.5,
-                color: AppTheme().colorScheme.outlineVariant,
+                color: Theme.of(context).colorScheme.outlineVariant,
               ),
             ),
             disabledBorder: OutlineInputBorder(
@@ -91,7 +91,7 @@ class AppDropDown<T> extends StatelessWidget {
               ),
               borderSide: BorderSide(
                 width: 0.5,
-                color: AppTheme().colorScheme.surfaceDim,
+                color: Theme.of(context).colorScheme.surfaceDim,
               ),
             ),
           ),

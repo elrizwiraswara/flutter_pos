@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_pos/app/themes/app_sizes.dart';
-import 'package:flutter_pos/app/themes/app_theme.dart';
 
 // App Progress Indicator
 class AppProgressIndicator extends StatelessWidget {
@@ -21,7 +20,7 @@ class AppProgressIndicator extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSizes.padding),
         decoration: BoxDecoration(
-          color: AppTheme().colorScheme.surface,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(AppSizes.radius),
         ),
         child: Column(
@@ -30,13 +29,13 @@ class AppProgressIndicator extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(height: AppSizes.padding / 4),
-            CircularProgressIndicator(color: AppTheme().colorScheme.primary),
+            CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
             if (showMessage)
               Padding(
                 padding: const EdgeInsets.only(top: AppSizes.padding),
                 child: Text(
                   message,
-                  style: AppTheme().textTheme.bodySmall?.copyWith(fontSize: fontSize),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: fontSize),
                 ),
               )
           ],
