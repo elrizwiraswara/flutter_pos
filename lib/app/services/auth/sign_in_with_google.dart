@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_pos/core/auth/auth_base.dart';
-import 'package:flutter_pos/core/errors/exceptions.dart';
+import 'package:flutter_pos/core/errors/errors.dart';
 import 'package:flutter_pos/core/usecase/usecase.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -40,10 +40,8 @@ class AuthService implements AuthBase {
       var result = await _firebaseAuth.signInWithCredential(credential);
 
       return Result.success(result);
-    } on Exception {
-      rethrow;
     } catch (e) {
-      throw ServiceException(error: e.toString());
+      return Result.error(ServiceError(error: e.toString()));
     }
   }
 
@@ -52,10 +50,8 @@ class AuthService implements AuthBase {
     try {
       await _firebaseAuth.signOut();
       return true;
-    } on Exception {
-      rethrow;
     } catch (e) {
-      throw ServiceException(error: e.toString());
+      return false;
     }
   }
 }
