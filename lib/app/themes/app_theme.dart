@@ -14,7 +14,7 @@ class AppTheme {
   Color? _secondaryColor = AppColors.charcoal;
   Color? _tertiaryColor = AppColors.plum;
   Brightness _brightness = Brightness.light;
-  TextTheme _primaryTextTheme = GoogleFonts.montserratTextTheme();
+  TextTheme _primaryTextTheme = GoogleFonts.latoTextTheme();
   TextTheme _secondaryTextTheme = GoogleFonts.poppinsTextTheme();
 
   ThemeData init({
@@ -67,7 +67,7 @@ class AppTheme {
       colorScheme: colorScheme,
       visualDensity: VisualDensity.adaptivePlatformDensity,
       scaffoldBackgroundColor: colorScheme.surfaceContainerLowest,
-      primaryTextTheme: textTheme,
+      textTheme: textTheme,
       appBarTheme: AppBarTheme(
         backgroundColor: colorScheme.surfaceContainerLowest,
         shadowColor: colorScheme.surfaceContainerHighest,
@@ -75,7 +75,7 @@ class AppTheme {
         scrolledUnderElevation: 0.5,
         titleTextStyle: textTheme.titleLarge?.copyWith(
           fontWeight: FontWeight.bold,
-          color: colorScheme.primary,
+          fontSize: 16,
         ),
       ),
       tabBarTheme: TabBarTheme(

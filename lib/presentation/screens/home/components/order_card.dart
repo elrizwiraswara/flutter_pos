@@ -134,7 +134,7 @@ class OrderCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(6),
             child: Text(
               '${product.stock}',
-              style: Theme.of(context).textTheme.titleSmall,
+              style: Theme.of(context).textTheme.bodySmall,
             ),
           ),
           AppButton(
