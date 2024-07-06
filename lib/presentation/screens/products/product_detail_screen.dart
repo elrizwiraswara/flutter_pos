@@ -77,9 +77,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       aspectRatio: 2,
       child: AppImage(
         image: imageUrl ?? '',
-        borderRadius: AppSizes.radius,
         backgroundColor: Theme.of(context).colorScheme.surface,
-        borderWidth: 1,
+        borderWidth: 0.5,
         borderColor: Theme.of(context).colorScheme.primaryContainer,
         enableFullScreenView: true,
         errorWidget: Icon(
