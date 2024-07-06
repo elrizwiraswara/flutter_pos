@@ -4,6 +4,7 @@ import 'package:flutter_pos/presentation/screens/account/account_screen.dart';
 import 'package:flutter_pos/presentation/screens/auth/sign_in/sign_in_screen.dart';
 import 'package:flutter_pos/presentation/screens/home/home_screen.dart';
 import 'package:flutter_pos/presentation/screens/main/main_screen.dart';
+import 'package:flutter_pos/presentation/screens/products/product_form_screen.dart';
 import 'package:flutter_pos/presentation/screens/products/products_screen.dart';
 import 'package:flutter_pos/presentation/screens/root_screen.dart';
 import 'package:flutter_pos/presentation/screens/transactions/transactions_screen.dart';
@@ -98,6 +99,9 @@ class AppRoutes {
         child: ProductsScreen(),
       );
     },
+    routes: [
+      _productForm,
+    ],
   );
 
   static final _transactions = GoRoute(
@@ -114,6 +118,17 @@ class AppRoutes {
     pageBuilder: (context, state) {
       return const NoTransitionPage<void>(
         child: AccountScreen(),
+      );
+    },
+  );
+
+  static final _productForm = GoRoute(
+    path: 'product-form/:id',
+    builder: (context, state) {
+      int? id = int.tryParse(state.pathParameters["id"] ?? '');
+
+      return ProductFormScreen(
+        id: id,
       );
     },
   );

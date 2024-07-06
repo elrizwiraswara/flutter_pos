@@ -2,6 +2,7 @@ import 'package:flutter_pos/presentation/providers/account/account_provider.dart
 import 'package:flutter_pos/presentation/providers/auth/auth_provider.dart';
 import 'package:flutter_pos/presentation/providers/home/home_provider.dart';
 import 'package:flutter_pos/presentation/providers/main/main_provider.dart';
+import 'package:flutter_pos/presentation/providers/products/product_form_provider.dart';
 import 'package:flutter_pos/presentation/providers/products/products_provider.dart';
 import 'package:flutter_pos/presentation/providers/transactions/transactions_provider.dart';
 import 'package:get_it/get_it.dart';
@@ -29,6 +30,7 @@ void setupServiceLocator() {
   sl.registerLazySingleton(() => ProductsProvider());
   sl.registerLazySingleton(() => TransactionsProvider());
   sl.registerLazySingleton(() => AccountProvider());
+  sl.registerLazySingleton(() => ProductFormProvider());
 }
 
 // All providers
@@ -39,4 +41,5 @@ final List<SingleChildWidget> providers = [
   ChangeNotifierProvider(create: (_) => sl<ProductsProvider>()),
   ChangeNotifierProvider(create: (_) => sl<TransactionsProvider>()),
   ChangeNotifierProvider(create: (_) => sl<AccountProvider>()),
+  ChangeNotifierProvider(create: (_) => sl<ProductFormProvider>()),
 ];
