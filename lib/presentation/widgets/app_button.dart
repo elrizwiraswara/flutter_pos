@@ -59,8 +59,8 @@ class AppButton extends StatelessWidget {
             child: child ??
                 Text(
                   text ?? '',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w500,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.bold,
                         fontSize: fontSize,
                         color: enabled
                             ? textColor ?? Theme.of(context).colorScheme.onPrimary

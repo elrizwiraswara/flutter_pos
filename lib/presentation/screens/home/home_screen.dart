@@ -28,12 +28,12 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: GridView.builder(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.all(AppSizes.padding),
         gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
           maxCrossAxisExtent: 200,
           childAspectRatio: 1 / 1.5,
-          crossAxisSpacing: 8,
-          mainAxisSpacing: 8,
+          crossAxisSpacing: AppSizes.padding / 2,
+          mainAxisSpacing: AppSizes.padding / 2,
         ),
         physics: const BouncingScrollPhysics(),
         itemCount: 10,

@@ -83,13 +83,13 @@ class AppTextField extends StatelessWidget {
             isDense: true,
             filled: true,
             fillColor:
-                enabled ? Theme.of(context).colorScheme.secondaryContainer : Theme.of(context).colorScheme.surfaceDim,
+                enabled ? Theme.of(context).colorScheme.surfaceContainerLow : Theme.of(context).colorScheme.surfaceDim,
             prefixIcon: prefixIcon,
             suffixIcon: suffixIcon,
             hintText: hintText,
             hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontSize: fontSize,
-                  color: Theme.of(context).colorScheme.outline,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
             contentPadding: contentPadding,
             focusedBorder: showBorder
@@ -110,7 +110,7 @@ class AppTextField extends StatelessWidget {
                     ),
                     borderSide: BorderSide(
                       width: 0.5,
-                      color: Theme.of(context).colorScheme.outlineVariant,
+                      color: Theme.of(context).colorScheme.surfaceContainerHigh,
                     ),
                   )
                 : InputBorder.none,
