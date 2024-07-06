@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pos/app/themes/app_sizes.dart';
 import 'package:flutter_pos/app/utilities/console_log.dart';
+import 'package:flutter_pos/presentation/widgets/app_button.dart';
+import 'package:go_router/go_router.dart';
 
 class ErrorHandlerWidget extends StatefulWidget {
   final FlutterErrorDetails? errorDetails;
@@ -67,6 +69,13 @@ class ErrorHandlerWidgetState extends State<ErrorHandlerWidget> {
                         color: Theme.of(context).colorScheme.outline,
                       ),
                 ),
+              const SizedBox(height: AppSizes.padding * 2),
+              AppButton(
+                text: 'Back to home',
+                onTap: () {
+                  GoRouter.of(context).go('/home');
+                },
+              )
             ],
           ),
         ),
