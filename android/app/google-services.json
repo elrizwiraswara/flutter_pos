@@ -12,7 +12,20 @@
           "package_name": "com.elriztechnology.flutter_pos"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "406037321591-oo52bjfle9q7ubesvjhptj8i95d9g85a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.elriztechnology.flutter_pos",
+            "certificate_hash": "896e5dee866c5c32e6f16cec445d600762349b58"
+          }
+        },
+        {
+          "client_id": "406037321591-bm3g2keghladt9q2fv1j9hh4c8udgi5i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyA67wagaW8U8yRKDMx5W5f2S0IPDTlVQSg"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "406037321591-bm3g2keghladt9q2fv1j9hh4c8udgi5i.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "406037321591-dn3vfumdup2tff1vdddctf7lehkl62o5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "elriztechnology.com.flutterPos"
+              }
+            }
+          ]
         }
       }
     }
