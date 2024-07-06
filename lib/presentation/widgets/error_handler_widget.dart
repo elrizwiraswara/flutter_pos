@@ -4,85 +4,73 @@ import 'package:flutter_pos/app/themes/app_sizes.dart';
 import 'package:flutter_pos/app/utilities/console_log.dart';
 
 class ErrorHandlerWidget extends StatefulWidget {
-  final Widget? child;
+  final FlutterErrorDetails? errorDetails;
+  final String? errorMessage;
 
-  const ErrorHandlerWidget({super.key, this.child});
+  const ErrorHandlerWidget({super.key, this.errorDetails, this.errorMessage});
 
   @override
   ErrorHandlerWidgetState createState() => ErrorHandlerWidgetState();
 }
 
 class ErrorHandlerWidgetState extends State<ErrorHandlerWidget> {
-  // Error handling logic
-  void onError(FlutterErrorDetails errorDetails) {
-    // Add your error handling logic here, e.g., logging, reporting to a server, etc.
-    cl("ERROR: $errorDetails");
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ErrorWidgetBuilder(
-      builder: (context, errorDetails) {
-        // Display a user-friendly error screen
-        return Scaffold(
-          appBar: AppBar(),
-          body: Center(
-            child: Column(
-              children: [
-                Text(
-                  'Oops!',
-                  style:
-                      Theme.of(context).textTheme.displaySmall?.copyWith(color: Theme.of(context).colorScheme.onError),
-                ),
-                const SizedBox(height: AppSizes.padding),
-                Text(
-                  'Something went wrong. Please try again later.',
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-                // Only show error details to UI on Debug Mode
-                if (kDebugMode)
-                  Text(
-                    errorDetails.toString(),
-                    style:
-                        Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.surface),
-                  ),
-              ],
-            ),
-          ),
-        );
-      },
-      onError: onError,
-      child: widget.child ?? const SizedBox(),
-    );
-  }
-}
-
-class ErrorWidgetBuilder extends StatefulWidget {
-  final Widget Function(BuildContext, FlutterErrorDetails) builder;
-  final void Function(FlutterErrorDetails) onError;
-  final Widget child;
-
-  const ErrorWidgetBuilder({
-    super.key,
-    required this.builder,
-    required this.onError,
-    required this.child,
-  });
-
-  @override
-  ErrorWidgetBuilderState createState() => ErrorWidgetBuilderState();
-}
-
-class ErrorWidgetBuilderState extends State<ErrorWidgetBuilder> {
   @override
   void initState() {
+    onError();
     super.initState();
-    // Set up global error handling
-    FlutterError.onError = widget.onError;
+  }
+
+  // Error handling logic
+  void onError() {
+    // Add your error handling logic here, e.g., logging, reporting to a server, etc.
+    cl("ERROR: ${widget.errorDetails}");
   }
 
   @override
   Widget build(BuildContext context) {
-    return widget.child;
+    return Scaffold(
+      appBar: AppBar(elevation: 0),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSizes.padding * 4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.report,
+                size: 100,
+                color: Theme.of(context).colorScheme.error,
+              ),
+              const SizedBox(height: AppSizes.padding / 4),
+              Text(
+                'Oops!',
+                style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+              ),
+              const SizedBox(height: AppSizes.padding),
+              Text(
+                widget.errorMessage ?? 'Something went wrong.\nPlease try again later.',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              const SizedBox(height: AppSizes.padding),
+              // Only show error details to UI on Debug Mode
+              if (kDebugMode)
+                Text(
+                  widget.errorDetails?.summary.toString() ?? '(No error summary)',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w100,
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
