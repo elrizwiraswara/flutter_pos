@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_pos/app/themes/app_colors.dart';
+import 'package:flutter_pos/app/themes/app_sizes.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
@@ -73,6 +74,7 @@ class AppTheme {
         shadowColor: colorScheme.surfaceContainerHighest,
         elevation: 0.5,
         scrolledUnderElevation: 0.5,
+        titleSpacing: AppSizes.padding,
         titleTextStyle: textTheme.titleLarge?.copyWith(
           fontWeight: FontWeight.bold,
           fontSize: 16,
