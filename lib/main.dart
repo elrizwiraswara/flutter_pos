@@ -39,6 +39,11 @@ void main() async {
     statusBarColor: Colors.transparent,
   ));
 
+  // Error handler
+  ErrorWidget.builder = (FlutterErrorDetails details) {
+    return ErrorHandlerWidget(errorDetails: details);
+  };
+
   runApp(const MyApp());
 }
 
@@ -59,7 +64,6 @@ class MyApp extends StatelessWidget {
         locale: AppLocale.defaultLocale,
         supportedLocales: AppLocale.supportedLocales,
         localizationsDelegates: AppLocale.localizationsDelegates,
-        builder: (context, child) => ErrorHandlerWidget(child: child),
       ),
     );
   }
