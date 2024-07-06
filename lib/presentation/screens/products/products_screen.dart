@@ -26,26 +26,19 @@ class _ProductsScreenState extends State<ProductsScreen> {
           child: searchField(),
         ),
       ),
-      body: Column(
-        children: [
-          // searchField(),
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.all(AppSizes.padding),
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 200,
-                childAspectRatio: 1 / 1.5,
-                crossAxisSpacing: AppSizes.padding / 2,
-                mainAxisSpacing: AppSizes.padding / 2,
-              ),
-              physics: const BouncingScrollPhysics(),
-              itemCount: 10,
-              itemBuilder: (context, i) {
-                return productCard();
-              },
-            ),
-          ),
-        ],
+      body: GridView.builder(
+        padding: const EdgeInsets.all(AppSizes.padding),
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 200,
+          childAspectRatio: 1 / 1.5,
+          crossAxisSpacing: AppSizes.padding / 2,
+          mainAxisSpacing: AppSizes.padding / 2,
+        ),
+        physics: const BouncingScrollPhysics(),
+        itemCount: 10,
+        itemBuilder: (context, i) {
+          return productCard();
+        },
       ),
     );
   }
