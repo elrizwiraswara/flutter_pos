@@ -103,7 +103,7 @@ class _AppImageState extends State<AppImage> {
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular((widget.borderRadius ?? 0) - (widget.borderWidth ?? 0)),
-          child: child(),
+          child: widget.image.isNotEmpty ? child() : errorWidget(),
         ),
       ),
     );
@@ -223,7 +223,7 @@ class _AppImageState extends State<AppImage> {
 
   Widget errorWidget() {
     if (widget.errorWidget != null) {
-      return errorWidget();
+      return widget.errorWidget!;
     }
 
     return Center(
