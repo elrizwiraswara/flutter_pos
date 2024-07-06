@@ -30,8 +30,14 @@ void main() async {
     ),
   ]);
 
-  // Set/lock orientationgvhvgj
+  // Set/lock screen orientation
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
+  // Set Default SystemUIOverlayStyle
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    systemNavigationBarColor: Colors.transparent,
+    statusBarColor: Colors.transparent,
+  ));
 
   runApp(const MyApp());
 }
