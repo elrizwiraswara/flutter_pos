@@ -66,12 +66,13 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
       visualDensity: VisualDensity.adaptivePlatformDensity,
-      scaffoldBackgroundColor: colorScheme.surface,
+      scaffoldBackgroundColor: colorScheme.surfaceContainerLowest,
       primaryTextTheme: textTheme,
       appBarTheme: AppBarTheme(
-        backgroundColor: colorScheme.surface,
-        shadowColor: colorScheme.surfaceDim,
+        backgroundColor: colorScheme.surfaceContainerLowest,
+        shadowColor: colorScheme.surfaceContainerHighest,
         elevation: 0.5,
+        scrolledUnderElevation: 0.5,
         titleTextStyle: textTheme.titleLarge?.copyWith(
           fontWeight: FontWeight.bold,
           color: colorScheme.primary,
@@ -98,6 +99,20 @@ class AppTheme {
       chipTheme: ChipThemeData(
         backgroundColor: colorScheme.surface,
       ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: colorScheme.surfaceContainerLowest,
+        selectedItemColor: colorScheme.primary,
+        unselectedItemColor: colorScheme.outline,
+        showUnselectedLabels: true,
+        type: BottomNavigationBarType.fixed,
+        selectedLabelStyle: textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold, fontSize: 10),
+        unselectedLabelStyle: textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold, fontSize: 10),
+      ),
+      dividerTheme: DividerThemeData(
+        color: colorScheme.surfaceDim,
+        thickness: 0.5,
+      ),
+      dialogBackgroundColor: colorScheme.surfaceContainerLowest,
     );
   }
 }
