@@ -4,6 +4,7 @@ import 'package:flutter_pos/app/themes/app_sizes.dart';
 import 'package:flutter_pos/presentation/widgets/app_button.dart';
 import 'package:flutter_pos/presentation/widgets/app_text_field.dart';
 import 'package:flutter_pos/presentation/widgets/products_card.dart';
+import 'package:go_router/go_router.dart';
 
 class ProductsScreen extends StatefulWidget {
   const ProductsScreen({super.key});
@@ -69,6 +70,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
             ),
           ],
         ),
+        onTap: () {
+          context.go('/products/product-form/');
+        },
       ),
     );
   }
@@ -90,7 +94,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     return ProductsCard(
       product: productDummy,
       onTap: () {
-        //
+        context.go('/products/product-detail/1');
       },
     );
   }

@@ -4,10 +4,12 @@ import 'package:flutter_pos/presentation/screens/account/account_screen.dart';
 import 'package:flutter_pos/presentation/screens/auth/sign_in/sign_in_screen.dart';
 import 'package:flutter_pos/presentation/screens/home/home_screen.dart';
 import 'package:flutter_pos/presentation/screens/main/main_screen.dart';
+import 'package:flutter_pos/presentation/screens/products/product_detail_screen.dart';
 import 'package:flutter_pos/presentation/screens/products/product_form_screen.dart';
 import 'package:flutter_pos/presentation/screens/products/products_screen.dart';
 import 'package:flutter_pos/presentation/screens/root_screen.dart';
 import 'package:flutter_pos/presentation/screens/transactions/transactions_screen.dart';
+import 'package:flutter_pos/presentation/widgets/error_handler_widget.dart';
 import 'package:go_router/go_router.dart';
 
 // App routes
@@ -22,6 +24,9 @@ class AppRoutes {
   static final router = GoRouter(
     initialLocation: '/home',
     navigatorKey: rootNavigatorKey,
+    errorBuilder: (context, state) => ErrorHandlerWidget(
+      errorMessage: state.error?.message,
+    ),
     routes: [
       _root,
       _auth,
@@ -101,6 +106,7 @@ class AppRoutes {
     },
     routes: [
       _productForm,
+      _productDetail,
     ],
   );
 
@@ -128,6 +134,21 @@ class AppRoutes {
       int? id = int.tryParse(state.pathParameters["id"] ?? '');
 
       return ProductFormScreen(
+        id: id,
+      );
+    },
+  );
+
+  static final _productDetail = GoRoute(
+    path: 'product-detail/:id',
+    builder: (context, state) {
+      int? id = int.tryParse(state.pathParameters["id"] ?? '');
+
+      if (id == null) {
+        throw 'Required productId is not provided!';
+      }
+
+      return ProductDetailScreen(
         id: id,
       );
     },
