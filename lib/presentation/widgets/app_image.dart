@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pos/app/assets/app_assets.dart';
+import 'package:flutter_pos/app/themes/app_sizes.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
@@ -24,7 +25,7 @@ enum ImgProvider {
 }
 
 // For development purpose
-const String randomImage = 'https://source.unsplash.com/512x512?food';
+const String randomImage = 'https://picsum.photos/500';
 
 class AppImage extends StatefulWidget {
   final String image;
@@ -228,6 +229,7 @@ class _AppImageState extends State<AppImage> {
     return Center(
       child: Icon(
         Icons.broken_image_rounded,
+        size: (widget.width ?? widget.height ?? AppSizes.padding * 2) / 2,
         color: Theme.of(context).colorScheme.outline,
       ),
     );

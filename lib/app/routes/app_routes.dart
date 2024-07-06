@@ -19,7 +19,7 @@ class AppRoutes {
   static final navNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'nav');
 
   static final router = GoRouter(
-    initialLocation: '/',
+    initialLocation: '/home',
     navigatorKey: rootNavigatorKey,
     routes: [
       _root,
@@ -84,29 +84,37 @@ class AppRoutes {
 
   static final _home = GoRoute(
     path: 'home',
-    builder: (context, state) {
-      return const HomeScreen();
+    pageBuilder: (context, state) {
+      return const NoTransitionPage<void>(
+        child: HomeScreen(),
+      );
     },
   );
 
   static final _products = GoRoute(
     path: 'products',
-    builder: (context, state) {
-      return const ProductsScreen();
+    pageBuilder: (context, state) {
+      return const NoTransitionPage<void>(
+        child: ProductsScreen(),
+      );
     },
   );
 
   static final _transactions = GoRoute(
     path: 'transactions',
-    builder: (context, state) {
-      return const TransactionsScreen();
+    pageBuilder: (context, state) {
+      return const NoTransitionPage<void>(
+        child: TransactionsScreen(),
+      );
     },
   );
 
   static final _account = GoRoute(
     path: 'account',
-    builder: (context, state) {
-      return const AccountScreen();
+    pageBuilder: (context, state) {
+      return const NoTransitionPage<void>(
+        child: AccountScreen(),
+      );
     },
   );
 }

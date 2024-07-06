@@ -16,19 +16,19 @@ class MainScreen extends StatelessWidget {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: Icon(Icons.maps_home_work_outlined),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.business),
-            label: 'Stocks',
+            icon: Icon(Icons.dashboard_customize_outlined),
+            label: 'Products',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.notification_important_rounded),
+            icon: Icon(Icons.receipt_long_rounded),
             label: 'Transactions',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.notification_important_rounded),
+            icon: Icon(Icons.account_circle_outlined),
             label: 'Account',
           ),
         ],
@@ -45,7 +45,7 @@ class MainScreen extends StatelessWidget {
       return 0;
     }
 
-    if (location.startsWith('/stocks')) {
+    if (location.startsWith('/products')) {
       return 1;
     }
 
@@ -65,7 +65,7 @@ class MainScreen extends StatelessWidget {
       case 0:
         GoRouter.of(context).go('/home');
       case 1:
-        GoRouter.of(context).go('/stocks');
+        GoRouter.of(context).go('/products');
       case 2:
         GoRouter.of(context).go('/transactions');
       case 3:
