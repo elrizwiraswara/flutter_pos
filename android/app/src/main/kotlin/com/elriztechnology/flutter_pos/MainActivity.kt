@@ -1,4 +1,4 @@
-package elriztechnology.com.flutter_pos
+package com.elriztechnology.flutter_pos
 
 import io.flutter.embedding.android.FlutterActivity
 

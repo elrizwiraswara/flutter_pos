@@ -24,8 +24,8 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace = "elriztechnology.com.flutter_pos"
-    compileSdk = flutter.compileSdkVersion
+    namespace = "com.elriztechnology.flutter_pos"
+    compileSdk = 34
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -35,11 +35,11 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "elriztechnology.com.flutter_pos"
+        applicationId = "com.elriztechnology.flutter_pos"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdk = 23
-        targetSdk = flutter.targetSdkVersion
+        targetSdk = 34
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
     }
