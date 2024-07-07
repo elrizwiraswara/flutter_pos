@@ -20,9 +20,8 @@ class AuthService implements AuthBase {
   }
 
   @override
-  Future<Result<User?>> getAuthData() async {
-    var result = _firebaseAuth.currentUser;
-    return Result.success(result);
+  User? getAuthData() {
+    return _firebaseAuth.currentUser;
   }
 
   @override
