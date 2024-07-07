@@ -44,7 +44,7 @@ class AppRoutes {
       if (!await AuthService().isAuthenticated()) {
         return '/auth/sign-in';
       } else {
-        return null;
+        return '/home';
       }
     },
     routes: [
@@ -105,7 +105,8 @@ class AppRoutes {
       );
     },
     routes: [
-      _productForm,
+      _productCreate,
+      _productEdit,
       _productDetail,
     ],
   );
@@ -128,10 +129,21 @@ class AppRoutes {
     },
   );
 
-  static final _productForm = GoRoute(
-    path: 'product-form/:id',
+  static final _productCreate = GoRoute(
+    path: 'product-create',
+    builder: (context, state) {
+      return const ProductFormScreen();
+    },
+  );
+
+  static final _productEdit = GoRoute(
+    path: 'product-edit/:id',
     builder: (context, state) {
       int? id = int.tryParse(state.pathParameters["id"] ?? '');
+
+      if (id == null) {
+        throw 'Required productId is not provided!';
+      }
 
       return ProductFormScreen(
         id: id,
