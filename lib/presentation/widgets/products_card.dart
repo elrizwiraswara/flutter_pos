@@ -44,9 +44,9 @@ class ProductsCard extends StatelessWidget {
                   children: [
                     AspectRatio(
                       aspectRatio: 1,
-                      child: (product.imageUrl?.isNotEmpty ?? false)
+                      child: product.imageUrl.isNotEmpty
                           ? AppImage(
-                              image: product.imageUrl!,
+                              image: product.imageUrl,
                               backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
                               borderRadius: 4,
                             )
@@ -55,7 +55,7 @@ class ProductsCard extends StatelessWidget {
                               imgProvider: ImgProvider.assetImage,
                             ),
                     ),
-                    product.isReleased == false
+                    product.stock == 0
                         ? AspectRatio(
                             aspectRatio: 1,
                             child: Container(
@@ -73,13 +73,13 @@ class ProductsCard extends StatelessWidget {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(
-                                      Icons.drafts_rounded,
+                                      Icons.remove_circle,
                                       color: Theme.of(context).colorScheme.outline,
                                       size: 10,
                                     ),
                                     const SizedBox(width: 2),
                                     Text(
-                                      'Draft',
+                                      'Habis',
                                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
                                             color: Theme.of(context).colorScheme.outline,
                                           ),
@@ -89,46 +89,12 @@ class ProductsCard extends StatelessWidget {
                               ),
                             ),
                           )
-                        : product.stock == 0
-                            ? AspectRatio(
-                                aspectRatio: 1,
-                                child: Container(
-                                  padding: const EdgeInsets.all(6),
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white70,
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: AppButton(
-                                    height: 22,
-                                    width: 54,
-                                    padding: EdgeInsets.zero,
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          Icons.remove_circle,
-                                          color: Theme.of(context).colorScheme.outline,
-                                          size: 10,
-                                        ),
-                                        const SizedBox(width: 2),
-                                        Text(
-                                          'Habis',
-                                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                                color: Theme.of(context).colorScheme.outline,
-                                              ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              )
-                            : const SizedBox.shrink(),
+                        : const SizedBox.shrink(),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  product.name ?? '',
+                  product.name,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.bodySmall,
@@ -150,7 +116,7 @@ class ProductsCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  CurrencyFormatter.format(product.price ?? 0),
+                  CurrencyFormatter.format(product.price),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ],

@@ -20,7 +20,7 @@ class AppProgressIndicator extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSizes.padding),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
+          color: Theme.of(context).colorScheme.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(AppSizes.radius),
         ),
         child: Column(
