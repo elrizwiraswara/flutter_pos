@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pos/app/themes/app_theme.dart';
+import 'package:flutter_pos/data/data_sources/local/app_database.dart';
 import 'package:flutter_pos/firebase_options.dart';
 import 'package:flutter_pos/presentation/widgets/error_handler_widget.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -16,19 +17,22 @@ void main() async {
   // Initialize binding
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize date formatting
-  initializeDateFormatting();
-
-  // Setup service locator
-  setupServiceLocator();
-
   // Initialize multiple futures
   await Future.wait([
     // Initialize Firebase (google-service.json required)
     Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     ),
+
+    // Initialize app local db
+    AppDatabaseConfig.init(),
   ]);
+
+  // Initialize date formatting
+  initializeDateFormatting();
+
+  // Setup service locator
+  setupServiceLocator();
 
   // Set/lock screen orientation
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
