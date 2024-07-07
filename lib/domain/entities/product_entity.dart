@@ -1,65 +1,67 @@
-import 'category_entity.dart';
+import 'package:equatable/equatable.dart';
 
-class ProductEntity {
-  ProductEntity({
-    this.category,
-    this.dateCreated,
-    this.dateUpdated,
-    this.description,
-    this.id,
-    this.imageUrl,
-    this.isReleased,
-    this.name,
-    this.price,
-    this.sellerId,
-    this.rating,
-    this.sold,
-    this.stock,
+class ProductEntity extends Equatable {
+  final int id;
+  final String createdById;
+  final String name;
+  final String imageUrl;
+  final int stock;
+  final int sold;
+  final int price;
+  final String description;
+  final String createdAt;
+  final String updatedAt;
+
+  const ProductEntity({
+    required this.id,
+    required this.createdById,
+    required this.name,
+    required this.imageUrl,
+    required this.stock,
+    required this.sold,
+    required this.price,
+    required this.description,
+    required this.createdAt,
+    required this.updatedAt,
   });
 
-  CategoryEntity? category;
-  String? dateCreated;
-  String? dateUpdated;
-  String? description;
-  String? id;
-  String? imageUrl;
-  bool? isReleased;
-  String? name;
-  int? price;
-  String? sellerId;
-  num? rating;
-  int? sold;
-  int? stock;
+  ProductEntity copyWith({
+    int? id,
+    String? createdById,
+    String? name,
+    String? imageUrl,
+    int? stock,
+    int? sold,
+    int? price,
+    String? description,
+    String? createdAt,
+    String? updatedAt,
+  }) {
+    return ProductEntity(
+      id: id ?? this.id,
+      createdById: createdById ?? this.createdById,
+      name: name ?? this.name,
+      imageUrl: imageUrl ?? this.imageUrl,
+      stock: stock ?? this.stock,
+      sold: sold ?? this.sold,
+      price: price ?? this.price,
+      description: description ?? this.description,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
 
-  factory ProductEntity.fromJson(Map<String, dynamic> json) => ProductEntity(
-        category: CategoryEntity.fromJson(json["category"]),
-        dateCreated: json["date_created"],
-        dateUpdated: json["date_updated"],
-        description: json["description"],
-        id: json["id"],
-        imageUrl: json["image_url"],
-        isReleased: json["is_released"],
-        name: json["name"],
-        price: json["price"],
-        sellerId: json["seller_id"],
-        rating: json["rating"],
-        sold: json["sold"],
-        stock: json["stock"],
-      );
-
-  Map<String, dynamic> toJson() => {
-        "category": category?.toJson(),
-        "date_created": dateCreated,
-        "date_updated": dateUpdated,
-        "description": description,
-        "id": id,
-        "image_urls": imageUrl,
-        "is_released": isReleased,
-        "name": name,
-        "price": price,
-        "seller_id": sellerId,
-        "rating": rating,
-        "sold": sold,
-        "stock": stock,
-      };
+  @override
+  List<Object?> get props => [
+        id,
+        createdById,
+        name,
+        imageUrl,
+        stock,
+        sold,
+        price,
+        description,
+        createdAt,
+        updatedAt,
+      ];
 }
