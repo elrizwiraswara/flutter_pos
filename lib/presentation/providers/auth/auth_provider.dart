@@ -35,6 +35,7 @@ class AuthProvider extends ChangeNotifier {
 
     var user = UserEntity(
       id: authData!.uid,
+      email: authData.email,
       name: authData.displayName ?? '',
       imageUrl: authData.photoURL,
       phone: authData.phoneNumber ?? '',
