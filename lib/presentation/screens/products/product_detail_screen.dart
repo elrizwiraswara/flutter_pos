@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pos/app/themes/app_sizes.dart';
 import 'package:flutter_pos/app/utilities/currency_formatter.dart';
 import 'package:flutter_pos/app/utilities/date_formatter.dart';
-import 'package:flutter_pos/presentation/providers/products/product_form_provider.dart';
+import 'package:flutter_pos/presentation/providers/products/product_detail_provider.dart';
 import 'package:flutter_pos/presentation/widgets/app_image.dart';
+import 'package:flutter_pos/presentation/widgets/app_progress_indicator.dart';
 import 'package:flutter_pos/service_locator.dart';
 import 'package:provider/provider.dart';
 
@@ -20,7 +21,7 @@ class ProductDetailScreen extends StatefulWidget {
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
-  final _productDetailProvider = sl<ProductFormProvider>();
+  final _productDetailProvider = sl<ProductDetailProvider>();
 
   @override
   void initState() {
@@ -37,26 +38,30 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         title: const Text('Product Detail'),
         titleSpacing: 0,
       ),
-      body: Consumer<ProductFormProvider>(builder: (context, provider, _) {
+      body: Consumer<ProductDetailProvider>(builder: (context, provider, _) {
+        if (provider.product == null) {
+          return const AppProgressIndicator();
+        }
+
         return SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              image(imageUrl: provider.product.imageUrl),
+              image(imageUrl: provider.product!.imageUrl),
               Padding(
                 padding: const EdgeInsets.all(AppSizes.padding),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     name(
-                      productName: provider.product.name,
-                      createdAt: provider.product.dateCreated,
-                      updatedAt: provider.product.dateUpdated,
+                      productName: provider.product!.name,
+                      createdAt: provider.product!.createdAt,
+                      updatedAt: provider.product!.updatedAt,
                     ),
-                    price(provider.product.price),
-                    stock(provider.product.stock),
-                    sold(provider.product.stock),
-                    description(provider.product.description),
+                    price(provider.product!.price),
+                    stock(provider.product!.stock),
+                    sold(provider.product!.stock),
+                    description(provider.product!.description),
                   ],
                 ),
               )
