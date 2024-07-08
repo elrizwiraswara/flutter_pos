@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/app/services/auth/sign_in_with_google.dart';
+import 'package:flutter_pos/app/services/auth/auth_service.dart';
+import 'package:flutter_pos/presentation/screens/account/profile_form_screen.dart';
 import 'package:flutter_pos/presentation/screens/account/account_screen.dart';
 import 'package:flutter_pos/presentation/screens/auth/sign_in/sign_in_screen.dart';
 import 'package:flutter_pos/presentation/screens/error_handler_screen.dart';
@@ -137,6 +138,9 @@ class AppRoutes {
         child: AccountScreen(),
       );
     },
+    routes: [
+      _profileEdit,
+    ],
   );
 
   static final _productCreate = GoRoute(
@@ -189,6 +193,13 @@ class AppRoutes {
       return TransactionDetailScreen(
         id: id,
       );
+    },
+  );
+
+  static final _profileEdit = GoRoute(
+    path: 'profile',
+    builder: (context, state) {
+      return const ProfileFormScreen();
     },
   );
 }
