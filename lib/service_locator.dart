@@ -24,10 +24,6 @@ final GetIt sl = GetIt.instance;
 void setupServiceLocator() async {
   sl.registerSingleton<AppDatabase>(AppDatabase());
 
-  // Services
-  // sl.registerLazySingleton(() => Client());
-  // sl.registerLazySingleton(() => RestFulApi());
-
   // Datasources
   sl.registerLazySingleton(() => ProductDatasource(sl<AppDatabase>()));
   sl.registerLazySingleton(() => TransactionDatasource(sl<AppDatabase>()));
@@ -39,15 +35,20 @@ void setupServiceLocator() async {
   sl.registerLazySingleton(() => UserRepositoryImpl(sl<UserDatasource>()));
 
   // Providers
+  sl.registerLazySingleton(
+    () => MainProvider(
+      userRepository: sl<UserRepositoryImpl>(),
+      productRepository: sl<ProductRepositoryImpl>(),
+      transactionRepository: sl<TransactionRepositoryImpl>(),
+    ),
+  );
   sl.registerLazySingleton(() => AuthProvider(userRepository: sl<UserRepositoryImpl>()));
-  sl.registerLazySingleton(() => MainProvider());
-  sl.registerLazySingleton(() => HomeProvider(
-      transactionRepository: sl<TransactionRepositoryImpl>(), productRepository: sl<ProductRepositoryImpl>()));
+  sl.registerLazySingleton(() => HomeProvider(transactionRepository: sl<TransactionRepositoryImpl>()));
   sl.registerLazySingleton(() => ProductsProvider(productRepository: sl<ProductRepositoryImpl>()));
   sl.registerLazySingleton(() => TransactionsProvider(transactionRepository: sl<TransactionRepositoryImpl>()));
-  sl.registerLazySingleton(() => AccountProvider());
+  sl.registerLazySingleton(() => AccountProvider(userRepository: sl<UserRepositoryImpl>()));
   sl.registerLazySingleton(() => ProductFormProvider(productRepository: sl<ProductRepositoryImpl>()));
-  sl.registerLazySingleton(() => ProductDetailProvider());
+  sl.registerLazySingleton(() => ProductDetailProvider(productRepository: sl<ProductRepositoryImpl>()));
   sl.registerLazySingleton(() => TransactionDetailProvider(transactionRepository: sl<TransactionRepositoryImpl>()));
 }
 
