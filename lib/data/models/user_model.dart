@@ -2,6 +2,7 @@ import 'package:flutter_pos/domain/entities/user_entity.dart';
 
 class UserModel {
   String? id;
+  String? email;
   String? phone;
   String? name;
   String? gender;
@@ -12,6 +13,7 @@ class UserModel {
 
   UserModel({
     this.id,
+    this.email,
     this.phone,
     this.name,
     this.gender,
@@ -24,6 +26,7 @@ class UserModel {
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       id: json['id'],
+      email: json['email'],
       phone: json['phone'],
       name: json['name'],
       gender: json['gender'],
@@ -37,6 +40,7 @@ class UserModel {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'email': email,
       'phone': phone,
       'name': name,
       'gender': gender,
@@ -50,6 +54,7 @@ class UserModel {
   factory UserModel.fromEntity(UserEntity entity) {
     return UserModel(
       id: entity.id,
+      email: entity.email,
       phone: entity.phone,
       name: entity.name,
       gender: entity.gender,
@@ -63,6 +68,7 @@ class UserModel {
   UserEntity toEntity() {
     return UserEntity(
       id: id,
+      email: email,
       phone: phone,
       name: name,
       gender: gender,
