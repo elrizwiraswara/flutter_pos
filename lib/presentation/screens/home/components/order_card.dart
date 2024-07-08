@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_pos/app/routes/app_routes.dart';
 import 'package:flutter_pos/app/themes/app_sizes.dart';
 import 'package:flutter_pos/app/utilities/currency_formatter.dart';
 import 'package:flutter_pos/domain/entities/product_entity.dart';
@@ -6,24 +7,47 @@ import 'package:flutter_pos/presentation/widgets/app_button.dart';
 import 'package:flutter_pos/presentation/widgets/app_dialog.dart';
 import 'package:flutter_pos/presentation/widgets/app_image.dart';
 
-class OrderCard extends StatelessWidget {
+class OrderCard extends StatefulWidget {
   final ProductEntity product;
-  final bool showDeleteButton;
-  final Function()? onTap;
+  final int initialQuantity;
+  final Function()? onTapCard;
+  final Function()? onTapRemove;
+  final Function(int) onChangedQuantity;
 
   const OrderCard({
     super.key,
+    this.initialQuantity = 0,
     required this.product,
-    this.showDeleteButton = true,
-    this.onTap,
+    this.onTapCard,
+    this.onTapRemove,
+    required this.onChangedQuantity,
   });
+
+  @override
+  State<OrderCard> createState() => _OrderCardState();
+}
+
+class _OrderCardState extends State<OrderCard> {
+  int quantity = 1;
+
+  @override
+  void initState() {
+    quantity = widget.initialQuantity == 0 ? 1 : widget.initialQuantity;
+    super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant OrderCard oldWidget) {
+    quantity = widget.initialQuantity == 0 ? 1 : widget.initialQuantity;
+    super.didUpdateWidget(oldWidget);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Material(
       borderRadius: BorderRadius.circular(AppSizes.radius),
       child: InkWell(
-        onTap: onTap,
+        onTap: widget.onTapCard,
         child: Ink(
           padding: const EdgeInsets.all(AppSizes.padding),
           decoration: BoxDecoration(
@@ -42,7 +66,7 @@ class OrderCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      product.name ?? '',
+                      widget.product.name,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodySmall,
@@ -54,23 +78,23 @@ class OrderCard extends StatelessWidget {
                         Row(
                           children: [
                             Text(
-                              CurrencyFormatter.format(product.price ?? 0),
+                              CurrencyFormatter.format(widget.product.price),
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              '/barang',
+                              '/pcs',
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 10),
                             ),
                           ],
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Stock: ${product.stock! - 1}',
+                          'Stock: ${widget.product.stock}',
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 10),
                         ),
                         const SizedBox(height: 6),
-                        qtyButtons(context),
+                        qtyButtons(),
                       ],
                     ),
                   ],
@@ -84,27 +108,29 @@ class OrderCard extends StatelessWidget {
                   AppImage(
                     width: 70,
                     height: 70,
-                    image: product.imageUrl ?? '',
+                    image: widget.product.imageUrl,
                     borderRadius: AppSizes.radius,
-                    backgroundColor: Theme.of(context).colorScheme.surfaceDim,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
                   ),
                   const SizedBox(height: 12),
-                  if (showDeleteButton)
+                  if (widget.onTapRemove != null)
                     AppButton(
-                      text: 'Hapus',
+                      text: 'Remove',
                       width: 70,
-                      padding: const EdgeInsets.all(2),
-                      buttonColor: Theme.of(context).colorScheme.errorContainer,
+                      fontSize: 10,
+                      borderRadius: BorderRadius.circular(4),
+                      padding: const EdgeInsets.all(AppSizes.padding / 4),
+                      buttonColor: Theme.of(context).colorScheme.errorContainer.withOpacity(0.32),
                       textColor: Theme.of(context).colorScheme.error,
-                      fontSize: 12,
                       onTap: () {
                         AppDialog.show(
-                          title: 'Konfirmasi',
-                          text: 'Apakah anda yakin ingin menghapus produk ${product.name} ini?',
-                          rightButtonText: 'Hapus',
-                          leftButtonText: 'Batal',
+                          title: 'Confirm',
+                          text: 'Are you sure want to remove this product?',
+                          rightButtonText: 'Remove',
+                          leftButtonText: 'Cancel',
                           onTapRightButton: () {
-                            //
+                            widget.onTapRemove!();
+                            AppRoutes.router.pop();
                           },
                         );
                       },
@@ -118,22 +144,21 @@ class OrderCard extends StatelessWidget {
     );
   }
 
-  Widget qtyButtons(BuildContext context) {
+  Widget qtyButtons() {
     return Container(
       height: 36,
       constraints: const BoxConstraints(maxWidth: 112),
       child: Stack(
         children: [
           AppButton(
-            enabled: false,
             width: double.infinity,
             height: 30,
             padding: EdgeInsets.zero,
-            disabledButtonColor: Theme.of(context).colorScheme.surfaceContainerLowest,
-            borderColor: Theme.of(context).colorScheme.primaryContainer,
-            borderRadius: BorderRadius.circular(6),
+            buttonColor: Theme.of(context).colorScheme.surfaceContainerLowest,
+            borderColor: Theme.of(context).colorScheme.surfaceContainer,
+            borderRadius: BorderRadius.circular(4),
             child: Text(
-              '${product.stock}',
+              '$quantity',
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ),
@@ -142,7 +167,7 @@ class OrderCard extends StatelessWidget {
             height: 30,
             padding: EdgeInsets.zero,
             buttonColor: Theme.of(context).colorScheme.surfaceContainer,
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(4),
             child: Text(
               '-',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -151,7 +176,12 @@ class OrderCard extends StatelessWidget {
                   ),
             ),
             onTap: () {
-              //
+              if (quantity > 1) {
+                quantity -= 1;
+                setState(() {});
+
+                widget.onChangedQuantity(quantity);
+              }
             },
           ),
           Positioned(
@@ -161,7 +191,7 @@ class OrderCard extends StatelessWidget {
               height: 30,
               padding: EdgeInsets.zero,
               buttonColor: Theme.of(context).colorScheme.surfaceContainer,
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(4),
               child: Text(
                 '+',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -170,7 +200,12 @@ class OrderCard extends StatelessWidget {
                     ),
               ),
               onTap: () {
-                //
+                if (quantity < widget.product.stock) {
+                  quantity += 1;
+                  setState(() {});
+
+                  widget.onChangedQuantity(quantity);
+                }
               },
             ),
           ),

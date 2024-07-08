@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/app/const/dummy.dart';
 import 'package:flutter_pos/app/themes/app_sizes.dart';
-import 'package:flutter_pos/presentation/screens/home/components/home_bottomsheet.dart';
+import 'package:flutter_pos/app/utilities/console_log.dart';
+import 'package:flutter_pos/domain/entities/product_entity.dart';
+import 'package:flutter_pos/presentation/providers/home/home_provider.dart';
+import 'package:flutter_pos/presentation/screens/home/components/cart_panel_body.dart';
+import 'package:flutter_pos/presentation/screens/home/components/cart_panel_footer.dart';
+import 'package:flutter_pos/presentation/screens/home/components/cart_panel_header.dart';
 import 'package:flutter_pos/presentation/screens/home/components/order_card.dart';
 import 'package:flutter_pos/presentation/widgets/app_button.dart';
 import 'package:flutter_pos/presentation/widgets/app_dialog.dart';
+import 'package:flutter_pos/presentation/widgets/app_empty_state.dart';
 import 'package:flutter_pos/presentation/widgets/app_image.dart';
+import 'package:flutter_pos/presentation/widgets/app_progress_indicator.dart';
 import 'package:flutter_pos/presentation/widgets/products_card.dart';
+import 'package:flutter_pos/service_locator.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,6 +26,16 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final _homeProvider = sl<HomeProvider>();
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _homeProvider.getAllProducts();
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,21 +46,25 @@ class _HomeScreenState extends State<HomeScreen> {
           networkInfo(),
         ],
       ),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(AppSizes.padding),
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 200,
-          childAspectRatio: 1 / 1.5,
-          crossAxisSpacing: AppSizes.padding / 2,
-          mainAxisSpacing: AppSizes.padding / 2,
-        ),
-        physics: const BouncingScrollPhysics(),
-        itemCount: 10,
-        itemBuilder: (context, i) {
-          return productCard();
-        },
+      body: SlidingUpPanel(
+        controller: _homeProvider.panelController,
+        minHeight: 86,
+        maxHeight: AppSizes.screenHeight(context),
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.shadow.withOpacity(0.06),
+            offset: const Offset(0, -2),
+            blurRadius: 6,
+          ),
+        ],
+        body: body(),
+        header: const CartPanelHeader(),
+        panel: const CartPanelBody(),
+        footer: const CartPanelFooter(),
+        onPanelOpened: () => _homeProvider.onChangedIsPanelExpanded(true),
+        onPanelClosed: () => _homeProvider.onChangedIsPanelExpanded(false),
       ),
-      bottomNavigationBar: const HomeBottomsheet(),
     );
   }
 
@@ -105,6 +128,9 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
+        onTap: () {
+          throw 'asdasdas';
+        },
       ),
     );
   }
@@ -126,22 +152,69 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget productCard() {
-    return ProductsCard(
-      product: productDummy,
-      onTap: () {
-        AppDialog.show(
-          title: 'Masukkan Jumlah',
-          child: OrderCard(
-            product: productDummy,
-            showDeleteButton: false,
+  Widget body() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 232),
+      child: Consumer<HomeProvider>(builder: (context, provider, _) {
+        if (provider.allProducts == null) {
+          return const AppProgressIndicator();
+        }
+
+        if (provider.allProducts!.isEmpty) {
+          return AppEmptyState(
+            subtitle: 'No products available, add product to continue',
+            buttonText: 'Add Product',
+            onTapButton: () => context.go('/products/product-create'),
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: () => provider.getAllProducts(),
+          child: GridView.builder(
+            padding: const EdgeInsets.all(AppSizes.padding),
+            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 200,
+              childAspectRatio: 1 / 1.5,
+              crossAxisSpacing: AppSizes.padding / 2,
+              mainAxisSpacing: AppSizes.padding / 2,
+            ),
+            physics: const BouncingScrollPhysics(),
+            itemCount: provider.allProducts!.length,
+            itemBuilder: (context, i) {
+              return productCard(provider.allProducts![i]);
+            },
           ),
-          rightButtonText: 'Tambah',
-          leftButtonText: 'Batal',
+        );
+      }),
+    );
+  }
+
+  Widget productCard(ProductEntity product) {
+    return ProductsCard(
+      product: product,
+      onTap: () {
+        cl('========== ${product.id}');
+        cl('========== ${product.name}');
+        if (product.stock == 0) return;
+
+        int qty = _homeProvider.orderedProducts.where((e) => e.productId == product.id).firstOrNull?.quantity ?? 0;
+
+        AppDialog.show(
+          title: 'Enter Amount',
+          child: OrderCard(
+            product: product,
+            initialQuantity: qty,
+            onChangedQuantity: (val) {
+              qty = val;
+            },
+          ),
+          rightButtonText: 'Add To Cart',
+          leftButtonText: 'Cancel',
           onTapLeftButton: () {
             GoRouter.of(context).pop();
           },
           onTapRightButton: () {
+            _homeProvider.onAddOrderedProduct(product, qty == 0 ? 1 : qty);
             GoRouter.of(context).pop();
           },
         );
