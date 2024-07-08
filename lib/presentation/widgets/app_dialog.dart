@@ -112,7 +112,7 @@ class AppDialog {
   }
 
   static void closeDialog() {
-    AppRoutes.router.pop();
+    AppRoutes.router.configuration.navigatorKey.currentState?.pop();
   }
 }
 
