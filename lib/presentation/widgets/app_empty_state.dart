@@ -51,9 +51,10 @@ class AppEmptyState extends StatelessWidget {
               AppButton(
                 text: buttonText,
                 onTap: onTapButton,
-                buttonColor: Theme.of(context).colorScheme.surfaceContainerLowest,
-                borderColor: Theme.of(context).colorScheme.primary,
+                buttonColor: Theme.of(context).colorScheme.surface,
+                borderColor: Theme.of(context).colorScheme.surfaceContainerLowest,
                 textColor: Theme.of(context).colorScheme.primary,
+                alignment: null,
               )
           ],
         ),

@@ -62,7 +62,7 @@ class ProductsCard extends StatelessWidget {
                               child: AppButton(
                                 height: 22,
                                 width: 54,
-                                padding: EdgeInsets.zero, 
+                                padding: EdgeInsets.zero,
                                 buttonColor: Theme.of(context).colorScheme.surfaceContainerLowest,
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
@@ -74,7 +74,7 @@ class ProductsCard extends StatelessWidget {
                                     ),
                                     const SizedBox(width: 2),
                                     Text(
-                                      'Habis',
+                                      'Out of stock',
                                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
                                             color: Theme.of(context).colorScheme.outline,
                                           ),
