@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_pos/app/assets/app_assets.dart';
-import 'package:flutter_pos/app/routes/app_routes.dart';
-import 'package:flutter_pos/app/services/auth/sign_in_with_google.dart';
 import 'package:flutter_pos/app/themes/app_sizes.dart';
+import 'package:flutter_pos/presentation/providers/auth/auth_provider.dart';
 import 'package:flutter_pos/presentation/widgets/app_button.dart';
-import 'package:flutter_pos/presentation/widgets/app_dialog.dart';
 import 'package:flutter_pos/presentation/widgets/app_image.dart';
+import 'package:flutter_pos/service_locator.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -15,6 +14,8 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
+  final _authProvider = sl<AuthProvider>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,19 +62,7 @@ class _SignInScreenState extends State<SignInScreen> {
   Widget signInButton() {
     return AppButton(
       text: 'Sign In With Google',
-      onTap: () async {
-        AppDialog.showDialogProgress();
-
-        var res = await AuthService().signIn();
-
-        AppDialog.closeDialog();
-
-        if (res.isSuccess) {
-          AppRoutes.router.refresh();
-        } else {
-          AppDialog.showErrorDialog(error: res.error?.error);
-        }
-      },
+      onTap: _authProvider.signIn,
     );
   }
 }
