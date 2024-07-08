@@ -1,18 +1,21 @@
 import 'package:flutter_pos/core/database/app_database.dart';
+import 'package:flutter_pos/data/data_sources/interfaces/transaction_datasource.dart';
 import 'package:flutter_pos/data/models/ordered_product_model.dart';
 import 'package:flutter_pos/data/models/product_model.dart';
 import 'package:flutter_pos/data/models/transaction_model.dart';
 import 'package:flutter_pos/data/models/user_model.dart';
 import 'package:sqflite/sqflite.dart';
 
-class TransactionDatasource {
+class TransactionLocalDatasourceImpl extends TransactionDatasource {
   final AppDatabase _appDatabase;
 
-  TransactionDatasource(this._appDatabase);
+  TransactionLocalDatasourceImpl(this._appDatabase);
 
-  Future<int> insertTransaction(TransactionModel transaction) async {
+  @override
+  Future<int> createTransaction(TransactionModel transaction) async {
     transaction.id ??= DateTime.now().millisecondsSinceEpoch;
     return await _appDatabase.database.transaction((trx) async {
+      // Create transaction
       var transactionId = await trx.insert(
         AppDatabaseConfig.transactionTableName,
         transaction.toJson()
@@ -39,7 +42,7 @@ class TransactionDatasource {
             AppDatabaseConfig.productTableName,
             {'stock': stock, 'sold': sold},
             where: 'id = ?',
-            whereArgs: [order.id],
+            whereArgs: [order.productId],
           );
         }
       }
@@ -48,8 +51,10 @@ class TransactionDatasource {
     });
   }
 
+  @override
   Future<void> updateTransaction(TransactionModel transaction) async {
     return await _appDatabase.database.transaction((trx) async {
+      // Update transaction
       await trx.update(
         AppDatabaseConfig.transactionTableName,
         transaction.toJson()
@@ -60,7 +65,7 @@ class TransactionDatasource {
 
       if (transaction.orderedProducts?.isNotEmpty ?? false) {
         for (var order in transaction.orderedProducts!) {
-          // Create ordered product
+          // Update ordered product
           await trx.update(
             AppDatabaseConfig.orderedProductTableName,
             order.toJson()..remove('product'),
@@ -81,6 +86,7 @@ class TransactionDatasource {
     });
   }
 
+  @override
   Future<void> deleteTransaction(int id) async {
     await _appDatabase.database.delete(
       AppDatabaseConfig.transactionTableName,
@@ -89,6 +95,7 @@ class TransactionDatasource {
     );
   }
 
+  @override
   Future<TransactionModel?> getTransaction(int id) async {
     return await _appDatabase.database.transaction((trx) async {
       // Get transaction
@@ -147,6 +154,7 @@ class TransactionDatasource {
     });
   }
 
+  @override
   Future<List<TransactionModel>> getAllUserTransactions(String userId) async {
     var rawTransactions = await _appDatabase.database.query(
       AppDatabaseConfig.transactionTableName,
