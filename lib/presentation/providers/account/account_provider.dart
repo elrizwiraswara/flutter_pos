@@ -41,7 +41,7 @@ class AccountProvider extends ChangeNotifier {
   Future<String?> updatedUser(String id) async {
     try {
       if (imageFile != null) {
-        imageUrl = await FirebaseStorageService().uploadProductImage(imageFile!.path);
+        imageUrl = await FirebaseStorageService().uploadUserPhoto(imageFile!.path);
       }
 
       cl('[updatedUser].imageUrl $imageUrl');
