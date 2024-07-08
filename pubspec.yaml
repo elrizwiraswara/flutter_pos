@@ -56,6 +56,11 @@ dependencies:
   photo_view: ^0.14.0
   image_picker: ^1.1.2
   image_cropper: ^7.1.0
+  sliding_up_panel: ^2.0.0+1
+  firebase_storage: ^12.1.0
+  path: ^1.9.0
+  connectivity_plus: ^6.0.3
+  http: ^1.2.1
 
 
 dev_dependencies:
@@ -66,6 +71,7 @@ dev_dependencies:
   mockito: ^5.4.4
   json_serializable: ^6.8.0
   build_runner: ^2.4.6
+  floor_generator: ^1.4.2
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
