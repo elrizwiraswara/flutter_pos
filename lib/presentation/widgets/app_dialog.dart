@@ -21,7 +21,11 @@ class AppDialog {
     bool? enableRightButton,
     bool? enableLeftButton,
     Color? leftButtonColor,
+    Color? leftButtonTextColor,
+    Color? leftButtonBorderColor,
     Color? rightButtonColor,
+    Color? rightButtonTextColor,
+    Color? rightButtonBorderColor,
     double? elevation,
   }) async {
     return await showDialog(
@@ -43,7 +47,11 @@ class AppDialog {
             enableLeftButton: enableLeftButton ?? true,
             elevation: elevation,
             leftButtonColor: leftButtonColor,
+            leftButtonTextColor: leftButtonTextColor,
+            leftButtonBorderColor: leftButtonBorderColor,
             rightButtonColor: rightButtonColor,
+            rightButtonTextColor: rightButtonTextColor,
+            rightButtonBorderColor: rightButtonBorderColor,
             child: child,
           ),
         );
@@ -130,7 +138,11 @@ class AppDialogWidget extends StatelessWidget {
   final double? elevation;
   final Color? backgroundColor;
   final Color? leftButtonColor;
+  final Color? leftButtonTextColor;
+  final Color? leftButtonBorderColor;
   final Color? rightButtonColor;
+  final Color? rightButtonTextColor;
+  final Color? rightButtonBorderColor;
   final Function()? onTapLeftButton;
   final Function()? onTapRightButton;
 
@@ -150,7 +162,11 @@ class AppDialogWidget extends StatelessWidget {
     this.elevation,
     this.backgroundColor,
     this.leftButtonColor,
+    this.leftButtonTextColor,
+    this.leftButtonBorderColor,
     this.rightButtonColor,
+    this.rightButtonTextColor,
+    this.rightButtonBorderColor,
   });
 
   @override
@@ -223,9 +239,10 @@ class AppDialogWidget extends StatelessWidget {
                     ? Expanded(
                         child: AppButton(
                           text: leftButtonText!,
-                          buttonColor: Theme.of(context).colorScheme.surface,
-                          borderColor: leftButtonColor ?? Theme.of(context).colorScheme.primary,
-                          textColor: leftButtonColor ?? Theme.of(context).colorScheme.primary,
+                          buttonColor: leftButtonColor ?? Theme.of(context).colorScheme.surface,
+                          borderColor:
+                              leftButtonBorderColor ?? leftButtonTextColor ?? Theme.of(context).colorScheme.primary,
+                          textColor: leftButtonTextColor ?? Theme.of(context).colorScheme.primary,
                           onTap: () async {
                             if (enableLeftButton) {
                               if (onTapLeftButton != null) {
@@ -245,6 +262,10 @@ class AppDialogWidget extends StatelessWidget {
                     ? Expanded(
                         child: AppButton(
                           text: rightButtonText!,
+                          buttonColor: rightButtonColor,
+                          borderColor:
+                              rightButtonBorderColor ?? rightButtonTextColor ?? Theme.of(context).colorScheme.primary,
+                          textColor: rightButtonTextColor,
                           onTap: () async {
                             if (enableRightButton) {
                               if (onTapRightButton != null) {
