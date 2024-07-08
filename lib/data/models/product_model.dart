@@ -1,41 +1,28 @@
-import 'package:floor/floor.dart';
-import 'package:flutter_pos/data/models/user_model.dart';
 import 'package:flutter_pos/domain/entities/product_entity.dart';
 
-@Entity(
-  tableName: 'product',
-  primaryKeys: ['id'],
-  foreignKeys: [
-    ForeignKey(
-      childColumns: ['id'],
-      parentColumns: ['createdById'],
-      entity: UserModel,
-    )
-  ],
-)
 class ProductModel {
-  final int id;
-  final String createdById;
-  final String name;
-  final String imageUrl;
-  final int stock;
-  final int sold;
-  final int price;
-  final String description;
-  final String createdAt;
-  final String updatedAt;
+  int? id;
+  String createdById;
+  String name;
+  String imageUrl;
+  int stock;
+  int sold;
+  int price;
+  String? description;
+  String? createdAt;
+  String? updatedAt;
 
-  const ProductModel({
-    required this.id,
+  ProductModel({
+    this.id,
     required this.createdById,
     required this.name,
     required this.imageUrl,
     required this.stock,
     required this.sold,
     required this.price,
-    required this.description,
-    required this.createdAt,
-    required this.updatedAt,
+    this.description,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
