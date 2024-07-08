@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pos/app/services/auth/sign_in_with_google.dart';
 import 'package:flutter_pos/presentation/screens/account/account_screen.dart';
 import 'package:flutter_pos/presentation/screens/auth/sign_in/sign_in_screen.dart';
+import 'package:flutter_pos/presentation/screens/error_handler_screen.dart';
 import 'package:flutter_pos/presentation/screens/home/home_screen.dart';
 import 'package:flutter_pos/presentation/screens/main/main_screen.dart';
 import 'package:flutter_pos/presentation/screens/products/product_detail_screen.dart';
 import 'package:flutter_pos/presentation/screens/products/product_form_screen.dart';
 import 'package:flutter_pos/presentation/screens/products/products_screen.dart';
 import 'package:flutter_pos/presentation/screens/root_screen.dart';
+import 'package:flutter_pos/presentation/screens/transactions/transaction_detail_screen.dart';
 import 'package:flutter_pos/presentation/screens/transactions/transactions_screen.dart';
-import 'package:flutter_pos/presentation/widgets/error_handler_widget.dart';
 import 'package:go_router/go_router.dart';
 
 // App routes
@@ -24,13 +25,10 @@ class AppRoutes {
   static final router = GoRouter(
     initialLocation: '/home',
     navigatorKey: rootNavigatorKey,
-    errorBuilder: (context, state) => ErrorHandlerWidget(
+    errorBuilder: (context, state) => ErrorScreen(
       errorMessage: state.error?.message,
     ),
-    routes: [
-      _root,
-      _auth,
-    ],
+    routes: [_root, _error],
   );
 
   static final _root = GoRoute(
@@ -44,16 +42,26 @@ class AppRoutes {
       if (!await AuthService().isAuthenticated()) {
         return '/auth/sign-in';
       } else {
-        return '/home';
+        return state.fullPath == '/' ? '/home' : null;
       }
     },
     routes: [
       _main,
+      _auth,
     ],
   );
 
+  static final _error = GoRoute(
+    path: '/error',
+    builder: (context, state) {
+      return ErrorScreen(
+        errorDetails: state.extra as FlutterErrorDetails?,
+      );
+    },
+  );
+
   static final _auth = GoRoute(
-    path: '/auth',
+    path: 'auth',
     redirect: (context, state) async {
       // if isAuthenticated = false, go to intended route screen
       // else back to main screen
@@ -112,13 +120,15 @@ class AppRoutes {
   );
 
   static final _transactions = GoRoute(
-    path: 'transactions',
-    pageBuilder: (context, state) {
-      return const NoTransitionPage<void>(
-        child: TransactionsScreen(),
-      );
-    },
-  );
+      path: 'transactions',
+      pageBuilder: (context, state) {
+        return const NoTransitionPage<void>(
+          child: TransactionsScreen(),
+        );
+      },
+      routes: [
+        _transactionDetail,
+      ]);
 
   static final _account = GoRoute(
     path: 'account',
@@ -131,6 +141,7 @@ class AppRoutes {
 
   static final _productCreate = GoRoute(
     path: 'product-create',
+    parentNavigatorKey: navNavigatorKey,
     builder: (context, state) {
       return const ProductFormScreen();
     },
@@ -161,6 +172,21 @@ class AppRoutes {
       }
 
       return ProductDetailScreen(
+        id: id,
+      );
+    },
+  );
+
+  static final _transactionDetail = GoRoute(
+    path: 'transaction-detail/:id',
+    builder: (context, state) {
+      int? id = int.tryParse(state.pathParameters["id"] ?? '');
+
+      if (id == null) {
+        throw 'Required productId is not provided!';
+      }
+
+      return TransactionDetailScreen(
         id: id,
       );
     },
