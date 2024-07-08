@@ -1,11 +1,21 @@
 import 'package:flutter_pos/domain/entities/product_entity.dart';
 
 class OrderedProductEntity {
+  int? id;
+  int? transactionId;
   int quantity;
-  ProductEntity product;
+  int productId;
+  ProductEntity? product;
+  String? createdAt;
+  String? updatedAt;
 
   OrderedProductEntity({
+    this.id,
+    this.transactionId,
     required this.quantity,
-    required this.product,
+    required this.productId,
+    this.product,
+    this.createdAt,
+    this.updatedAt,
   });
 }

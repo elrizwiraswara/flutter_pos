@@ -1,24 +1,24 @@
 import 'package:equatable/equatable.dart';
 
 class UserEntity extends Equatable {
-  final String id;
-  final String phone;
-  final String name;
+  final String? id;
+  final String? phone;
+  final String? name;
   final String? gender;
   final String? birthdate;
   final String? imageUrl;
-  final String createdAt;
-  final String updatedAt;
+  final String? createdAt;
+  final String? updatedAt;
 
   const UserEntity({
-    required this.id,
-    required this.phone,
-    required this.name,
+    this.id,
+    this.phone,
+    this.name,
     this.gender,
     this.birthdate,
     this.imageUrl,
-    required this.createdAt,
-    required this.updatedAt,
+    this.createdAt,
+    this.updatedAt,
   });
 
   UserEntity copyWith({
