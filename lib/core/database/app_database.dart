@@ -16,7 +16,7 @@ class AppDatabase {
   late Database database;
 
   Future<void> init() async {
-    await dropDatabase();
+    // await dropDatabase();
 
     database = await openDatabase(
       join(await getDatabasesPath(), AppDatabaseConfig.dbPath),
@@ -62,6 +62,7 @@ class AppDatabaseConfig {
   static String createUserTable = '''
 CREATE TABLE IF NOT EXISTS '$userTableName' (
     'id' TEXT NOT NULL,
+    'email' TEXT,
     'phone' TEXT,
     'name' TEXT,
     'gender' TEXT,
