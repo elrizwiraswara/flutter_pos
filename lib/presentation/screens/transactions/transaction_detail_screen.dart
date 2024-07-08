@@ -1,0 +1,227 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_pos/app/themes/app_colors.dart';
+import 'package:flutter_pos/app/themes/app_sizes.dart';
+import 'package:flutter_pos/app/utilities/currency_formatter.dart';
+import 'package:flutter_pos/app/utilities/date_formatter.dart';
+import 'package:flutter_pos/domain/entities/ordered_product_entity.dart';
+import 'package:flutter_pos/domain/entities/transaction_entity.dart';
+import 'package:flutter_pos/presentation/providers/transactions/transaction_detail_provider.dart';
+import 'package:flutter_pos/presentation/screens/error_handler_screen.dart';
+import 'package:flutter_pos/presentation/widgets/app_empty_state.dart';
+import 'package:flutter_pos/service_locator.dart';
+
+class TransactionDetailScreen extends StatelessWidget {
+  final int id;
+
+  const TransactionDetailScreen({super.key, required this.id});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(elevation: 0),
+      body: FutureBuilder(
+        future: sl<TransactionDetailProvider>().getTransactionDetail(id),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return const ErrorScreen();
+          }
+
+          if (snapshot.data == null) {
+            return const AppEmptyState(
+              title: 'Not Found',
+            );
+          }
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(AppSizes.padding),
+            child: Column(
+              children: [
+                status(context),
+                const SizedBox(height: AppSizes.padding * 2),
+                transactionDetail(context, snapshot.data!),
+                const SizedBox(height: AppSizes.padding),
+                paymentDetail(context, snapshot.data!),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget status(BuildContext context) {
+    return Column(
+      children: [
+        const Icon(
+          Icons.check_circle_outline_rounded,
+          color: AppColors.green,
+          size: 60,
+        ),
+        const SizedBox(height: AppSizes.padding / 2),
+        Text(
+          'Transaction Created',
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+        )
+      ],
+    );
+  }
+
+  Widget transactionDetail(BuildContext context, TransactionEntity transaction) {
+    return Container(
+      padding: const EdgeInsets.all(AppSizes.padding),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(AppSizes.radius),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Transaction ID',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              Text(
+                '${transaction.id ?? '-'}',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+              )
+            ],
+          ),
+          const SizedBox(height: AppSizes.padding),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Payment Method',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              Text(
+                transaction.paymentMethod,
+                style: Theme.of(context).textTheme.bodyMedium,
+              )
+            ],
+          ),
+          const SizedBox(height: AppSizes.padding),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Created By',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              Text(
+                transaction.createdBy?.name ?? '-',
+                style: Theme.of(context).textTheme.bodyMedium,
+              )
+            ],
+          ),
+          const SizedBox(height: AppSizes.padding),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Created At',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              Text(
+                DateFormatter.normalWithClock(transaction.createdAt ?? ''),
+                style: Theme.of(context).textTheme.bodyMedium,
+              )
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget paymentDetail(BuildContext context, TransactionEntity transaction) {
+    return Container(
+      padding: const EdgeInsets.all(AppSizes.padding),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(AppSizes.radius),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ...List.generate(transaction.orderedProducts?.length ?? 0, (i) {
+            return product(context, transaction.orderedProducts![i]);
+          }),
+          const Divider(height: AppSizes.padding * 2),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Total',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              Text(
+                CurrencyFormatter.format(transaction.totalAmount),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+              )
+            ],
+          ),
+          const SizedBox(height: AppSizes.padding),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Payment Received',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              Text(
+                CurrencyFormatter.format(transaction.receivedAmount),
+                style: Theme.of(context).textTheme.bodyMedium,
+              )
+            ],
+          ),
+          const SizedBox(height: AppSizes.padding),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Change',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              Text(
+                CurrencyFormatter.format(transaction.receivedAmount - transaction.totalAmount),
+                style: Theme.of(context).textTheme.bodyMedium,
+              )
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget product(BuildContext context, OrderedProductEntity order) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          order.product?.name ?? '-',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: AppSizes.padding / 2),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              '${CurrencyFormatter.format(order.product?.price ?? 0)} x ${order.quantity}',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            Text(
+              CurrencyFormatter.format(order.product?.price ?? 0 * order.quantity),
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ],
+        )
+      ],
+    );
+  }
+}
