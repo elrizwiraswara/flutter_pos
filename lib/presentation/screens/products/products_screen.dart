@@ -33,7 +33,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('All Product'),
+        title: const Text('Products'),
         actions: [
           addButton(),
         ],
