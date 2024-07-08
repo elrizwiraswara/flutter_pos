@@ -2,15 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pos/app/routes/app_routes.dart';
 import 'package:flutter_pos/app/services/auth/auth_service.dart';
 import 'package:flutter_pos/app/themes/app_sizes.dart';
-import 'package:flutter_pos/domain/entities/user_entity.dart';
-import 'package:flutter_pos/presentation/providers/account/account_provider.dart';
-import 'package:flutter_pos/presentation/screens/error_handler_screen.dart';
+import 'package:flutter_pos/presentation/providers/main/main_provider.dart';
 import 'package:flutter_pos/presentation/widgets/app_button.dart';
 import 'package:flutter_pos/presentation/widgets/app_dialog.dart';
 import 'package:flutter_pos/presentation/widgets/app_image.dart';
-import 'package:flutter_pos/presentation/widgets/app_progress_indicator.dart';
-import 'package:flutter_pos/service_locator.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -19,59 +16,48 @@ class AccountScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Account')),
-      body: FutureBuilder(
-        future: sl<AccountProvider>().getUserDetail(AuthService().getAuthData()!.uid),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const AppProgressIndicator();
-          }
-
-          if (snapshot.hasError) {
-            return ErrorScreen(errorMessage: snapshot.error.toString());
-          }
-
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(AppSizes.padding),
-            child: Column(
-              children: [
-                user(context, snapshot.data),
-                profilButton(context),
-                signOutButton(context),
-              ],
-            ),
-          );
-        },
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(AppSizes.padding),
+        child: Column(
+          children: [
+            user(context),
+            profilButton(context),
+            signOutButton(context),
+          ],
+        ),
       ),
     );
   }
 
-  Widget user(BuildContext context, UserEntity? user) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSizes.padding),
-      child: Column(
-        children: [
-          AppImage(
-            image: user?.imageUrl ?? '',
-            width: 120,
-            height: 120,
-            borderRadius: 100,
-            backgroundColor: Theme.of(context).colorScheme.surface,
-          ),
-          const SizedBox(height: AppSizes.padding),
-          Text(
-            user?.name ?? '(No Name)',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
-          const SizedBox(height: AppSizes.padding / 4),
-          Text(
-            user?.email ?? '-',
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-        ],
-      ),
-    );
+  Widget user(BuildContext context) {
+    return Consumer<MainProvider>(builder: (context, provider, _) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppSizes.padding),
+        child: Column(
+          children: [
+            AppImage(
+              image: provider.user?.imageUrl ?? '',
+              width: 120,
+              height: 120,
+              borderRadius: 100,
+              backgroundColor: Theme.of(context).colorScheme.surface,
+            ),
+            const SizedBox(height: AppSizes.padding),
+            Text(
+              provider.user?.name ?? '(No Name)',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: AppSizes.padding / 4),
+            Text(
+              provider.user?.email ?? '',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   Widget profilButton(BuildContext context) {
@@ -147,9 +133,9 @@ class AccountScreen extends StatelessWidget {
             text: 'Are you sure want to sign out?',
             leftButtonText: 'Cancel',
             rightButtonText: 'Sign Out',
-            onTapRightButton: () {
+            onTapRightButton: () async {
               context.pop();
-              AuthService().signOut();
+              await AuthService().signOut();
               AppRoutes.router.refresh();
             },
           );
