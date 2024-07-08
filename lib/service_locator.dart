@@ -1,7 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_pos/core/database/app_database.dart';
-import 'package:flutter_pos/data/data_sources/local/product_datasource.dart';
-import 'package:flutter_pos/data/data_sources/local/transaction_datasource.dart';
-import 'package:flutter_pos/data/data_sources/local/user_datasource.dart';
+import 'package:flutter_pos/data/data_sources/local/product_local_datasource_impl.dart';
+import 'package:flutter_pos/data/data_sources/local/transaction_local_datasource_impl.dart';
+import 'package:flutter_pos/data/data_sources/local/user_local_datasource_impl.dart';
+import 'package:flutter_pos/data/data_sources/remote/product_remote_datasource_impl.dart';
+import 'package:flutter_pos/data/data_sources/remote/transaction_remote_datasource_impl.dart';
+import 'package:flutter_pos/data/data_sources/remote/user_remote_datasource_impl.dart';
 import 'package:flutter_pos/data/repositories/product_repository_impl.dart';
 import 'package:flutter_pos/data/repositories/transaction_repository_impl.dart';
 import 'package:flutter_pos/data/repositories/user_repository_impl.dart';
@@ -23,16 +27,37 @@ final GetIt sl = GetIt.instance;
 // Service Locator
 void setupServiceLocator() async {
   sl.registerSingleton<AppDatabase>(AppDatabase());
+  sl.registerSingleton<FirebaseFirestore>(FirebaseFirestore.instance);
 
   // Datasources
-  sl.registerLazySingleton(() => ProductDatasource(sl<AppDatabase>()));
-  sl.registerLazySingleton(() => TransactionDatasource(sl<AppDatabase>()));
-  sl.registerLazySingleton(() => UserDatasource(sl<AppDatabase>()));
+  // Local Datasources
+  sl.registerLazySingleton(() => ProductLocalDatasourceImpl(sl<AppDatabase>()));
+  sl.registerLazySingleton(() => TransactionLocalDatasourceImpl(sl<AppDatabase>()));
+  sl.registerLazySingleton(() => UserLocalDatasourceImpl(sl<AppDatabase>()));
+  // Remote Datasources
+  sl.registerLazySingleton(() => ProductRemoteDatasourceImpl(sl<FirebaseFirestore>()));
+  sl.registerLazySingleton(() => TransactionRemoteDatasourceImpl(sl<FirebaseFirestore>()));
+  sl.registerLazySingleton(() => UserRemoteDatasourceImpl(sl<FirebaseFirestore>()));
 
   // Repositories
-  sl.registerLazySingleton(() => ProductRepositoryImpl(sl<ProductDatasource>()));
-  sl.registerLazySingleton(() => TransactionRepositoryImpl(sl<TransactionDatasource>()));
-  sl.registerLazySingleton(() => UserRepositoryImpl(sl<UserDatasource>()));
+  sl.registerLazySingleton(
+    () => ProductRepositoryImpl(
+      productLocalDatasource: sl<ProductLocalDatasourceImpl>(),
+      productRemoteDatasource: sl<ProductRemoteDatasourceImpl>(),
+    ),
+  );
+  sl.registerLazySingleton(
+    () => TransactionRepositoryImpl(
+      transactionLocalDatasource: sl<TransactionLocalDatasourceImpl>(),
+      transactionRemoteDatasource: sl<TransactionRemoteDatasourceImpl>(),
+    ),
+  );
+  sl.registerLazySingleton(
+    () => UserRepositoryImpl(
+      userLocalDatasource: sl<UserLocalDatasourceImpl>(),
+      userRemoteDatasource: sl<UserRemoteDatasourceImpl>(),
+    ),
+  );
 
   // Providers
   sl.registerLazySingleton(
