@@ -1,28 +1,28 @@
 import 'package:equatable/equatable.dart';
 
 class ProductEntity extends Equatable {
-  final int id;
+  final int? id;
   final String createdById;
   final String name;
   final String imageUrl;
   final int stock;
   final int sold;
   final int price;
-  final String description;
-  final String createdAt;
-  final String updatedAt;
+  final String? description;
+  final String? createdAt;
+  final String? updatedAt;
 
   const ProductEntity({
-    required this.id,
+    this.id,
     required this.createdById,
     required this.name,
     required this.imageUrl,
     required this.stock,
     required this.sold,
     required this.price,
-    required this.description,
-    required this.createdAt,
-    required this.updatedAt,
+    this.description,
+    this.createdAt,
+    this.updatedAt,
   });
 
   ProductEntity copyWith({

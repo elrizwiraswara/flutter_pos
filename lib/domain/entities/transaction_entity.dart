@@ -1,34 +1,34 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter_pos/domain/entities/product_entity.dart';
+import 'package:flutter_pos/domain/entities/ordered_product_entity.dart';
 import 'package:flutter_pos/domain/entities/user_entity.dart';
 
 class TransactionEntity extends Equatable {
-  final int id;
+  final int? id;
   final String paymentMethod;
   final String? customerName;
   final String? description;
-  final String? createdById;
+  final String createdById;
   final UserEntity? createdBy;
-  final List<ProductEntity>? products;
+  final List<OrderedProductEntity>? orderedProducts;
   final int receivedAmount;
   final int returnAmount;
   final int totalAmount;
-  final String createdAt;
-  final String updatedAt;
+  final String? createdAt;
+  final String? updatedAt;
 
   const TransactionEntity({
-    required this.id,
+    this.id,
     required this.paymentMethod,
     this.customerName,
     this.description,
     required this.createdById,
     this.createdBy,
-    this.products,
+    this.orderedProducts,
     required this.receivedAmount,
     required this.returnAmount,
     required this.totalAmount,
-    required this.createdAt,
-    required this.updatedAt,
+    this.createdAt,
+    this.updatedAt,
   });
 
   TransactionEntity copyWith({
@@ -38,7 +38,7 @@ class TransactionEntity extends Equatable {
     String? description,
     String? createdById,
     UserEntity? createdBy,
-    List<ProductEntity>? products,
+    List<OrderedProductEntity>? orderdProducts,
     int? receivedAmount,
     int? returnAmount,
     int? totalAmount,
@@ -52,7 +52,7 @@ class TransactionEntity extends Equatable {
       description: description ?? this.description,
       createdById: createdById ?? this.createdById,
       createdBy: createdBy ?? this.createdBy,
-      products: products ?? this.products,
+      orderedProducts: orderdProducts ?? orderedProducts,
       receivedAmount: receivedAmount ?? this.receivedAmount,
       returnAmount: returnAmount ?? this.returnAmount,
       totalAmount: totalAmount ?? this.totalAmount,
@@ -69,7 +69,7 @@ class TransactionEntity extends Equatable {
         description,
         createdById,
         createdBy,
-        products,
+        orderedProducts,
         receivedAmount,
         returnAmount,
         totalAmount,

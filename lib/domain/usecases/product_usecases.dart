@@ -2,26 +2,17 @@ import 'package:flutter_pos/core/usecase/usecase.dart';
 import 'package:flutter_pos/domain/entities/product_entity.dart';
 import 'package:flutter_pos/domain/repositories/product_repository.dart';
 
-class GetAllProducts extends UseCase<Result, String> {
-  GetAllProducts(this._productRepository);
+class GetAllProductsUsecase extends UseCase<Result, String> {
+  GetAllProductsUsecase(this._productRepository);
 
   final ProductRepository _productRepository;
 
   @override
-  Future<Result<List<ProductEntity>>> call(String params) async => _productRepository.getAllProducts(params);
+  Future<Result<List<ProductEntity>>> call(String params) async => _productRepository.getAllUserProducts(params);
 }
 
-class CreateProduct extends UseCase<Result, ProductEntity> {
-  CreateProduct(this._productRepository);
-
-  final ProductRepository _productRepository;
-
-  @override
-  Future<Result<ProductEntity>> call(ProductEntity params) async => _productRepository.createProduct(params);
-}
-
-class GetProduct extends UseCase<Result, int> {
-  GetProduct(this._productRepository);
+class GetProductUsecase extends UseCase<Result, int> {
+  GetProductUsecase(this._productRepository);
 
   final ProductRepository _productRepository;
 
@@ -29,8 +20,17 @@ class GetProduct extends UseCase<Result, int> {
   Future<Result<ProductEntity>> call(int params) async => _productRepository.getProduct(params);
 }
 
-class UpateProduct extends UseCase<void, ProductEntity> {
-  UpateProduct(this._productRepository);
+class CreateProductUsecase extends UseCase<Result, ProductEntity> {
+  CreateProductUsecase(this._productRepository);
+
+  final ProductRepository _productRepository;
+
+  @override
+  Future<Result<int>> call(ProductEntity params) async => _productRepository.createProduct(params);
+}
+
+class UpdateProductUsecase extends UseCase<void, ProductEntity> {
+  UpdateProductUsecase(this._productRepository);
 
   final ProductRepository _productRepository;
 
@@ -38,11 +38,11 @@ class UpateProduct extends UseCase<void, ProductEntity> {
   Future<void> call(ProductEntity params) async => _productRepository.updateProduct(params);
 }
 
-class DeleteProduct extends UseCase<void, ProductEntity> {
-  DeleteProduct(this._productRepository);
+class DeleteProductUsecase extends UseCase<void, int> {
+  DeleteProductUsecase(this._productRepository);
 
   final ProductRepository _productRepository;
 
   @override
-  Future<void> call(ProductEntity params) async => _productRepository.deleteProduct(params);
+  Future<void> call(int params) async => _productRepository.deleteProduct(params);
 }
