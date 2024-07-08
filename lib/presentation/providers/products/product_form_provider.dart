@@ -114,6 +114,20 @@ class ProductFormProvider extends ChangeNotifier {
     }
   }
 
+  Future<String?> deleteProduct(int id) async {
+    try {
+      await DeleteProductUsecase(productRepository).call(id);
+
+      // Refresh products
+      sl<ProductsProvider>().getAllProducts();
+
+      return null;
+    } catch (e) {
+      cl("[deleteProduct].error $e");
+      return e.toString();
+    }
+  }
+
   void onChangedImage(File value) {
     imageFile = value;
     notifyListeners();
