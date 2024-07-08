@@ -2,8 +2,8 @@ import 'package:flutter_pos/core/usecase/usecase.dart';
 import 'package:flutter_pos/domain/entities/user_entity.dart';
 import 'package:flutter_pos/domain/repositories/user_repository.dart';
 
-class GetUser extends UseCase<Result, String> {
-  GetUser(this._userRepository);
+class GetUserUsecase extends UseCase<Result, String> {
+  GetUserUsecase(this._userRepository);
 
   final UserRepository _userRepository;
 
@@ -11,8 +11,8 @@ class GetUser extends UseCase<Result, String> {
   Future<Result<UserEntity>> call(String params) async => _userRepository.getUser(params);
 }
 
-class CreateUser extends UseCase<Result, UserEntity> {
-  CreateUser(this._userRepository);
+class CreateUserUsecase extends UseCase<Result, UserEntity> {
+  CreateUserUsecase(this._userRepository);
 
   final UserRepository _userRepository;
 
@@ -20,8 +20,8 @@ class CreateUser extends UseCase<Result, UserEntity> {
   Future<Result<int>> call(UserEntity params) async => _userRepository.createUser(params);
 }
 
-class UpateUser extends UseCase<void, UserEntity> {
-  UpateUser(this._userRepository);
+class UpateUserUsecase extends UseCase<void, UserEntity> {
+  UpateUserUsecase(this._userRepository);
 
   final UserRepository _userRepository;
 
@@ -29,8 +29,8 @@ class UpateUser extends UseCase<void, UserEntity> {
   Future<void> call(UserEntity params) async => _userRepository.updateUser(params);
 }
 
-class DeleteUser extends UseCase<void, String> {
-  DeleteUser(this._userRepository);
+class DeleteUserUsecase extends UseCase<void, String> {
+  DeleteUserUsecase(this._userRepository);
 
   final UserRepository _userRepository;
 

@@ -2,8 +2,8 @@ import 'package:flutter_pos/core/usecase/usecase.dart';
 import 'package:flutter_pos/domain/entities/transaction_entity.dart';
 import 'package:flutter_pos/domain/repositories/transaction_repository.dart';
 
-class GetAllTransactions extends UseCase<Result, String> {
-  GetAllTransactions(this._transactionRepository);
+class GetAllTransactionsUsecase extends UseCase<Result, String> {
+  GetAllTransactionsUsecase(this._transactionRepository);
 
   final TransactionRepository _transactionRepository;
 
@@ -12,8 +12,8 @@ class GetAllTransactions extends UseCase<Result, String> {
       _transactionRepository.getAllUserTransactions(params);
 }
 
-class GetTransaction extends UseCase<Result, int> {
-  GetTransaction(this._transactionRepository);
+class GetTransactionUsecase extends UseCase<Result, int> {
+  GetTransactionUsecase(this._transactionRepository);
 
   final TransactionRepository _transactionRepository;
 
@@ -21,8 +21,8 @@ class GetTransaction extends UseCase<Result, int> {
   Future<Result<TransactionEntity>> call(int params) async => _transactionRepository.getTransaction(params);
 }
 
-class CreateTransaction extends UseCase<Result, TransactionEntity> {
-  CreateTransaction(this._transactionRepository);
+class CreateTransactionUsecase extends UseCase<Result, TransactionEntity> {
+  CreateTransactionUsecase(this._transactionRepository);
 
   final TransactionRepository _transactionRepository;
 
@@ -30,8 +30,8 @@ class CreateTransaction extends UseCase<Result, TransactionEntity> {
   Future<Result<int>> call(TransactionEntity params) async => _transactionRepository.createTransaction(params);
 }
 
-class UpateTransaction extends UseCase<void, TransactionEntity> {
-  UpateTransaction(this._transactionRepository);
+class UpateTransactionUsecase extends UseCase<void, TransactionEntity> {
+  UpateTransactionUsecase(this._transactionRepository);
 
   final TransactionRepository _transactionRepository;
 
@@ -39,8 +39,8 @@ class UpateTransaction extends UseCase<void, TransactionEntity> {
   Future<void> call(TransactionEntity params) async => _transactionRepository.updateTransaction(params);
 }
 
-class DeleteTransaction extends UseCase<void, int> {
-  DeleteTransaction(this._transactionRepository);
+class DeleteTransactionUsecase extends UseCase<void, int> {
+  DeleteTransactionUsecase(this._transactionRepository);
 
   final TransactionRepository _transactionRepository;
 
