@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_pos/app/const/const.dart';
 import 'package:flutter_pos/app/themes/app_sizes.dart';
 import 'package:flutter_pos/domain/entities/product_entity.dart';
 import 'package:flutter_pos/presentation/providers/home/home_provider.dart';
+import 'package:flutter_pos/presentation/providers/main/main_provider.dart';
 import 'package:flutter_pos/presentation/providers/products/products_provider.dart';
 import 'package:flutter_pos/presentation/screens/home/components/cart_panel_body.dart';
 import 'package:flutter_pos/presentation/screens/home/components/cart_panel_footer.dart';
@@ -70,86 +72,127 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget title() {
-    return Row(
-      children: [
-        AppImage(
-          image: randomImage,
-          borderRadius: 100,
-          width: 34,
-          height: 34,
-          backgroundColor: Theme.of(context).colorScheme.surfaceDim,
-        ),
-        const SizedBox(width: AppSizes.padding / 2),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Consumer<MainProvider>(
+      builder: (context, provider, _) {
+        return Row(
           children: [
-            Text(
-              'Elriz Wiraswara',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    height: 0,
-                  ),
+            AppImage(
+              image: provider.user?.imageUrl ?? '',
+              borderRadius: 100,
+              width: 34,
+              height: 34,
+              backgroundColor: Theme.of(context).colorScheme.surfaceDim,
             ),
-            Text(
-              'elrizwiraswara@gmail.com',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontSize: 10,
-                    color: Theme.of(context).colorScheme.outline,
-                  ),
-            ),
+            const SizedBox(width: AppSizes.padding / 2),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  provider.user?.name ?? '',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        height: 0,
+                      ),
+                ),
+                Text(
+                  provider.user?.email ?? '',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontSize: 10,
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
+                ),
+              ],
+            )
           ],
-        )
-      ],
+        );
+      },
     );
   }
 
   Widget syncButton() {
-    return Padding(
-      padding: const EdgeInsets.only(right: AppSizes.padding / 4),
-      child: AppButton(
-        height: 26,
-        borderRadius: BorderRadius.circular(4),
-        padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding / 2),
-        buttonColor: Theme.of(context).colorScheme.surfaceContainer,
-        child: Row(
-          children: [
-            Icon(
-              Icons.sync,
-              size: 12,
-              color: Theme.of(context).colorScheme.primary,
+    return Consumer<MainProvider>(
+      builder: (context, provider, _) {
+        return Padding(
+          padding: const EdgeInsets.only(right: AppSizes.padding / 4),
+          child: AppButton(
+            height: 26,
+            borderRadius: BorderRadius.circular(4),
+            padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding / 2),
+            buttonColor: provider.isDataSynced
+                ? Theme.of(context).colorScheme.surfaceContainer
+                : Theme.of(context).colorScheme.shadow.withOpacity(0.06),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.sync,
+                  size: 12,
+                  color: provider.isDataSynced
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.outline,
+                ),
+                const SizedBox(width: AppSizes.padding / 4),
+                Text(
+                  provider.isDataSynced ? 'Synced' : 'Pending',
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: provider.isDataSynced
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.outline,
+                      ),
+                ),
+              ],
             ),
-            const SizedBox(width: AppSizes.padding / 4),
-            Text(
-              'Synced',
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-            ),
-          ],
-        ),
-        onTap: () {
-          throw 'asdasdas';
-        },
-      ),
+            onTap: () {
+              var message = '';
+
+              if (provider.isDataSynced) {
+                message = syncMessage;
+              }
+
+              if (provider.isHasInternet && !provider.isDataSynced) {
+                message = unsyncMessage;
+                provider.initMainProvider();
+              }
+
+              if (!provider.isHasInternet && !provider.isDataSynced) {
+                message = syncPendingMessage;
+              }
+
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+            },
+          ),
+        );
+      },
     );
   }
 
   Widget networkInfo() {
-    return Padding(
-      padding: const EdgeInsets.only(right: AppSizes.padding),
-      child: AppButton(
-        height: 26,
-        borderRadius: BorderRadius.circular(4),
-        padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding / 2),
-        buttonColor: Theme.of(context).colorScheme.surfaceContainer,
-        child: Icon(
-          Icons.wifi,
-          size: 12,
-          color: Theme.of(context).colorScheme.primary,
-        ),
-      ),
+    return Selector<MainProvider, bool>(
+      selector: (a, b) => b.isHasInternet,
+      builder: (context, isHasInternet, _) {
+        return Padding(
+          padding: const EdgeInsets.only(right: AppSizes.padding),
+          child: AppButton(
+            height: 26,
+            borderRadius: BorderRadius.circular(4),
+            padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding / 2),
+            buttonColor: isHasInternet
+                ? Theme.of(context).colorScheme.surfaceContainer
+                : Theme.of(context).colorScheme.shadow.withOpacity(0.06),
+            child: Icon(
+              isHasInternet ? Icons.wifi_rounded : Icons.wifi_off_rounded,
+              size: 12,
+              color: isHasInternet ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.outline,
+            ),
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(isHasInternet ? onlineMessage : offlineMessage)),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 
