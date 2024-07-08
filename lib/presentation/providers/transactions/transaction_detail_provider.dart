@@ -9,7 +9,7 @@ class TransactionDetailProvider extends ChangeNotifier {
   TransactionDetailProvider({required this.transactionRepository});
 
   Future<TransactionEntity?> getTransactionDetail(int id) async {
-    var res = await GetTransaction(transactionRepository).call(id);
+    var res = await GetTransactionUsecase(transactionRepository).call(id);
 
     if (res.isSuccess) {
       return res.data;

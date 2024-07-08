@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_pos/app/services/auth/sign_in_with_google.dart';
+import 'package:flutter_pos/app/services/auth/auth_service.dart';
 import 'package:flutter_pos/domain/entities/transaction_entity.dart';
 import 'package:flutter_pos/domain/repositories/transaction_repository.dart';
 import 'package:flutter_pos/domain/usecases/transaction_usecases.dart';
@@ -12,7 +12,7 @@ class TransactionsProvider extends ChangeNotifier {
   List<TransactionEntity>? allTransactions;
 
   Future<void> getAllTransactions() async {
-    var res = await GetAllTransactions(transactionRepository).call(AuthService().getAuthData()!.uid);
+    var res = await GetAllTransactionsUsecase(transactionRepository).call(AuthService().getAuthData()!.uid);
 
     if (res.isSuccess) {
       allTransactions = res.data ?? [];

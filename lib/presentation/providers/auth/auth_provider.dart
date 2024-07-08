@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_pos/app/routes/app_routes.dart';
-import 'package:flutter_pos/app/services/auth/sign_in_with_google.dart';
+import 'package:flutter_pos/app/services/auth/auth_service.dart';
 import 'package:flutter_pos/domain/entities/user_entity.dart';
 import 'package:flutter_pos/domain/repositories/user_repository.dart';
 import 'package:flutter_pos/domain/usecases/user_usecases.dart';
@@ -43,6 +43,6 @@ class AuthProvider extends ChangeNotifier {
       updatedAt: DateTime.now().toIso8601String(),
     );
 
-    await CreateUser(userRepository).call(user);
+    await CreateUserUsecase(userRepository).call(user);
   }
 }

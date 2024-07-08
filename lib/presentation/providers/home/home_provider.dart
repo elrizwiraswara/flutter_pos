@@ -1,22 +1,21 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_pos/app/services/auth/sign_in_with_google.dart';
+import 'package:flutter_pos/app/services/auth/auth_service.dart';
 import 'package:flutter_pos/app/utilities/console_log.dart';
 import 'package:flutter_pos/core/errors/errors.dart';
 import 'package:flutter_pos/core/usecase/usecase.dart';
 import 'package:flutter_pos/domain/entities/ordered_product_entity.dart';
 import 'package:flutter_pos/domain/entities/product_entity.dart';
 import 'package:flutter_pos/domain/entities/transaction_entity.dart';
-import 'package:flutter_pos/domain/repositories/product_repository.dart';
 import 'package:flutter_pos/domain/repositories/transaction_repository.dart';
-import 'package:flutter_pos/domain/usecases/product_usecases.dart';
 import 'package:flutter_pos/domain/usecases/transaction_usecases.dart';
+import 'package:flutter_pos/presentation/providers/products/products_provider.dart';
+import 'package:flutter_pos/service_locator.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class HomeProvider extends ChangeNotifier {
   final TransactionRepository transactionRepository;
-  final ProductRepository productRepository;
 
-  HomeProvider({required this.transactionRepository, required this.productRepository});
+  HomeProvider({required this.transactionRepository});
 
   final panelController = PanelController();
 
@@ -40,17 +39,6 @@ class HomeProvider extends ChangeNotifier {
     description = null;
   }
 
-  Future<void> getAllProducts() async {
-    var res = await GetAllProductsUsecase(productRepository).call(AuthService().getAuthData()!.uid);
-
-    if (res.isSuccess) {
-      allProducts = res.data ?? [];
-      notifyListeners();
-    } else {
-      throw res.error?.error ?? 'Failed to load data';
-    }
-  }
-
   Future<Result<int>> createTransaction() async {
     try {
       var transaction = TransactionEntity(
@@ -67,13 +55,13 @@ class HomeProvider extends ChangeNotifier {
         updatedAt: DateTime.now().toIso8601String(),
       );
 
-      var res = await CreateTransaction(transactionRepository).call(transaction);
+      var res = await CreateTransactionUsecase(transactionRepository).call(transaction);
 
       resetStates();
       panelController.close();
 
-      // Refresh
-      getAllProducts();
+      // Refresh products
+      sl<ProductsProvider>().getAllProducts();
 
       return res;
     } catch (e) {
