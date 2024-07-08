@@ -8,6 +8,7 @@ import 'package:flutter_pos/domain/entities/transaction_entity.dart';
 import 'package:flutter_pos/presentation/providers/transactions/transaction_detail_provider.dart';
 import 'package:flutter_pos/presentation/screens/error_handler_screen.dart';
 import 'package:flutter_pos/presentation/widgets/app_empty_state.dart';
+import 'package:flutter_pos/presentation/widgets/app_progress_indicator.dart';
 import 'package:flutter_pos/service_locator.dart';
 
 class TransactionDetailScreen extends StatelessWidget {
@@ -22,14 +23,16 @@ class TransactionDetailScreen extends StatelessWidget {
       body: FutureBuilder(
         future: sl<TransactionDetailProvider>().getTransactionDetail(id),
         builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const AppProgressIndicator();
+          }
+
           if (snapshot.hasError) {
-            return const ErrorScreen();
+            return ErrorScreen(errorMessage: snapshot.error.toString());
           }
 
           if (snapshot.data == null) {
-            return const AppEmptyState(
-              title: 'Not Found',
-            );
+            return const AppEmptyState(title: 'Not Found');
           }
 
           return SingleChildScrollView(
