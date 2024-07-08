@@ -3,12 +3,15 @@ import 'package:flutter_pos/app/themes/app_sizes.dart';
 import 'package:flutter_pos/app/utilities/currency_formatter.dart';
 import 'package:flutter_pos/app/utilities/date_formatter.dart';
 import 'package:flutter_pos/presentation/providers/products/product_detail_provider.dart';
+import 'package:flutter_pos/presentation/screens/error_handler_screen.dart';
+import 'package:flutter_pos/presentation/widgets/app_button.dart';
+import 'package:flutter_pos/presentation/widgets/app_empty_state.dart';
 import 'package:flutter_pos/presentation/widgets/app_image.dart';
 import 'package:flutter_pos/presentation/widgets/app_progress_indicator.dart';
 import 'package:flutter_pos/service_locator.dart';
-import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 
-class ProductDetailScreen extends StatefulWidget {
+class ProductDetailScreen extends StatelessWidget {
   final int id;
 
   const ProductDetailScreen({
@@ -17,62 +20,94 @@ class ProductDetailScreen extends StatefulWidget {
   });
 
   @override
-  State<ProductDetailScreen> createState() => _ProductDetailScreenState();
-}
-
-class _ProductDetailScreenState extends State<ProductDetailScreen> {
-  final _productDetailProvider = sl<ProductDetailProvider>();
-
-  @override
-  void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _productDetailProvider.getProductDetail(widget.id);
-    });
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Product Detail'),
         titleSpacing: 0,
+        actions: [editButton(context)],
       ),
-      body: Consumer<ProductDetailProvider>(builder: (context, provider, _) {
-        if (provider.product == null) {
-          return const AppProgressIndicator();
-        }
+      body: FutureBuilder(
+        future: sl<ProductDetailProvider>().getProductDetail(id),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const AppProgressIndicator();
+          }
 
-        return SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              image(imageUrl: provider.product!.imageUrl),
-              Padding(
-                padding: const EdgeInsets.all(AppSizes.padding),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    name(
-                      productName: provider.product!.name,
-                      createdAt: provider.product!.createdAt,
-                      updatedAt: provider.product!.updatedAt,
-                    ),
-                    price(provider.product!.price),
-                    stock(provider.product!.stock),
-                    sold(provider.product!.stock),
-                    description(provider.product!.description),
-                  ],
-                ),
-              )
-            ],
-          ),
-        );
-      }),
+          if (snapshot.hasError) {
+            return ErrorScreen(errorMessage: snapshot.error.toString());
+          }
+
+          if (snapshot.data == null) {
+            return const AppEmptyState(title: 'Not Found');
+          }
+
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                image(context, imageUrl: snapshot.data!.imageUrl),
+                Padding(
+                  padding: const EdgeInsets.all(AppSizes.padding),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      name(
+                        context,
+                        productName: snapshot.data!.name,
+                        createdAt: snapshot.data!.createdAt,
+                        updatedAt: snapshot.data!.updatedAt,
+                      ),
+                      price(context, snapshot.data!.price),
+                      stock(context, snapshot.data!.stock),
+                      sold(context, snapshot.data!.stock),
+                      description(context, snapshot.data!.description),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
-  Widget image({
+  Widget editButton(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: AppSizes.padding),
+      child: AppButton(
+        height: 26,
+        borderRadius: BorderRadius.circular(4),
+        padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding / 2),
+        buttonColor: Theme.of(context).colorScheme.surfaceContainer,
+        child: Row(
+          children: [
+            Icon(
+              Icons.edit_note_rounded,
+              size: 12,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(width: AppSizes.padding / 4),
+            Text(
+              'Edit Product',
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+            ),
+          ],
+        ),
+        onTap: () {
+          context.push('/products/product-edit/$id');
+        },
+      ),
+    );
+  }
+
+  Widget image(
+    BuildContext context, {
     String? imageUrl,
     String? productName,
     String? createdAt,
@@ -95,7 +130,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget name({
+  Widget name(
+    BuildContext context, {
     String? productName,
     String? createdAt,
     String? updatedAt,
@@ -126,7 +162,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget price(int? price) {
+  Widget price(BuildContext context, int? price) {
     return Padding(
       padding: const EdgeInsets.only(top: AppSizes.padding),
       child: Column(
@@ -145,7 +181,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget stock(int? stock) {
+  Widget stock(BuildContext context, int? stock) {
     return Padding(
       padding: const EdgeInsets.only(top: AppSizes.padding),
       child: Column(
@@ -164,7 +200,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget sold(int? sold) {
+  Widget sold(BuildContext context, int? sold) {
     return Padding(
       padding: const EdgeInsets.only(top: AppSizes.padding),
       child: Column(
@@ -183,7 +219,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget description(String? description) {
+  Widget description(BuildContext context, String? description) {
     return Padding(
       padding: const EdgeInsets.only(top: AppSizes.padding),
       child: Column(

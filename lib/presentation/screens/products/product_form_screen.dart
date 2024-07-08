@@ -231,10 +231,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         bottom: AppSizes.padding * 2,
       ),
       child: AppButton(
-        text: widget.id != null ? 'Tambah' : 'Simpan',
+        text: widget.id == null ? 'Tambah' : 'Simpan',
         onTap: () {
           if (widget.id != null) {
-            // TODO
+            updatedProduct();
           } else {
             createProduct();
           }
@@ -256,6 +256,24 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     if (err == null) {
       router.go('/products');
       messenger.showSnackBar(const SnackBar(content: Text('Product created')));
+    } else {
+      AppDialog.showErrorDialog(error: err);
+    }
+  }
+
+  void updatedProduct() async {
+    final router = GoRouter.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+
+    AppDialog.showDialogProgress();
+
+    var err = await _productFormProvider.updatedProduct(widget.id!);
+
+    AppDialog.closeDialog();
+
+    if (err == null) {
+      router.pop();
+      messenger.showSnackBar(const SnackBar(content: Text('Product updated')));
     } else {
       AppDialog.showErrorDialog(error: err);
     }
