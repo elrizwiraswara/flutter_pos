@@ -1,13 +1,15 @@
 import 'package:flutter_pos/core/database/app_database.dart';
+import 'package:flutter_pos/data/data_sources/interfaces/product_datasource.dart';
 import 'package:flutter_pos/data/models/product_model.dart';
 import 'package:sqflite/sqflite.dart';
 
-class ProductDatasource {
+class ProductLocalDatasourceImpl extends ProductDatasource {
   final AppDatabase _appDatabase;
 
-  ProductDatasource(this._appDatabase);
+  ProductLocalDatasourceImpl(this._appDatabase);
 
-  Future<int> insertProduct(ProductModel product) async {
+  @override
+  Future<int> createProduct(ProductModel product) async {
     product.id ??= DateTime.now().millisecondsSinceEpoch;
     return await _appDatabase.database.insert(
       AppDatabaseConfig.productTableName,
@@ -16,6 +18,7 @@ class ProductDatasource {
     );
   }
 
+  @override
   Future<void> updateProduct(ProductModel product) async {
     await _appDatabase.database.update(
       AppDatabaseConfig.productTableName,
@@ -26,6 +29,7 @@ class ProductDatasource {
     );
   }
 
+  @override
   Future<void> deleteProduct(int id) async {
     await _appDatabase.database.delete(
       AppDatabaseConfig.productTableName,
@@ -34,6 +38,7 @@ class ProductDatasource {
     );
   }
 
+  @override
   Future<ProductModel?> getProduct(int id) async {
     var res = await _appDatabase.database.query(
       AppDatabaseConfig.productTableName,
@@ -48,6 +53,7 @@ class ProductDatasource {
     return ProductModel.fromJson(res.first);
   }
 
+  @override
   Future<List<ProductModel>> getAllUserProduct(String id) async {
     var res = await _appDatabase.database.query(
       AppDatabaseConfig.productTableName,
