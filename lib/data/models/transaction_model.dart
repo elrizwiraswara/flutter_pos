@@ -1,41 +1,34 @@
-import 'package:floor/floor.dart';
+import 'package:flutter_pos/data/models/ordered_product_model.dart';
 import 'package:flutter_pos/data/models/user_model.dart';
 import 'package:flutter_pos/domain/entities/transaction_entity.dart';
 
-@Entity(
-  tableName: 'transaction',
-  primaryKeys: ['id'],
-  foreignKeys: [
-    ForeignKey(
-      childColumns: ['id'],
-      parentColumns: ['createdById'],
-      entity: UserModel,
-    )
-  ],
-)
 class TransactionModel {
-  final int id;
-  final String paymentMethod;
-  final String? customerName;
-  final String? description;
-  final String? createdById;
-  final int receivedAmount;
-  final int returnAmount;
-  final int totalAmount;
-  final String createdAt;
-  final String updatedAt;
+  int? id;
+  String paymentMethod;
+  String? customerName;
+  String? description;
+  String createdById;
+  UserModel? createdBy;
+  List<OrderedProductModel>? orderedProducts;
+  int receivedAmount;
+  int returnAmount;
+  int totalAmount;
+  String? createdAt;
+  String? updatedAt;
 
-  const TransactionModel({
-    required this.id,
+  TransactionModel({
+    this.id,
     required this.paymentMethod,
     this.customerName,
     this.description,
     required this.createdById,
+    this.createdBy,
+    this.orderedProducts,
     required this.receivedAmount,
     required this.returnAmount,
     required this.totalAmount,
-    required this.createdAt,
-    required this.updatedAt,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory TransactionModel.fromJson(Map<String, dynamic> json) {
@@ -45,6 +38,10 @@ class TransactionModel {
       customerName: json['customerName'],
       description: json['description'],
       createdById: json['createdById'],
+      createdBy: json['createdBy'],
+      orderedProducts: json['orderedProducts'] != null
+          ? (json['orderedProducts'] as List).map((e) => OrderedProductModel.fromJson(e)).toList()
+          : null,
       receivedAmount: json['receivedAmount'],
       returnAmount: json['returnAmount'],
       totalAmount: json['totalAmount'],
@@ -60,6 +57,8 @@ class TransactionModel {
       'customerName': customerName,
       'description': description,
       'createdById': createdById,
+      'createdBy': createdBy,
+      'orderedProducts': orderedProducts?.map((e) => e.toJson()).toList(),
       'receivedAmount': receivedAmount,
       'returnAmount': returnAmount,
       'totalAmount': totalAmount,
@@ -75,6 +74,8 @@ class TransactionModel {
       customerName: entity.customerName,
       description: entity.description,
       createdById: entity.createdById,
+      createdBy: entity.createdBy != null ? UserModel.fromEntity(entity.createdBy!) : null,
+      orderedProducts: entity.orderedProducts?.map((e) => OrderedProductModel.fromEntity(e)).toList(),
       receivedAmount: entity.receivedAmount,
       returnAmount: entity.returnAmount,
       totalAmount: entity.totalAmount,
@@ -89,9 +90,9 @@ class TransactionModel {
       paymentMethod: paymentMethod,
       customerName: customerName,
       description: description,
-      createdBy: null,
+      createdBy: createdBy?.toEntity(),
       createdById: createdById,
-      products: const [],
+      orderedProducts: orderedProducts?.map((e) => e.toEntity()).toList(),
       receivedAmount: receivedAmount,
       returnAmount: returnAmount,
       totalAmount: totalAmount,

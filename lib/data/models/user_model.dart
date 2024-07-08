@@ -1,26 +1,24 @@
-import 'package:floor/floor.dart';
 import 'package:flutter_pos/domain/entities/user_entity.dart';
 
-@Entity(tableName: 'user', primaryKeys: ['id'])
 class UserModel {
-  final String id;
-  final String phone;
-  final String name;
-  final String? gender;
-  final String? birthdate;
-  final String? imageUrl;
-  final String createdAt;
-  final String updatedAt;
+  String? id;
+  String? phone;
+  String? name;
+  String? gender;
+  String? birthdate;
+  String? imageUrl;
+  String? createdAt;
+  String? updatedAt;
 
-  const UserModel({
-    required this.id,
-    required this.phone,
-    required this.name,
+  UserModel({
+    this.id,
+    this.phone,
+    this.name,
     this.gender,
     this.birthdate,
     this.imageUrl,
-    required this.createdAt,
-    required this.updatedAt,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
