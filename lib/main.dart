@@ -3,9 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pos/app/themes/app_theme.dart';
-import 'package:flutter_pos/data/data_sources/local/app_database.dart';
+import 'package:flutter_pos/core/database/app_database.dart';
 import 'package:flutter_pos/firebase_options.dart';
-import 'package:flutter_pos/presentation/widgets/error_handler_widget.dart';
+import 'package:flutter_pos/presentation/screens/error_handler_screen.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
@@ -25,7 +25,7 @@ void main() async {
     ),
 
     // Initialize app local db
-    AppDatabaseConfig.init(),
+    AppDatabase().init(),
   ]);
 
   // Initialize date formatting
@@ -42,11 +42,6 @@ void main() async {
     systemNavigationBarColor: Colors.transparent,
     statusBarColor: Colors.transparent,
   ));
-
-  // Error handler
-  ErrorWidget.builder = (FlutterErrorDetails details) {
-    return ErrorHandlerWidget(errorDetails: details);
-  };
 
   runApp(const MyApp());
 }
@@ -68,6 +63,7 @@ class MyApp extends StatelessWidget {
         locale: AppLocale.defaultLocale,
         supportedLocales: AppLocale.supportedLocales,
         localizationsDelegates: AppLocale.localizationsDelegates,
+        builder: (context, child) => ErrorHandlerBuilder(child: child),
       ),
     );
   }
