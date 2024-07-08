@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/app/assets/app_assets.dart';
 import 'package:flutter_pos/app/utilities/currency_formatter.dart';
 import 'package:flutter_pos/domain/entities/product_entity.dart';
 import 'package:flutter_pos/presentation/widgets/app_button.dart';
@@ -44,16 +43,11 @@ class ProductsCard extends StatelessWidget {
                   children: [
                     AspectRatio(
                       aspectRatio: 1,
-                      child: product.imageUrl.isNotEmpty
-                          ? AppImage(
-                              image: product.imageUrl,
-                              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
-                              borderRadius: 4,
-                            )
-                          : const AppImage(
-                              image: AppAssets.emptyPlaceholder,
-                              imgProvider: ImgProvider.assetImage,
-                            ),
+                      child: AppImage(
+                        image: product.imageUrl,
+                        backgroundColor: Theme.of(context).colorScheme.surface,
+                        borderRadius: 4,
+                      ),
                     ),
                     product.stock == 0
                         ? AspectRatio(
@@ -68,7 +62,8 @@ class ProductsCard extends StatelessWidget {
                               child: AppButton(
                                 height: 22,
                                 width: 54,
-                                padding: EdgeInsets.zero,
+                                padding: EdgeInsets.zero, 
+                                buttonColor: Theme.of(context).colorScheme.surfaceContainerLowest,
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [

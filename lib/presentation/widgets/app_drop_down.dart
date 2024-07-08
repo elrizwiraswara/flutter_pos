@@ -9,6 +9,7 @@ class AppDropDown<T> extends StatelessWidget {
   final String? labelText;
   final String? hintText;
   final double fontSize;
+  final EdgeInsets contentPadding;
 
   const AppDropDown({
     super.key,
@@ -19,84 +20,85 @@ class AppDropDown<T> extends StatelessWidget {
     this.labelText,
     this.hintText,
     this.fontSize = 14,
+    this.contentPadding = const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
   });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (labelText != null && labelText != '')
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: Text(
-              labelText!,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: fontSize),
+    return Opacity(
+      opacity: enabled ? 1.0 : 0.5,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (labelText != null && labelText != '')
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Text(
+                labelText!,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      fontSize: fontSize,
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
             ),
-          ),
-        DropdownButtonFormField<T>(
-          value: selectedValue,
-          onChanged: onChanged,
-          items: dropdownItems,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: fontSize),
-          icon: Icon(
-            Icons.keyboard_arrow_down_rounded,
-            color: Theme.of(context).colorScheme.outline,
-            size: 22,
-          ),
-          dropdownColor: Colors.white,
-          borderRadius: const BorderRadius.all(Radius.circular(AppSizes.radius)),
-          decoration: InputDecoration(
-            enabled: enabled,
-            isDense: true,
-            filled: true,
-            fillColor:
-                enabled ? Theme.of(context).colorScheme.secondaryContainer : Theme.of(context).colorScheme.surfaceDim,
-            hintText: hintText,
-            hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+          DropdownButtonFormField<T>(
+            value: selectedValue,
+            onChanged: onChanged,
+            items: dropdownItems,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontSize: fontSize,
-                  color: Theme.of(context).colorScheme.outline,
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
-            contentPadding: const EdgeInsets.fromLTRB(12, 16, 12, 8),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: const BorderRadius.all(
-                Radius.circular(AppSizes.radius),
-              ),
-              borderSide: BorderSide(
-                width: 0.5,
-                color: Theme.of(context).colorScheme.primary,
-              ),
+            icon: Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: Theme.of(context).colorScheme.outline,
+              size: 22,
             ),
-            border: OutlineInputBorder(
-              borderRadius: const BorderRadius.all(
-                Radius.circular(AppSizes.radius),
+            dropdownColor: Colors.white,
+            borderRadius: const BorderRadius.all(Radius.circular(AppSizes.radius)),
+            decoration: InputDecoration(
+              enabled: enabled,
+              isDense: true,
+              filled: true,
+              fillColor: enabled ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.surfaceDim,
+              hintText: hintText,
+              hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontSize: fontSize,
+                    color: Theme.of(context).colorScheme.outlineVariant,
+                  ),
+              contentPadding: contentPadding,
+              focusedBorder: OutlineInputBorder(
+                borderRadius: const BorderRadius.all(
+                  Radius.circular(AppSizes.radius),
+                ),
+                borderSide: BorderSide(
+                  width: 0.5,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
-              borderSide: BorderSide(
-                width: 0.5,
-                color: Theme.of(context).colorScheme.outlineVariant,
+              enabledBorder: OutlineInputBorder(
+                borderRadius: const BorderRadius.all(
+                  Radius.circular(AppSizes.radius),
+                ),
+                borderSide: BorderSide(
+                  width: 0.5,
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                ),
               ),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: const BorderRadius.all(
-                Radius.circular(AppSizes.radius),
-              ),
-              borderSide: BorderSide(
-                width: 0.5,
-                color: Theme.of(context).colorScheme.outlineVariant,
-              ),
-            ),
-            disabledBorder: OutlineInputBorder(
-              borderRadius: const BorderRadius.all(
-                Radius.circular(AppSizes.radius),
-              ),
-              borderSide: BorderSide(
-                width: 0.5,
-                color: Theme.of(context).colorScheme.surfaceDim,
+              disabledBorder: OutlineInputBorder(
+                borderRadius: const BorderRadius.all(
+                  Radius.circular(AppSizes.radius),
+                ),
+                borderSide: BorderSide(
+                  width: 0.5,
+                  color: Theme.of(context).colorScheme.surfaceDim,
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
