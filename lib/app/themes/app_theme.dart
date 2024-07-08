@@ -115,6 +115,16 @@ class AppTheme {
         thickness: 0.5,
       ),
       dialogBackgroundColor: colorScheme.surfaceContainerLowest,
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: colorScheme.primary,
+        contentTextStyle: textTheme.labelSmall?.copyWith(
+          color: colorScheme.surface,
+          fontWeight: FontWeight.w600,
+        ),
+        showCloseIcon: true,
+        elevation: 1,
+      ),
     );
   }
 }
