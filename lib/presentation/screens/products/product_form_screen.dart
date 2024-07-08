@@ -103,7 +103,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
             price(),
             stock(),
             description(),
-            button(),
+            createOrUpdateButton(),
+            deleteButton(),
           ],
         ),
       ),
@@ -224,20 +225,47 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     );
   }
 
-  Widget button() {
+  Widget createOrUpdateButton() {
     return Padding(
-      padding: const EdgeInsets.only(
-        top: AppSizes.padding * 1.5,
-        bottom: AppSizes.padding * 2,
-      ),
+      padding: const EdgeInsets.only(top: AppSizes.padding * 1.5),
       child: AppButton(
-        text: widget.id == null ? 'Tambah' : 'Simpan',
+        text: widget.id == null ? 'Add Product' : 'Update Product',
         onTap: () {
           if (widget.id != null) {
             updatedProduct();
           } else {
             createProduct();
           }
+        },
+      ),
+    );
+  }
+
+  Widget deleteButton() {
+    if (widget.id == null) return const SizedBox(height: AppSizes.padding * 2);
+
+    return Padding(
+      padding: const EdgeInsets.only(
+        top: AppSizes.padding,
+        bottom: AppSizes.padding * 2,
+      ),
+      child: AppButton(
+        text: 'Delete',
+        textColor: Theme.of(context).colorScheme.error,
+        buttonColor: Theme.of(context).colorScheme.surfaceContainerLowest,
+        onTap: () {
+          AppDialog.show(
+            title: 'Confirm',
+            text: 'Are you sure want to delete this product?',
+            leftButtonText: 'Cancel',
+            rightButtonText: 'Delete',
+            rightButtonColor: Theme.of(context).colorScheme.errorContainer,
+            rightButtonTextColor: Theme.of(context).colorScheme.error,
+            onTapRightButton: () async {
+              AppDialog.closeDialog();
+              deleteProduct();
+            },
+          );
         },
       ),
     );
@@ -274,6 +302,24 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     if (err == null) {
       router.pop();
       messenger.showSnackBar(const SnackBar(content: Text('Product updated')));
+    } else {
+      AppDialog.showErrorDialog(error: err);
+    }
+  }
+
+  void deleteProduct() async {
+    final router = GoRouter.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+
+    AppDialog.showDialogProgress();
+
+    var err = await _productFormProvider.deleteProduct(widget.id!);
+
+    AppDialog.closeDialog();
+
+    if (err == null) {
+      router.go('/products');
+      messenger.showSnackBar(const SnackBar(content: Text('Product deleted')));
     } else {
       AppDialog.showErrorDialog(error: err);
     }

@@ -114,7 +114,7 @@ class ProductDetailScreen extends StatelessWidget {
     String? updatedAt,
   }) {
     return AspectRatio(
-      aspectRatio: 2,
+      aspectRatio: 1.5,
       child: AppImage(
         image: imageUrl ?? '',
         backgroundColor: Theme.of(context).colorScheme.surface,
