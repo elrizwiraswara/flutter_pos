@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/app/const/dummy.dart';
 import 'package:flutter_pos/app/themes/app_sizes.dart';
+import 'package:flutter_pos/domain/entities/product_entity.dart';
+import 'package:flutter_pos/presentation/providers/products/products_provider.dart';
 import 'package:flutter_pos/presentation/widgets/app_button.dart';
+import 'package:flutter_pos/presentation/widgets/app_empty_state.dart';
+import 'package:flutter_pos/presentation/widgets/app_progress_indicator.dart';
 import 'package:flutter_pos/presentation/widgets/app_text_field.dart';
 import 'package:flutter_pos/presentation/widgets/products_card.dart';
+import 'package:flutter_pos/service_locator.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class ProductsScreen extends StatefulWidget {
   const ProductsScreen({super.key});
@@ -14,6 +19,16 @@ class ProductsScreen extends StatefulWidget {
 }
 
 class _ProductsScreenState extends State<ProductsScreen> {
+  final _productProvider = sl<ProductsProvider>();
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _productProvider.getAllProducts();
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,25 +37,39 @@ class _ProductsScreenState extends State<ProductsScreen> {
         actions: [
           addButton(),
         ],
-        bottom: PreferredSize(
-          preferredSize: Size(AppSizes.screenWidth(context), 75),
-          child: searchField(),
-        ),
+        // bottom: PreferredSize(
+        //   preferredSize: Size(AppSizes.screenWidth(context), 75),
+        //   child: searchField(),
+        // ),
       ),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(AppSizes.padding),
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 200,
-          childAspectRatio: 1 / 1.5,
-          crossAxisSpacing: AppSizes.padding / 2,
-          mainAxisSpacing: AppSizes.padding / 2,
-        ),
-        physics: const BouncingScrollPhysics(),
-        itemCount: 10,
-        itemBuilder: (context, i) {
-          return productCard();
-        },
-      ),
+      body: Consumer<ProductsProvider>(builder: (context, provider, _) {
+        if (provider.allProducts == null) {
+          return const AppProgressIndicator();
+        }
+
+        if (provider.allProducts!.isEmpty) {
+          return AppEmptyState(
+            subtitle: 'No products available, add product to continue',
+            buttonText: 'Add Product',
+            onTapButton: () => context.go('/products/product-create'),
+          );
+        }
+
+        return GridView.builder(
+          padding: const EdgeInsets.all(AppSizes.padding),
+          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 200,
+            childAspectRatio: 1 / 1.5,
+            crossAxisSpacing: AppSizes.padding / 2,
+            mainAxisSpacing: AppSizes.padding / 2,
+          ),
+          physics: const BouncingScrollPhysics(),
+          itemCount: provider.allProducts!.length,
+          itemBuilder: (context, i) {
+            return productCard(provider.allProducts![i]);
+          },
+        );
+      }),
     );
   }
 
@@ -71,7 +100,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
           ],
         ),
         onTap: () {
-          context.go('/products/product-form/');
+          context.go('/products/product-create');
         },
       ),
     );
@@ -90,11 +119,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
     );
   }
 
-  Widget productCard() {
+  Widget productCard(ProductEntity product) {
     return ProductsCard(
-      product: productDummy,
+      product: product,
       onTap: () {
-        context.go('/products/product-detail/1');
+        context.go('/products/product-detail/${product.id}');
       },
     );
   }

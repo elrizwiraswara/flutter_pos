@@ -5,10 +5,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_pos/app/themes/app_sizes.dart';
 import 'package:flutter_pos/presentation/providers/products/product_form_provider.dart';
 import 'package:flutter_pos/presentation/widgets/app_button.dart';
+import 'package:flutter_pos/presentation/widgets/app_dialog.dart';
 import 'package:flutter_pos/presentation/widgets/app_icon_button.dart';
 import 'package:flutter_pos/presentation/widgets/app_image.dart';
 import 'package:flutter_pos/presentation/widgets/app_text_field.dart';
 import 'package:flutter_pos/service_locator.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -26,7 +28,7 @@ class ProductFormScreen extends StatefulWidget {
 }
 
 class _ProductFormScreenState extends State<ProductFormScreen> {
-  final _productDetailProvider = sl<ProductFormProvider>();
+  final _productFormProvider = sl<ProductFormProvider>();
 
   final _nameController = TextEditingController();
   final _priceController = TextEditingController();
@@ -35,9 +37,16 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    _productFormProvider.clearStates();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (widget.id != null) {
-        _productDetailProvider.getProductDetail(widget.id!);
+        await _productFormProvider.getProductDetail(widget.id!);
+
+        _nameController.text = _productFormProvider.name ?? '';
+        _priceController.text = _productFormProvider.price.toString();
+        _stockController.text = _productFormProvider.stock.toString();
+        _descController.text = _productFormProvider.description ?? '';
       }
     });
     super.initState();
@@ -73,7 +82,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
     if (croppedFile != null) {
       var file = File(croppedFile.path);
-      _productDetailProvider.onChangedImage(file);
+      _productFormProvider.onChangedImage(file);
     }
   }
 
@@ -117,7 +126,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                 GestureDetector(
                   onTap: onTapImage,
                   child: AppImage(
-                    image: provider.imageFile?.path ?? provider.product.imageUrl ?? '',
+                    image: provider.imageFile?.path ?? provider.imageUrl ?? '',
                     imgProvider: provider.imageFile != null ? ImgProvider.fileImage : ImgProvider.networkImage,
                     width: 100,
                     height: 100,
@@ -158,7 +167,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         controller: _nameController,
         labelText: 'Nama',
         hintText: 'Masukkan nama produk...',
-        onChanged: _productDetailProvider.onChangedName,
+        onChanged: _productFormProvider.onChangedName,
       ),
     );
   }
@@ -183,7 +192,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                 ),
           ),
         ),
-        onChanged: _productDetailProvider.onChangedPrice,
+        onChanged: _productFormProvider.onChangedPrice,
       ),
     );
   }
@@ -192,13 +201,12 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     return Padding(
       padding: const EdgeInsets.only(top: AppSizes.padding),
       child: AppTextField(
-        enabled: false,
         controller: _stockController,
         labelText: 'Stok',
         hintText: 'Masukkan stok produk...',
         keyboardType: TextInputType.number,
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        onChanged: _productDetailProvider.onChangedStock,
+        onChanged: _productFormProvider.onChangedStock,
       ),
     );
   }
@@ -211,7 +219,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         labelText: 'Deskripsi',
         hintText: 'Masukkan deskripsi produk...',
         maxLines: 4,
-        onChanged: _productDetailProvider.onChangedDesc,
+        onChanged: _productFormProvider.onChangedDesc,
       ),
     );
   }
@@ -228,10 +236,28 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           if (widget.id != null) {
             // TODO
           } else {
-            // TODO
+            createProduct();
           }
         },
       ),
     );
+  }
+
+  void createProduct() async {
+    final router = GoRouter.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+
+    AppDialog.showDialogProgress();
+
+    var err = await _productFormProvider.createProduct();
+
+    AppDialog.closeDialog();
+
+    if (err == null) {
+      router.go('/products');
+      messenger.showSnackBar(const SnackBar(content: Text('Product created')));
+    } else {
+      AppDialog.showErrorDialog(error: err);
+    }
   }
 }

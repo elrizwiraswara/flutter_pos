@@ -1,16 +1,79 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_pos/domain/entities/category_entity.dart';
+import 'package:flutter_pos/app/services/auth/sign_in_with_google.dart';
+import 'package:flutter_pos/app/services/firebase_storage/firebase_storage_service.dart';
+import 'package:flutter_pos/app/utilities/console_log.dart';
 import 'package:flutter_pos/domain/entities/product_entity.dart';
+import 'package:flutter_pos/domain/repositories/product_repository.dart';
+import 'package:flutter_pos/domain/usecases/product_usecases.dart';
 
 class ProductFormProvider extends ChangeNotifier {
-  File? imageFile;
+  final ProductRepository productRepository;
 
-  ProductEntity product = ProductEntity();
+  ProductFormProvider({required this.productRepository});
+
+  File? imageFile;
+  String? imageUrl;
+  String? name;
+  int? price;
+  int? stock;
+  String? description;
+
+  void clearStates() {
+    imageFile = null;
+    imageUrl = null;
+    name = null;
+    price = null;
+    stock = null;
+    description = null;
+  }
 
   Future<void> getProductDetail(int id) async {
-    // TODO
+    var res = await GetProductUsecase(productRepository).call(id);
+
+    if (res.isSuccess) {
+      var product = res.data;
+
+      imageUrl = product?.imageUrl;
+      name = product?.name;
+      price = product?.price;
+      stock = product?.stock;
+      description = product?.description;
+
+      notifyListeners();
+    } else {
+      throw res.error?.error ?? 'Failed to load data';
+    }
+  }
+
+  Future<String?> createProduct() async {
+    try {
+      if (imageFile != null) {
+        imageUrl = await FirebaseStorageService().uploadProductImage(imageFile!.path);
+      }
+
+      cl('[createProduct].imageUrl $imageUrl');
+
+      var product = ProductEntity(
+        createdById: AuthService().getAuthData()!.uid,
+        name: name!,
+        imageUrl: imageUrl ?? '',
+        stock: stock ?? 0,
+        sold: 0,
+        price: price ?? 0,
+        description: description ?? '',
+        createdAt: DateTime.now().toIso8601String(),
+        updatedAt: DateTime.now().toIso8601String(),
+      );
+
+      await CreateProductUsecase(productRepository).call(product);
+
+      return null;
+    } catch (e) {
+      cl("[createProduct].error $e");
+      return e.toString();
+    }
   }
 
   void onChangedImage(File value) {
@@ -19,27 +82,22 @@ class ProductFormProvider extends ChangeNotifier {
   }
 
   void onChangedName(String value) {
-    product.name = value;
-    notifyListeners();
-  }
-
-  void onChangedCatgeory(CategoryEntity value) {
-    product.category = value;
+    name = value;
     notifyListeners();
   }
 
   void onChangedPrice(String value) {
-    product.price = int.tryParse(value);
+    price = int.tryParse(value);
     notifyListeners();
   }
 
   void onChangedStock(String value) {
-    product.stock = int.tryParse(value);
+    stock = int.tryParse(value);
     notifyListeners();
   }
 
   void onChangedDesc(String value) {
-    product.description = value;
+    description = value;
     notifyListeners();
   }
 }
