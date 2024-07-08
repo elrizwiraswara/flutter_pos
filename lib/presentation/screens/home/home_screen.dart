@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_pos/app/themes/app_sizes.dart';
-import 'package:flutter_pos/app/utilities/console_log.dart';
 import 'package:flutter_pos/domain/entities/product_entity.dart';
 import 'package:flutter_pos/presentation/providers/home/home_provider.dart';
+import 'package:flutter_pos/presentation/providers/products/products_provider.dart';
 import 'package:flutter_pos/presentation/screens/home/components/cart_panel_body.dart';
 import 'package:flutter_pos/presentation/screens/home/components/cart_panel_footer.dart';
 import 'package:flutter_pos/presentation/screens/home/components/cart_panel_header.dart';
@@ -27,11 +27,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final _homeProvider = sl<HomeProvider>();
+  final _productProvider = sl<ProductsProvider>();
 
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _homeProvider.getAllProducts();
+      _productProvider.getAllProducts();
     });
     super.initState();
   }
@@ -155,7 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget body() {
     return Padding(
       padding: const EdgeInsets.only(bottom: 232),
-      child: Consumer<HomeProvider>(builder: (context, provider, _) {
+      child: Consumer<ProductsProvider>(builder: (context, provider, _) {
         if (provider.allProducts == null) {
           return const AppProgressIndicator();
         }
@@ -164,7 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
           return AppEmptyState(
             subtitle: 'No products available, add product to continue',
             buttonText: 'Add Product',
-            onTapButton: () => context.go('/products/product-create'),
+            onTapButton: () => context.push('/products/product-create'),
           );
         }
 
@@ -193,8 +194,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return ProductsCard(
       product: product,
       onTap: () {
-        cl('========== ${product.id}');
-        cl('========== ${product.name}');
         if (product.stock == 0) return;
 
         int qty = _homeProvider.orderedProducts.where((e) => e.productId == product.id).firstOrNull?.quantity ?? 0;
