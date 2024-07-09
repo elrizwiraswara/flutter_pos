@@ -33,6 +33,8 @@ class ErrorHandlerBuilderState extends State<ErrorHandlerBuilder> {
 
     // Prevent to push to ErrorScreen multiple times
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (kDebugMode) return;
+
       if (AppRoutes.router.routeInformationProvider.value.uri.path != '/error') {
         AppRoutes.router.go('/error', extra: errorDetails);
       }
@@ -54,7 +56,6 @@ class ErrorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(elevation: 0),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 250),
