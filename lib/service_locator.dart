@@ -1,12 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_pos/core/database/app_database.dart';
+import 'package:flutter_pos/app/database/app_database.dart';
 import 'package:flutter_pos/data/data_sources/local/product_local_datasource_impl.dart';
+import 'package:flutter_pos/data/data_sources/local/queued_action_local_datasource_impl.dart';
 import 'package:flutter_pos/data/data_sources/local/transaction_local_datasource_impl.dart';
 import 'package:flutter_pos/data/data_sources/local/user_local_datasource_impl.dart';
 import 'package:flutter_pos/data/data_sources/remote/product_remote_datasource_impl.dart';
 import 'package:flutter_pos/data/data_sources/remote/transaction_remote_datasource_impl.dart';
 import 'package:flutter_pos/data/data_sources/remote/user_remote_datasource_impl.dart';
 import 'package:flutter_pos/data/repositories/product_repository_impl.dart';
+import 'package:flutter_pos/data/repositories/queued_action_repository_impl.dart';
 import 'package:flutter_pos/data/repositories/transaction_repository_impl.dart';
 import 'package:flutter_pos/data/repositories/user_repository_impl.dart';
 import 'package:flutter_pos/presentation/providers/account/account_provider.dart';
@@ -16,6 +18,7 @@ import 'package:flutter_pos/presentation/providers/main/main_provider.dart';
 import 'package:flutter_pos/presentation/providers/products/product_detail_provider.dart';
 import 'package:flutter_pos/presentation/providers/products/product_form_provider.dart';
 import 'package:flutter_pos/presentation/providers/products/products_provider.dart';
+import 'package:flutter_pos/presentation/providers/theme/theme_provider.dart';
 import 'package:flutter_pos/presentation/providers/transactions/transaction_detail_provider.dart';
 import 'package:flutter_pos/presentation/providers/transactions/transactions_provider.dart';
 import 'package:get_it/get_it.dart';
@@ -34,6 +37,7 @@ void setupServiceLocator() async {
   sl.registerLazySingleton(() => ProductLocalDatasourceImpl(sl<AppDatabase>()));
   sl.registerLazySingleton(() => TransactionLocalDatasourceImpl(sl<AppDatabase>()));
   sl.registerLazySingleton(() => UserLocalDatasourceImpl(sl<AppDatabase>()));
+  sl.registerLazySingleton(() => QueuedActionLocalDatasourceImpl(sl<AppDatabase>()));
   // Remote Datasources
   sl.registerLazySingleton(() => ProductRemoteDatasourceImpl(sl<FirebaseFirestore>()));
   sl.registerLazySingleton(() => TransactionRemoteDatasourceImpl(sl<FirebaseFirestore>()));
@@ -44,18 +48,26 @@ void setupServiceLocator() async {
     () => ProductRepositoryImpl(
       productLocalDatasource: sl<ProductLocalDatasourceImpl>(),
       productRemoteDatasource: sl<ProductRemoteDatasourceImpl>(),
+      queuedActionLocalDatasourceImpl: sl<QueuedActionLocalDatasourceImpl>(),
     ),
   );
   sl.registerLazySingleton(
     () => TransactionRepositoryImpl(
       transactionLocalDatasource: sl<TransactionLocalDatasourceImpl>(),
       transactionRemoteDatasource: sl<TransactionRemoteDatasourceImpl>(),
+      queuedActionLocalDatasourceImpl: sl<QueuedActionLocalDatasourceImpl>(),
     ),
   );
   sl.registerLazySingleton(
     () => UserRepositoryImpl(
       userLocalDatasource: sl<UserLocalDatasourceImpl>(),
       userRemoteDatasource: sl<UserRemoteDatasourceImpl>(),
+      queuedActionLocalDatasourceImpl: sl<QueuedActionLocalDatasourceImpl>(),
+    ),
+  );
+  sl.registerLazySingleton(
+    () => QueuedActionRepositoryImpl(
+      queuedActionLocalDatasourceImpl: sl<QueuedActionLocalDatasourceImpl>(),
     ),
   );
 
@@ -65,6 +77,7 @@ void setupServiceLocator() async {
       userRepository: sl<UserRepositoryImpl>(),
       productRepository: sl<ProductRepositoryImpl>(),
       transactionRepository: sl<TransactionRepositoryImpl>(),
+      queuedActionRepository: sl<QueuedActionRepositoryImpl>(),
     ),
   );
   sl.registerLazySingleton(() => AuthProvider(userRepository: sl<UserRepositoryImpl>()));
@@ -75,6 +88,7 @@ void setupServiceLocator() async {
   sl.registerLazySingleton(() => ProductFormProvider(productRepository: sl<ProductRepositoryImpl>()));
   sl.registerLazySingleton(() => ProductDetailProvider(productRepository: sl<ProductRepositoryImpl>()));
   sl.registerLazySingleton(() => TransactionDetailProvider(transactionRepository: sl<TransactionRepositoryImpl>()));
+  sl.registerLazySingleton(() => ThemeProvider());
 }
 
 // All providers
@@ -87,5 +101,5 @@ final List<SingleChildWidget> providers = [
   ChangeNotifierProvider(create: (_) => sl<AccountProvider>()),
   ChangeNotifierProvider(create: (_) => sl<ProductFormProvider>()),
   ChangeNotifierProvider(create: (_) => sl<ProductDetailProvider>()),
-  ChangeNotifierProvider(create: (_) => sl<TransactionDetailProvider>()),
+  ChangeNotifierProvider(create: (_) => sl<ThemeProvider>()),
 ];
