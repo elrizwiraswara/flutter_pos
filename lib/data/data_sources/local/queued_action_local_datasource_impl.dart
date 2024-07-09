@@ -1,0 +1,52 @@
+import 'package:flutter_pos/app/database/app_database.dart';
+import 'package:flutter_pos/data/data_sources/interfaces/queued_action_datasource.dart';
+import 'package:flutter_pos/data/models/queued_action_model.dart';
+import 'package:sqflite/sqflite.dart';
+
+class QueuedActionLocalDatasourceImpl extends QueuedActionDatasource {
+  final AppDatabase _appDatabase;
+
+  QueuedActionLocalDatasourceImpl(this._appDatabase);
+
+  @override
+  Future<int> createQueuedAction(QueuedActionModel queue) async {
+    queue.id ??= DateTime.now().millisecondsSinceEpoch;
+    await _appDatabase.database.insert(
+      AppDatabaseConfig.queuedActionTableName,
+      queue.toJson(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+    return queue.id!;
+  }
+
+  @override
+  Future<void> deleteQueuedAction(int id) async {
+    await _appDatabase.database.delete(
+      AppDatabaseConfig.queuedActionTableName,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  @override
+  Future<QueuedActionModel?> getQueuedAction(int id) async {
+    var res = await _appDatabase.database.query(
+      AppDatabaseConfig.queuedActionTableName,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    if (res.isEmpty) return null;
+
+    return QueuedActionModel.fromJson(res.first);
+  }
+
+  @override
+  Future<List<QueuedActionModel>> getAllUserQueuedAction() async {
+    var res = await _appDatabase.database.query(
+      AppDatabaseConfig.queuedActionTableName,
+    );
+
+    return res.map((e) => QueuedActionModel.fromJson(e)).toList();
+  }
+}

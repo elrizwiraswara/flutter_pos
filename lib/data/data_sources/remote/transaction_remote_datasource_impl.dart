@@ -16,19 +16,17 @@ class TransactionRemoteDatasourceImpl extends TransactionDatasource {
     return await _firebaseFirestore.runTransaction((trx) async {
       // Create transaction
       var tarnsactionDocRef = _firebaseFirestore.collection('Transaction').doc('${transaction.id}');
-      var transactionId = await trx
-          .set(
-              tarnsactionDocRef,
-              transaction.toJson()
-                ..remove('orderedProducts')
-                ..remove('createdBy'))
-          .get(tarnsactionDocRef);
+      trx.set(
+          tarnsactionDocRef,
+          transaction.toJson()
+            ..remove('orderedProducts')
+            ..remove('createdBy'));
 
       if (transaction.orderedProducts?.isNotEmpty ?? false) {
         for (var order in transaction.orderedProducts!) {
           // Create ordered product
           order.id ??= DateTime.now().millisecondsSinceEpoch;
-          order.transactionId = transactionId.data()?['id'];
+          order.transactionId = transaction.id!;
           var orderedProductDocRef = _firebaseFirestore.collection('OrderedProduct').doc('${order.id}');
 
           trx.set(
@@ -37,18 +35,19 @@ class TransactionRemoteDatasourceImpl extends TransactionDatasource {
           );
 
           // Update product stock and sold
-          int stock = (order.product?.stock ?? 0) - order.quantity;
-          int sold = (order.product?.sold ?? 0) + order.quantity;
-          var productDocRef = _firebaseFirestore.collection('Product').doc('${order.id}');
+          order.product?.stock -= order.quantity;
+          order.product?.sold += order.quantity;
+          var productDocRef = _firebaseFirestore.collection('Product').doc('${order.productId}');
 
-          trx.update(
+          trx.set(
             productDocRef,
-            {'stock': stock, 'sold': sold},
+            order.product?.toJson(),
+            SetOptions(merge: true),
           );
         }
       }
 
-      return transactionId.data()?['id'];
+      return transaction.id!;
     });
   }
 
@@ -62,6 +61,7 @@ class TransactionRemoteDatasourceImpl extends TransactionDatasource {
         transaction.toJson()
           ..remove('orderedProducts')
           ..remove('createdBy'),
+        SetOptions(merge: true),
       );
 
       if (transaction.orderedProducts?.isNotEmpty ?? false) {
@@ -72,16 +72,18 @@ class TransactionRemoteDatasourceImpl extends TransactionDatasource {
           trx.set(
             orderedProductDocRef,
             order.toJson()..remove('product'),
+            SetOptions(merge: true),
           );
 
           // Update product stock and sold
-          int stock = (order.product?.stock ?? 0) - order.quantity;
-          int sold = (order.product?.sold ?? 0) + order.quantity;
-          var productDocRef = _firebaseFirestore.collection('Product').doc('${order.id}');
+          order.product?.stock -= order.quantity;
+          order.product?.sold += order.quantity;
+          var productDocRef = _firebaseFirestore.collection('Product').doc('${order.productId}');
 
-          trx.update(
+          trx.set(
             productDocRef,
-            {'stock': stock, 'sold': sold},
+            order.product?.toJson(),
+            SetOptions(merge: true),
           );
         }
       }
@@ -108,13 +110,18 @@ class TransactionRemoteDatasourceImpl extends TransactionDatasource {
 
       // Get transaction ordered products
       var rawOrderedProducts =
-          await _firebaseFirestore.collection('OrderedProduct').where('transactionId', isEqualTo: id).get();
+          await _firebaseFirestore.collection('OrderedProduct').where('transactionId', isEqualTo: transaction.id).get();
 
       var orderedProducts = rawOrderedProducts.docs.map((e) => OrderedProductModel.fromJson(e.data())).toList();
 
-      // Get created by
-      var rawCreatedBy = await _firebaseFirestore.collection('User').doc(transaction.createdById).get();
+      // Set ordered products to transaction
+      transaction.orderedProducts = orderedProducts;
 
+      // Get created by
+      var rawCreatedByDocRef = _firebaseFirestore.collection('User').doc(transaction.createdById);
+      var rawCreatedBy = await trx.get(rawCreatedByDocRef);
+
+      // Set created by to transaction
       if (rawCreatedBy.data() != null) {
         transaction.createdBy = UserModel.fromJson(rawCreatedBy.data()!);
       }
@@ -122,7 +129,8 @@ class TransactionRemoteDatasourceImpl extends TransactionDatasource {
       // Get products of ordered products
       if (orderedProducts.isNotEmpty) {
         for (var order in orderedProducts) {
-          var rawProducts = await _firebaseFirestore.collection('Product').doc('${order.productId}').get();
+          var rawProductDocRef = _firebaseFirestore.collection('Product').doc('${order.productId}');
+          var rawProducts = await trx.get(rawProductDocRef);
 
           if (rawProducts.data() == null) continue;
 
@@ -130,9 +138,6 @@ class TransactionRemoteDatasourceImpl extends TransactionDatasource {
           order.product = ProductModel.fromJson(rawProducts.data()!);
         }
       }
-
-      // Set ordered products to transaction
-      transaction.orderedProducts = orderedProducts;
 
       return transaction;
     });
@@ -143,20 +148,6 @@ class TransactionRemoteDatasourceImpl extends TransactionDatasource {
     var rawTransactions =
         await _firebaseFirestore.collection('Transaction').where('createdById', isEqualTo: userId).get();
 
-    if (rawTransactions.docs.isEmpty) {
-      return [];
-    }
-
-    List<TransactionModel> transactions = [];
-
-    for (var transaction in rawTransactions.docs) {
-      var data = await getTransaction(transaction.data()['id'] as int);
-
-      if (data == null) continue;
-
-      transactions.add(data);
-    }
-
-    return transactions;
+    return rawTransactions.docs.map((e) => TransactionModel.fromJson(e.data())).toList();
   }
 }
