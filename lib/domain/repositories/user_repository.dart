@@ -1,5 +1,5 @@
-import 'package:flutter_pos/core/usecase/usecase.dart';
-import 'package:flutter_pos/domain/entities/user_entity.dart';
+import '../../core/usecase/usecase.dart';
+import '../entities/user_entity.dart';
 
 abstract class UserRepository {
   Future<Result<UserEntity>> getUser(String userId);

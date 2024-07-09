@@ -1,6 +1,6 @@
-import 'package:flutter_pos/app/database/app_database.dart';
-import 'package:flutter_pos/data/data_sources/interfaces/queued_action_datasource.dart';
-import 'package:flutter_pos/data/models/queued_action_model.dart';
+import '../../../app/database/app_database.dart';
+import '../interfaces/queued_action_datasource.dart';
+import '../../models/queued_action_model.dart';
 import 'package:sqflite/sqflite.dart';
 
 class QueuedActionLocalDatasourceImpl extends QueuedActionDatasource {

@@ -1,15 +1,15 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_pos/app/services/auth/auth_service.dart';
-import 'package:flutter_pos/app/utilities/console_log.dart';
-import 'package:flutter_pos/core/errors/errors.dart';
-import 'package:flutter_pos/core/usecase/usecase.dart';
-import 'package:flutter_pos/domain/entities/ordered_product_entity.dart';
-import 'package:flutter_pos/domain/entities/product_entity.dart';
-import 'package:flutter_pos/domain/entities/transaction_entity.dart';
-import 'package:flutter_pos/domain/repositories/transaction_repository.dart';
-import 'package:flutter_pos/domain/usecases/transaction_usecases.dart';
-import 'package:flutter_pos/presentation/providers/products/products_provider.dart';
-import 'package:flutter_pos/service_locator.dart';
+import '../../../app/services/auth/auth_service.dart';
+import '../../../app/utilities/console_log.dart';
+import '../../../core/errors/errors.dart';
+import '../../../core/usecase/usecase.dart';
+import '../../../domain/entities/ordered_product_entity.dart';
+import '../../../domain/entities/product_entity.dart';
+import '../../../domain/entities/transaction_entity.dart';
+import '../../../domain/repositories/transaction_repository.dart';
+import '../../../domain/usecases/transaction_usecases.dart';
+import '../products/products_provider.dart';
+import '../../../service_locator.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class HomeProvider extends ChangeNotifier {

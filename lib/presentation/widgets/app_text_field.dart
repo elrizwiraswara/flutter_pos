@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_pos/app/themes/app_sizes.dart';
+import '../../app/themes/app_sizes.dart';
 
 class AppTextField extends StatelessWidget {
   final TextEditingController? controller;

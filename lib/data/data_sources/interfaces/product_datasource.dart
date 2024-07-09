@@ -1,4 +1,4 @@
-import 'package:flutter_pos/data/models/product_model.dart';
+import '../../models/product_model.dart';
 
 abstract class ProductDatasource {
   Future<int> createProduct(ProductModel product);

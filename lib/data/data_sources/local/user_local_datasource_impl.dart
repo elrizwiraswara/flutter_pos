@@ -1,6 +1,6 @@
-import 'package:flutter_pos/app/database/app_database.dart';
-import 'package:flutter_pos/data/data_sources/interfaces/user_datasource.dart';
-import 'package:flutter_pos/data/models/user_model.dart';
+import '../../../app/database/app_database.dart';
+import '../interfaces/user_datasource.dart';
+import '../../models/user_model.dart';
 import 'package:sqflite/sqflite.dart';
 
 class UserLocalDatasourceImpl extends UserDatasource {

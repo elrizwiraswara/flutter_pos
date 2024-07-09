@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/app/themes/app_sizes.dart';
-import 'package:flutter_pos/presentation/widgets/app_button.dart';
+import '../../app/themes/app_sizes.dart';
+import 'app_button.dart';
 
 class AppEmptyState extends StatelessWidget {
   final String? title;

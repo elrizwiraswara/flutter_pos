@@ -1,4 +1,4 @@
-import 'package:flutter_pos/data/models/transaction_model.dart';
+import '../../models/transaction_model.dart';
 
 abstract class TransactionDatasource {
   Future<int> createTransaction(TransactionModel transaction);

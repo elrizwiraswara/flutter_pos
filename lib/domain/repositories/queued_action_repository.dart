@@ -1,5 +1,5 @@
-import 'package:flutter_pos/core/usecase/usecase.dart';
-import 'package:flutter_pos/domain/entities/queued_action_entity.dart';
+import '../../core/usecase/usecase.dart';
+import '../entities/queued_action_entity.dart';
 
 abstract class QueuedActionRepository {
   Future<Result<List<QueuedActionEntity>>> getAllQueuedAction();

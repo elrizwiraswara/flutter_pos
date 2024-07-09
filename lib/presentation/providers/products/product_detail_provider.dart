@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_pos/domain/entities/product_entity.dart';
-import 'package:flutter_pos/domain/repositories/product_repository.dart';
-import 'package:flutter_pos/domain/usecases/product_usecases.dart';
+import '../../../domain/entities/product_entity.dart';
+import '../../../domain/repositories/product_repository.dart';
+import '../../../domain/usecases/product_usecases.dart';
 
 class ProductDetailProvider extends ChangeNotifier {
   final ProductRepository productRepository;

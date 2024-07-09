@@ -1,4 +1,4 @@
-import 'package:flutter_pos/domain/entities/user_entity.dart';
+import '../../domain/entities/user_entity.dart';
 
 class UserModel {
   String? id;

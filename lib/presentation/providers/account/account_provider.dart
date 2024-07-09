@@ -1,11 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_pos/app/services/firebase_storage/firebase_storage_service.dart';
-import 'package:flutter_pos/app/utilities/console_log.dart';
-import 'package:flutter_pos/domain/entities/user_entity.dart';
-import 'package:flutter_pos/domain/repositories/user_repository.dart';
-import 'package:flutter_pos/domain/usecases/user_usecases.dart';
+import '../../../app/services/firebase_storage/firebase_storage_service.dart';
+import '../../../app/utilities/console_log.dart';
+import '../../../domain/entities/user_entity.dart';
+import '../../../domain/repositories/user_repository.dart';
+import '../../../domain/usecases/user_usecases.dart';
 
 class AccountProvider extends ChangeNotifier {
   final UserRepository userRepository;

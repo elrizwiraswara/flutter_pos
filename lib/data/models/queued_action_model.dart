@@ -1,4 +1,4 @@
-import 'package:flutter_pos/domain/entities/queued_action_entity.dart';
+import '../../domain/entities/queued_action_entity.dart';
 
 class QueuedActionModel {
   int? id;

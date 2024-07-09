@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/app/routes/app_routes.dart';
-import 'package:flutter_pos/app/themes/app_sizes.dart';
-import 'package:flutter_pos/app/utilities/console_log.dart';
-import 'package:flutter_pos/presentation/widgets/app_button.dart';
+import '../../app/routes/app_routes.dart';
+import '../../app/themes/app_sizes.dart';
+import '../../app/utilities/console_log.dart';
+import '../widgets/app_button.dart';
 import 'package:go_router/go_router.dart';
 
 class ErrorHandlerBuilder extends StatefulWidget {

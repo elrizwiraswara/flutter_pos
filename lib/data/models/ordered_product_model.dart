@@ -1,5 +1,5 @@
-import 'package:flutter_pos/data/models/product_model.dart';
-import 'package:flutter_pos/domain/entities/ordered_product_entity.dart';
+import '../../domain/entities/ordered_product_entity.dart';
+import 'product_model.dart';
 
 class OrderedProductModel {
   int? id;

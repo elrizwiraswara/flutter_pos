@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/app/themes/app_sizes.dart';
-import 'package:flutter_pos/app/utilities/currency_formatter.dart';
-import 'package:flutter_pos/presentation/providers/home/home_provider.dart';
-import 'package:flutter_pos/presentation/widgets/app_button.dart';
-import 'package:flutter_pos/presentation/widgets/app_dialog.dart';
-import 'package:flutter_pos/presentation/widgets/app_drop_down.dart';
-import 'package:flutter_pos/presentation/widgets/app_text_field.dart';
-import 'package:flutter_pos/service_locator.dart';
+import '../../../../app/themes/app_sizes.dart';
+import '../../../../app/utilities/currency_formatter.dart';
+import '../../../providers/home/home_provider.dart';
+import '../../../widgets/app_button.dart';
+import '../../../widgets/app_dialog.dart';
+import '../../../widgets/app_drop_down.dart';
+import '../../../widgets/app_text_field.dart';
+import '../../../../service_locator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_pos/data/data_sources/interfaces/user_datasource.dart';
-import 'package:flutter_pos/data/models/user_model.dart';
+import '../interfaces/user_datasource.dart';
+import '../../models/user_model.dart';
 
 class UserRemoteDatasourceImpl extends UserDatasource {
   final FirebaseFirestore _firebaseFirestore;

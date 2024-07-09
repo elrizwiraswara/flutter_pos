@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/app/routes/app_routes.dart';
-import 'package:flutter_pos/app/themes/app_sizes.dart';
-import 'package:flutter_pos/app/utilities/currency_formatter.dart';
-import 'package:flutter_pos/domain/entities/product_entity.dart';
-import 'package:flutter_pos/presentation/widgets/app_button.dart';
-import 'package:flutter_pos/presentation/widgets/app_dialog.dart';
-import 'package:flutter_pos/presentation/widgets/app_image.dart';
+import '../../../../app/routes/app_routes.dart';
+import '../../../../app/themes/app_sizes.dart';
+import '../../../../app/utilities/currency_formatter.dart';
+import '../../../../domain/entities/product_entity.dart';
+import '../../../widgets/app_button.dart';
+import '../../../widgets/app_dialog.dart';
+import '../../../widgets/app_image.dart';
 
 class OrderCard extends StatefulWidget {
   final ProductEntity product;

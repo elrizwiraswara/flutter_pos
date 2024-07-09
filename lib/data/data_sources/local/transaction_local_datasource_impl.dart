@@ -1,9 +1,9 @@
-import 'package:flutter_pos/app/database/app_database.dart';
-import 'package:flutter_pos/data/data_sources/interfaces/transaction_datasource.dart';
-import 'package:flutter_pos/data/models/ordered_product_model.dart';
-import 'package:flutter_pos/data/models/product_model.dart';
-import 'package:flutter_pos/data/models/transaction_model.dart';
-import 'package:flutter_pos/data/models/user_model.dart';
+import '../../../app/database/app_database.dart';
+import '../interfaces/transaction_datasource.dart';
+import '../../models/ordered_product_model.dart';
+import '../../models/product_model.dart';
+import '../../models/transaction_model.dart';
+import '../../models/user_model.dart';
 import 'package:sqflite/sqflite.dart';
 
 class TransactionLocalDatasourceImpl extends TransactionDatasource {

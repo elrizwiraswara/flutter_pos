@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/app/services/auth/auth_service.dart';
-import 'package:flutter_pos/presentation/screens/account/profile_form_screen.dart';
-import 'package:flutter_pos/presentation/screens/account/account_screen.dart';
-import 'package:flutter_pos/presentation/screens/auth/sign_in/sign_in_screen.dart';
-import 'package:flutter_pos/presentation/screens/error_handler_screen.dart';
-import 'package:flutter_pos/presentation/screens/home/home_screen.dart';
-import 'package:flutter_pos/presentation/screens/main/main_screen.dart';
-import 'package:flutter_pos/presentation/screens/products/product_detail_screen.dart';
-import 'package:flutter_pos/presentation/screens/products/product_form_screen.dart';
-import 'package:flutter_pos/presentation/screens/products/products_screen.dart';
-import 'package:flutter_pos/presentation/screens/root_screen.dart';
-import 'package:flutter_pos/presentation/screens/transactions/transaction_detail_screen.dart';
-import 'package:flutter_pos/presentation/screens/transactions/transactions_screen.dart';
+import '../services/auth/auth_service.dart';
+import '../../presentation/screens/account/profile_form_screen.dart';
+import '../../presentation/screens/account/account_screen.dart';
+import '../../presentation/screens/auth/sign_in/sign_in_screen.dart';
+import '../../presentation/screens/error_handler_screen.dart';
+import '../../presentation/screens/home/home_screen.dart';
+import '../../presentation/screens/main/main_screen.dart';
+import '../../presentation/screens/products/product_detail_screen.dart';
+import '../../presentation/screens/products/product_form_screen.dart';
+import '../../presentation/screens/products/products_screen.dart';
+import '../../presentation/screens/root_screen.dart';
+import '../../presentation/screens/transactions/transaction_detail_screen.dart';
+import '../../presentation/screens/transactions/transactions_screen.dart';
 import 'package:go_router/go_router.dart';
 
 // App routes

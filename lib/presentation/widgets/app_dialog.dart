@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/app/routes/app_routes.dart';
-import 'package:flutter_pos/app/themes/app_sizes.dart';
-import 'package:flutter_pos/presentation/widgets/app_progress_indicator.dart';
+import '../../app/routes/app_routes.dart';
+import '../../app/themes/app_sizes.dart';
+import 'app_progress_indicator.dart';
 
 import 'app_button.dart';
 

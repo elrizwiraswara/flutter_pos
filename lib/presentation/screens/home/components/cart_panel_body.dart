@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/app/themes/app_sizes.dart';
-import 'package:flutter_pos/app/utilities/currency_formatter.dart';
-import 'package:flutter_pos/presentation/providers/home/home_provider.dart';
-import 'package:flutter_pos/presentation/screens/home/components/order_card.dart';
-import 'package:flutter_pos/presentation/widgets/app_empty_state.dart';
+import '../../../../app/themes/app_sizes.dart';
+import '../../../../app/utilities/currency_formatter.dart';
+import '../../../providers/home/home_provider.dart';
+import 'order_card.dart';
+import '../../../widgets/app_empty_state.dart';
 import 'package:provider/provider.dart';
 
 class CartPanelBody extends StatefulWidget {

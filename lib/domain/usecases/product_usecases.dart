@@ -1,6 +1,6 @@
-import 'package:flutter_pos/core/usecase/usecase.dart';
-import 'package:flutter_pos/domain/entities/product_entity.dart';
-import 'package:flutter_pos/domain/repositories/product_repository.dart';
+import '../../core/usecase/usecase.dart';
+import '../entities/product_entity.dart';
+import '../repositories/product_repository.dart';
 
 class GetAllProductsUsecase extends UseCase<Result, String> {
   GetAllProductsUsecase(this._productRepository);

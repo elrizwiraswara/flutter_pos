@@ -1,6 +1,6 @@
-import 'package:flutter_pos/core/usecase/usecase.dart';
-import 'package:flutter_pos/domain/entities/queued_action_entity.dart';
-import 'package:flutter_pos/domain/repositories/queued_action_repository.dart';
+import '../../core/usecase/usecase.dart';
+import '../entities/queued_action_entity.dart';
+import '../repositories/queued_action_repository.dart';
 
 class GetAllQueuedActionUsecase extends UseCase<Result, NoParams> {
   GetAllQueuedActionUsecase(this._queuedActionRepository);

@@ -1,6 +1,6 @@
-import 'package:flutter_pos/app/database/app_database.dart';
-import 'package:flutter_pos/data/data_sources/interfaces/product_datasource.dart';
-import 'package:flutter_pos/data/models/product_model.dart';
+import '../../../app/database/app_database.dart';
+import '../interfaces/product_datasource.dart';
+import '../../models/product_model.dart';
 import 'package:sqflite/sqflite.dart';
 
 class ProductLocalDatasourceImpl extends ProductDatasource {
