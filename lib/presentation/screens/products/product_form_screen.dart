@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pos/app/themes/app_sizes.dart';
+import 'package:flutter_pos/app/utilities/console_log.dart';
 import 'package:flutter_pos/presentation/providers/products/product_form_provider.dart';
 import 'package:flutter_pos/presentation/widgets/app_button.dart';
 import 'package:flutter_pos/presentation/widgets/app_dialog.dart';
@@ -112,17 +113,17 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   }
 
   Widget image() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Foto Produk',
-          style: Theme.of(context).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: AppSizes.padding / 2),
-        Consumer<ProductFormProvider>(
-          builder: (context, provider, _) {
-            return Stack(
+    return Consumer<ProductFormProvider>(
+      builder: (context, provider, _) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Foto Produk',
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: AppSizes.padding / 2),
+            Stack(
               children: [
                 GestureDetector(
                   onTap: onTapImage,
@@ -154,10 +155,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                   ),
                 ),
               ],
-            );
-          },
-        ),
-      ],
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -226,18 +227,24 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   }
 
   Widget createOrUpdateButton() {
-    return Padding(
-      padding: const EdgeInsets.only(top: AppSizes.padding * 1.5),
-      child: AppButton(
-        text: widget.id == null ? 'Add Product' : 'Update Product',
-        onTap: () {
-          if (widget.id != null) {
-            updatedProduct();
-          } else {
-            createProduct();
-          }
-        },
-      ),
+    return Consumer<ProductFormProvider>(
+      builder: (context, provider, _) {
+        cl(provider.isFormValid());
+        return Padding(
+          padding: const EdgeInsets.only(top: AppSizes.padding * 1.5),
+          child: AppButton(
+            text: widget.id == null ? 'Add Product' : 'Update Product',
+            enabled: provider.isFormValid(),
+            onTap: () {
+              if (widget.id != null) {
+                updatedProduct();
+              } else {
+                createProduct();
+              }
+            },
+          ),
+        );
+      },
     );
   }
 
