@@ -5,9 +5,9 @@ import '../../app/services/connectivity/connectivity_service.dart';
 import '../../core/usecase/usecase.dart';
 import '../../domain/entities/transaction_entity.dart';
 import '../../domain/repositories/transaction_repository.dart';
-import '../data_sources/local/queued_action_local_datasource_impl.dart';
-import '../data_sources/local/transaction_local_datasource_impl.dart';
-import '../data_sources/remote/transaction_remote_datasource_impl.dart';
+import '../datasources/local/queued_action_local_datasource_impl.dart';
+import '../datasources/local/transaction_local_datasource_impl.dart';
+import '../datasources/remote/transaction_remote_datasource_impl.dart';
 import '../models/queued_action_model.dart';
 import '../models/transaction_model.dart';
 
@@ -59,7 +59,7 @@ class TransactionRepositoryImpl extends TransactionRepository {
             var updatedAtLocal = DateTime.tryParse(localData.updatedAt ?? DateTime.now().toIso8601String());
             var updatedAtRemote = DateTime.tryParse(matchRemoteData.updatedAt ?? DateTime.now().toIso8601String());
             var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
-            var isRemoteNewer = differenceInMinutes > MIN_SYNC_INTERVAL_TOLERANCE_FOR_LESS_CRITICAL_IN_MINUTES;
+            var isRemoteNewer = differenceInMinutes > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
 
             if (isRemoteNewer) {
               isRemoteHasNewerData.add(true);
@@ -113,7 +113,7 @@ class TransactionRepositoryImpl extends TransactionRepository {
         var updatedAtLocal = DateTime.tryParse(local.updatedAt ?? DateTime.now().toIso8601String());
         var updatedAtRemote = DateTime.tryParse(remote.updatedAt ?? DateTime.now().toIso8601String());
         var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
-        var isRemoteNewer = differenceInMinutes > MIN_SYNC_INTERVAL_TOLERANCE_FOR_LESS_CRITICAL_IN_MINUTES;
+        var isRemoteNewer = differenceInMinutes > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
 
         // Compare local & remote data updatedAt difference
         if (isRemoteNewer) {

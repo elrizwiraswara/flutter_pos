@@ -9,7 +9,7 @@ import '../../domain/entities/transaction_entity.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/queued_action_repository.dart';
 import '../../service_locator.dart';
-import '../data_sources/local/queued_action_local_datasource_impl.dart';
+import '../datasources/local/queued_action_local_datasource_impl.dart';
 import '../models/product_model.dart';
 import '../models/queued_action_model.dart';
 import '../models/transaction_model.dart';

@@ -5,9 +5,9 @@ import '../../app/services/connectivity/connectivity_service.dart';
 import '../../core/usecase/usecase.dart';
 import '../../domain/entities/product_entity.dart';
 import '../../domain/repositories/product_repository.dart';
-import '../data_sources/local/product_local_datasource_impl.dart';
-import '../data_sources/local/queued_action_local_datasource_impl.dart';
-import '../data_sources/remote/product_remote_datasource_impl.dart';
+import '../datasources/local/product_local_datasource_impl.dart';
+import '../datasources/local/queued_action_local_datasource_impl.dart';
+import '../datasources/remote/product_remote_datasource_impl.dart';
 import '../models/product_model.dart';
 import '../models/queued_action_model.dart';
 
@@ -57,7 +57,7 @@ class ProductRepositoryImpl extends ProductRepository {
             var updatedAtLocal = DateTime.tryParse(localData.updatedAt ?? DateTime.now().toIso8601String());
             var updatedAtRemote = DateTime.tryParse(matchRemoteData.updatedAt ?? DateTime.now().toIso8601String());
             var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
-            var isRemoteNewer = differenceInMinutes > MIN_SYNC_INTERVAL_TOLERANCE_FOR_LESS_CRITICAL_IN_MINUTES;
+            var isRemoteNewer = differenceInMinutes > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
 
             if (isRemoteNewer) {
               isRemoteHasNewerData.add(true);
@@ -111,7 +111,7 @@ class ProductRepositoryImpl extends ProductRepository {
         var updatedAtLocal = DateTime.tryParse(local.updatedAt ?? DateTime.now().toIso8601String());
         var updatedAtRemote = DateTime.tryParse(remote.updatedAt ?? DateTime.now().toIso8601String());
         var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
-        var isRemoteNewer = differenceInMinutes > MIN_SYNC_INTERVAL_TOLERANCE_FOR_LESS_CRITICAL_IN_MINUTES;
+        var isRemoteNewer = differenceInMinutes > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
 
         // Compare local & remote data updatedAt difference
         if (isRemoteNewer) {

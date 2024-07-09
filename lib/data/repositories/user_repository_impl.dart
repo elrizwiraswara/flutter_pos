@@ -5,9 +5,9 @@ import '../../app/services/connectivity/connectivity_service.dart';
 import '../../core/usecase/usecase.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/user_repository.dart';
-import '../data_sources/local/queued_action_local_datasource_impl.dart';
-import '../data_sources/local/user_local_datasource_impl.dart';
-import '../data_sources/remote/user_remote_datasource_impl.dart';
+import '../datasources/local/queued_action_local_datasource_impl.dart';
+import '../datasources/local/user_local_datasource_impl.dart';
+import '../datasources/remote/user_remote_datasource_impl.dart';
 import '../models/queued_action_model.dart';
 import '../models/user_model.dart';
 
