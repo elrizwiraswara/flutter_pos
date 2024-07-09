@@ -3,6 +3,7 @@ import 'package:flutter_pos/app/routes/app_routes.dart';
 import 'package:flutter_pos/app/services/auth/auth_service.dart';
 import 'package:flutter_pos/app/themes/app_sizes.dart';
 import 'package:flutter_pos/presentation/providers/main/main_provider.dart';
+import 'package:flutter_pos/presentation/providers/theme/theme_provider.dart';
 import 'package:flutter_pos/presentation/widgets/app_button.dart';
 import 'package:flutter_pos/presentation/widgets/app_dialog.dart';
 import 'package:flutter_pos/presentation/widgets/app_image.dart';
@@ -22,6 +23,7 @@ class AccountScreen extends StatelessWidget {
           children: [
             user(context),
             profilButton(context),
+            themeButton(context),
             signOutButton(context),
           ],
         ),
@@ -92,6 +94,65 @@ class AccountScreen extends StatelessWidget {
         ),
         onTap: () {
           context.go('/account/profile');
+        },
+      ),
+    );
+  }
+
+  Widget themeButton(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSizes.padding),
+      child: AppButton(
+        buttonColor: Theme.of(context).colorScheme.surface,
+        borderColor: Theme.of(context).colorScheme.surfaceContainer,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                const Icon(
+                  Icons.format_paint_outlined,
+                  size: 18,
+                ),
+                const SizedBox(width: AppSizes.padding / 1.5),
+                Text(
+                  'Theme',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              ],
+            ),
+            const Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 18,
+            )
+          ],
+        ),
+        onTap: () {
+          AppDialog.show(
+            title: 'Theme',
+            leftButtonText: 'Close',
+            child: Consumer<ThemeProvider>(builder: (context, provider, _) {
+              return Row(
+                children: [
+                  Switch(
+                    value: !provider.isLight(),
+                    onChanged: (val) {
+                      provider.changeBrightness(!val);
+                    },
+                  ),
+                  const SizedBox(width: AppSizes.padding),
+                  Text(
+                    'Dark Mode',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ],
+              );
+            }),
+          );
         },
       ),
     );
