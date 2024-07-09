@@ -1,14 +1,16 @@
 # Flutter POS
 
-A powerful and flexible Point of Sale (POS) application built with Flutter. This application is designed to cater to the needs of small to medium-sized businesses, providing features such as product management, sales tracking, and reporting.
+A simple Point of Sale (POS) application built with Flutter. The application is designed to be used both online and offline. The application's local data (sqflite) will be automatically synchronized with the cloud data (firestore) when the application detects an internet connection. This application uses an offline-first approach, where data will be stored in the local database first and then in the cloud database if there is an internet connection. If there is no internet connection, all actions performed by the user (create, update, delete) will be recorded as 'QueuedActions' in local database and will be executed automatically when the internet connection available.
+
+## Demo APK
+[Download Demo APK](flutter_pos.apk)
 
 ## Features
 
 - **Product Management**: Add, update, and delete products.
 - **Sales Tracking**: Record and manage sales transactions.
-- **Reporting**: Generate sales reports for better business insights.
 - **User Authentication**: Secure login and user management.
-- **Responsive UI**: Optimized for both mobile and tablet devices.
+- **Responsive UI**: Use Material UI 3, support Dark & Light mode.
 
 ## Getting Started
 
@@ -36,46 +38,22 @@ A powerful and flexible Point of Sale (POS) application built with Flutter. This
     - Follow the instructions to add Firebase to your Flutter app.
     - Download the `google-services.json` file and place it in the `android/app` directory.
     - Download the `GoogleService-Info.plist` file and place it in the `ios/Runner` directory.
+    - Enable google authentication provider
+    - Set Clouf Firestore rules, like
+    ```
+    service cloud.firestore {
+    match /databases/{database}/documents {
+        match /{document=**} {
+        allow read, write: if request.auth != null;
+        }
+     }
+    }
+```
 
 4. **Run the application:**
     ```sh
     flutter run
     ```
-
-## Project Structure
-
-lib/
-│
-├── main.dart # Entry point of the application
-├── core/ # Core functionalities
-│ ├── models/ # Data models
-│ ├── providers/ # State management
-│ ├── services/ # Business logic and API interactions
-│ └── utils/ # Utility classes and functions
-├── screens/ # UI screens
-└── widgets/ # Reusable UI components
-
-## Usage
-
-### Adding a Product
-
-1. **Navigate to the Product Management Screen:**
-
-    Open the app and go to the product management section from the menu.
-
-2. **Add a new product:**
-
-    Fill in the product details such as name, price, and category, then click on the "Add Product" button.
-
-### Recording a Sale
-
-1. **Select Products:**
-
-    Go to the sales section and select the products being sold.
-
-2. **Complete the Sale:**
-
-    Enter the customer details and payment method, then click on the "Complete Sale" button.
 
 ## Contributing
 
