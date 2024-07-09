@@ -10,7 +10,7 @@ A simple Point of Sale (POS) application built with Flutter. The application is 
 - **Product Management**: Add, update, and delete products.
 - **Sales Tracking**: Record and manage sales transactions.
 - **User Authentication**: Secure login and user management.
-- **Responsive UI**: Use Material UI 3, support Dark & Light mode.
+- **Responsive UI**: Used Material UI 3, support dark & light mode.
 
 ## Getting Started
 
@@ -39,17 +39,15 @@ A simple Point of Sale (POS) application built with Flutter. The application is 
     - Download the `google-services.json` file and place it in the `android/app` directory.
     - Download the `GoogleService-Info.plist` file and place it in the `ios/Runner` directory.
     - Enable google authentication provider
-    - Set Clouf Firestore rules, like
+    - Update Cloud Firestore rules to allow read write operation
     ```
     service cloud.firestore {
     match /databases/{database}/documents {
         match /{document=**} {
-        allow read, write: if request.auth != null;
+            allow read, write: if request.auth != null;
         }
      }
     }
-```
-
 4. **Run the application:**
     ```sh
     flutter run
