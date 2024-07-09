@@ -65,7 +65,7 @@ class _CartPanelFooterState extends State<CartPanelFooter> {
 
   Widget backButton() {
     return AppButton(
-      text: 'Kembali',
+      text: 'Back',
       buttonColor: Theme.of(context).colorScheme.surface,
       borderColor: Theme.of(context).colorScheme.primary,
       textColor: Theme.of(context).colorScheme.primary,
@@ -135,19 +135,21 @@ class _CartPanelFooterState extends State<CartPanelFooter> {
                 child: Text('Cash'),
               ),
             ],
-            onChanged: (val) {},
+            onChanged: provider.onChangedPaymentMethod,
           ),
           const SizedBox(height: AppSizes.padding),
           AppTextField(
             controller: _customerControlller,
             labelText: 'Customer Name (Optional)',
             hintText: 'e.g. Jhone Doe',
+            onChanged: provider.onChangedCustomerName,
           ),
           const SizedBox(height: AppSizes.padding),
           AppTextField(
             controller: _descriptionControlller,
             labelText: 'Description (Optional)',
             hintText: 'Description...',
+            onChanged: provider.onChangedDescription,
           ),
           const SizedBox(height: AppSizes.padding * 1.5),
           Row(

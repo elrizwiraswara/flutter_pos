@@ -9,12 +9,12 @@ import 'package:flutter_pos/presentation/screens/home/components/cart_panel_body
 import 'package:flutter_pos/presentation/screens/home/components/cart_panel_footer.dart';
 import 'package:flutter_pos/presentation/screens/home/components/cart_panel_header.dart';
 import 'package:flutter_pos/presentation/screens/home/components/order_card.dart';
+import 'package:flutter_pos/presentation/screens/products/components/products_card.dart';
 import 'package:flutter_pos/presentation/widgets/app_button.dart';
 import 'package:flutter_pos/presentation/widgets/app_dialog.dart';
 import 'package:flutter_pos/presentation/widgets/app_empty_state.dart';
 import 'package:flutter_pos/presentation/widgets/app_image.dart';
 import 'package:flutter_pos/presentation/widgets/app_progress_indicator.dart';
-import 'package:flutter_pos/presentation/widgets/products_card.dart';
 import 'package:flutter_pos/service_locator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -42,25 +42,22 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: title(),
-        actions: [
-          syncButton(),
-          networkInfo(),
-        ],
-      ),
       body: SlidingUpPanel(
         controller: _homeProvider.panelController,
-        minHeight: 86,
-        maxHeight: AppSizes.screenHeight(context),
+        minHeight: 88,
+        maxHeight: AppSizes.screenHeight(context) - AppSizes.appBarHeight() - AppSizes.viewPadding(context).top,
         color: Theme.of(context).colorScheme.surfaceContainerLowest,
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.shadow.withOpacity(0.06),
-            offset: const Offset(0, -2),
-            blurRadius: 6,
+            color: Theme.of(context).colorScheme.shadow.withOpacity(0.04),
+            offset: const Offset(0, -4),
+            blurRadius: 12,
           ),
         ],
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(AppSizes.radius * 2),
+          topRight: Radius.circular(AppSizes.radius * 2),
+        ),
         body: body(),
         header: const CartPanelHeader(),
         panel: const CartPanelBody(),
@@ -81,7 +78,11 @@ class _HomeScreenState extends State<HomeScreen> {
               borderRadius: 100,
               width: 34,
               height: 34,
-              backgroundColor: Theme.of(context).colorScheme.surfaceDim,
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              errorWidget: Icon(
+                Icons.person,
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              ),
             ),
             const SizedBox(width: AppSizes.padding / 2),
             Column(
@@ -118,25 +119,33 @@ class _HomeScreenState extends State<HomeScreen> {
             height: 26,
             borderRadius: BorderRadius.circular(4),
             padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding / 2),
-            buttonColor: provider.isDataSynced
+            buttonColor: provider.isDataSynced && !provider.isSyncronizing
                 ? Theme.of(context).colorScheme.surfaceContainer
                 : Theme.of(context).colorScheme.shadow.withOpacity(0.06),
             child: Row(
               children: [
                 Icon(
-                  Icons.sync,
+                  provider.isSyncronizing
+                      ? Icons.sync
+                      : provider.isDataSynced
+                          ? Icons.cloud_done_sharp
+                          : Icons.sync_problem_sharp,
                   size: 12,
-                  color: provider.isDataSynced
+                  color: provider.isDataSynced && !provider.isSyncronizing
                       ? Theme.of(context).colorScheme.primary
                       : Theme.of(context).colorScheme.outline,
                 ),
                 const SizedBox(width: AppSizes.padding / 4),
                 Text(
-                  provider.isDataSynced ? 'Synced' : 'Pending',
+                  provider.isSyncronizing
+                      ? 'Syncronizing'
+                      : provider.isDataSynced
+                          ? 'Synced'
+                          : 'Pending',
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
-                        color: provider.isDataSynced
+                        color: provider.isDataSynced && !provider.isSyncronizing
                             ? Theme.of(context).colorScheme.primary
                             : Theme.of(context).colorScheme.outline,
                       ),
@@ -146,17 +155,17 @@ class _HomeScreenState extends State<HomeScreen> {
             onTap: () {
               var message = '';
 
-              if (provider.isDataSynced) {
-                message = syncMessage;
+              if (provider.isSyncronizing) {
+                message = SYNCED_MESSAGE;
               }
 
-              if (provider.isHasInternet && !provider.isDataSynced) {
-                message = unsyncMessage;
-                provider.initMainProvider();
+              if (provider.isHasInternet && !provider.isSyncronizing) {
+                message = SYNCRONIZING_MESSAGE;
+                provider.checkAndSyncAllData();
               }
 
-              if (!provider.isHasInternet && !provider.isDataSynced) {
-                message = syncPendingMessage;
+              if (!provider.isHasInternet && !provider.isSyncronizing) {
+                message = SYNC_PENDING_MESSAGE;
               }
 
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
@@ -187,7 +196,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             onTap: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(isHasInternet ? onlineMessage : offlineMessage)),
+                SnackBar(content: Text(isHasInternet ? ONLINE_MESSAGE : OFFLINE_MESSAGE)),
               );
             },
           ),
@@ -197,39 +206,48 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget body() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 232),
-      child: Consumer<ProductsProvider>(builder: (context, provider, _) {
-        if (provider.allProducts == null) {
-          return const AppProgressIndicator();
-        }
+    return Scaffold(
+      appBar: AppBar(
+        title: title(),
+        actions: [
+          syncButton(),
+          networkInfo(),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.only(bottom: 232),
+        child: Consumer<ProductsProvider>(builder: (context, provider, _) {
+          if (provider.allProducts == null) {
+            return const AppProgressIndicator();
+          }
 
-        if (provider.allProducts!.isEmpty) {
-          return AppEmptyState(
-            subtitle: 'No products available, add product to continue',
-            buttonText: 'Add Product',
-            onTapButton: () => context.push('/products/product-create'),
-          );
-        }
+          if (provider.allProducts!.isEmpty) {
+            return AppEmptyState(
+              subtitle: 'No products available, add product to continue',
+              buttonText: 'Add Product',
+              onTapButton: () => context.push('/products/product-create'),
+            );
+          }
 
-        return RefreshIndicator(
-          onRefresh: () => provider.getAllProducts(),
-          child: GridView.builder(
-            padding: const EdgeInsets.all(AppSizes.padding),
-            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 200,
-              childAspectRatio: 1 / 1.5,
-              crossAxisSpacing: AppSizes.padding / 2,
-              mainAxisSpacing: AppSizes.padding / 2,
+          return RefreshIndicator(
+            onRefresh: () => provider.getAllProducts(),
+            child: GridView.builder(
+              padding: const EdgeInsets.all(AppSizes.padding),
+              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 200,
+                childAspectRatio: 1 / 1.5,
+                crossAxisSpacing: AppSizes.padding / 2,
+                mainAxisSpacing: AppSizes.padding / 2,
+              ),
+              physics: const BouncingScrollPhysics(),
+              itemCount: provider.allProducts!.length,
+              itemBuilder: (context, i) {
+                return productCard(provider.allProducts![i]);
+              },
             ),
-            physics: const BouncingScrollPhysics(),
-            itemCount: provider.allProducts!.length,
-            itemBuilder: (context, i) {
-              return productCard(provider.allProducts![i]);
-            },
-          ),
-        );
-      }),
+          );
+        }),
+      ),
     );
   }
 

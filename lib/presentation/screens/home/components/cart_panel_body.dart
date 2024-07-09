@@ -17,8 +17,9 @@ class _CartPanelBodyState extends State<CartPanelBody> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 62, bottom: 210),
+      padding: const EdgeInsets.symmetric(vertical: 62),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           orderList(),
           orderTotal(),
@@ -28,37 +29,37 @@ class _CartPanelBodyState extends State<CartPanelBody> {
   }
 
   Widget orderList() {
-    return Expanded(
-      child: Consumer<HomeProvider>(builder: (context, provider, _) {
-        if (provider.orderedProducts.isEmpty) {
-          return const AppEmptyState(
+    return Consumer<HomeProvider>(builder: (context, provider, _) {
+      if (provider.orderedProducts.isEmpty) {
+        return const Expanded(
+          child: AppEmptyState(
             title: 'Empty',
             subtitle: 'No products added to cart',
-          );
-        }
-
-        return ListView.builder(
-          itemCount: provider.orderedProducts.length,
-          shrinkWrap: true,
-          padding: const EdgeInsets.all(AppSizes.padding),
-          itemBuilder: (context, i) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: AppSizes.padding),
-              child: OrderCard(
-                product: provider.orderedProducts[i].product!,
-                initialQuantity: provider.orderedProducts[i].quantity,
-                onChangedQuantity: (val) {
-                  provider.onChangedOrderedProductQuantity(i, val);
-                },
-                onTapRemove: () {
-                  provider.onRemoveOrderedProduct(provider.orderedProducts[i]);
-                },
-              ),
-            );
-          },
+          ),
         );
-      }),
-    );
+      }
+
+      return ListView.builder(
+        itemCount: provider.orderedProducts.length,
+        shrinkWrap: true,
+        padding: const EdgeInsets.all(AppSizes.padding),
+        itemBuilder: (context, i) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: AppSizes.padding),
+            child: OrderCard(
+              product: provider.orderedProducts[i].product!,
+              initialQuantity: provider.orderedProducts[i].quantity,
+              onChangedQuantity: (val) {
+                provider.onChangedOrderedProductQuantity(i, val);
+              },
+              onTapRemove: () {
+                provider.onRemoveOrderedProduct(provider.orderedProducts[i]);
+              },
+            ),
+          );
+        },
+      );
+    });
   }
 
   Widget orderTotal() {
@@ -78,7 +79,7 @@ class _CartPanelBodyState extends State<CartPanelBody> {
           children: [
             Text(
               'Total (${provider.orderedProducts.length})',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             Text(
               CurrencyFormatter.format(provider.getTotalAmount()),

@@ -32,12 +32,16 @@ class _CartPanelHeaderState extends State<CartPanelHeader> {
             color: Theme.of(context).colorScheme.surfaceContainer,
           ),
         ),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(AppSizes.radius * 2),
+          topRight: Radius.circular(AppSizes.radius * 2),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           slideIndicator(),
-          const SizedBox(height: AppSizes.padding / 2),
+          const SizedBox(height: AppSizes.padding / 1.5),
           header(),
         ],
       ),
