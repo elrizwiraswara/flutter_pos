@@ -65,8 +65,8 @@ class ProductModel {
       sold: entity.sold,
       price: entity.price,
       description: entity.description,
-      createdAt: entity.createdAt,
-      updatedAt: entity.updatedAt,
+      createdAt: entity.createdAt ?? DateTime.now().toIso8601String(),
+      updatedAt: entity.updatedAt ?? DateTime.now().toIso8601String(),
     );
   }
 
