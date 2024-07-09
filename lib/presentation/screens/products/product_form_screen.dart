@@ -2,19 +2,20 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+
 import '../../../app/themes/app_sizes.dart';
 import '../../../app/utilities/console_log.dart';
+import '../../../service_locator.dart';
 import '../../providers/products/product_form_provider.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
 import '../../widgets/app_icon_button.dart';
 import '../../widgets/app_image.dart';
 import '../../widgets/app_text_field.dart';
-import '../../../service_locator.dart';
-import 'package:go_router/go_router.dart';
-import 'package:image_cropper/image_cropper.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
 
 class ProductFormScreen extends StatefulWidget {
   final int? id;

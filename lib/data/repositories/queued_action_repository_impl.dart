@@ -3,6 +3,12 @@ import 'dart:convert';
 import '../../app/services/connectivity/connectivity_service.dart';
 import '../../app/utilities/console_log.dart';
 import '../../core/usecase/usecase.dart';
+import '../../domain/entities/product_entity.dart';
+import '../../domain/entities/queued_action_entity.dart';
+import '../../domain/entities/transaction_entity.dart';
+import '../../domain/entities/user_entity.dart';
+import '../../domain/repositories/queued_action_repository.dart';
+import '../../service_locator.dart';
 import '../data_sources/local/queued_action_local_datasource_impl.dart';
 import '../models/product_model.dart';
 import '../models/queued_action_model.dart';
@@ -11,12 +17,6 @@ import '../models/user_model.dart';
 import 'product_repository_impl.dart';
 import 'transaction_repository_impl.dart';
 import 'user_repository_impl.dart';
-import '../../domain/entities/product_entity.dart';
-import '../../domain/entities/queued_action_entity.dart';
-import '../../domain/entities/transaction_entity.dart';
-import '../../domain/entities/user_entity.dart';
-import '../../domain/repositories/queued_action_repository.dart';
-import '../../service_locator.dart';
 
 class QueuedActionRepositoryImpl extends QueuedActionRepository {
   final QueuedActionLocalDatasourceImpl queuedActionLocalDatasourceImpl;

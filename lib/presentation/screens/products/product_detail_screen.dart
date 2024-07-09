@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
 import '../../../app/themes/app_sizes.dart';
 import '../../../app/utilities/currency_formatter.dart';
 import '../../../app/utilities/date_formatter.dart';
+import '../../../service_locator.dart';
 import '../../providers/products/product_detail_provider.dart';
-import '../error_handler_screen.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_empty_state.dart';
 import '../../widgets/app_image.dart';
 import '../../widgets/app_progress_indicator.dart';
-import '../../../service_locator.dart';
-import 'package:go_router/go_router.dart';
+import '../error_handler_screen.dart';
 
 class ProductDetailScreen extends StatelessWidget {
   final int id;
@@ -60,7 +61,7 @@ class ProductDetailScreen extends StatelessWidget {
                       ),
                       price(context, snapshot.data!.price),
                       stock(context, snapshot.data!.stock),
-                      sold(context, snapshot.data!.stock),
+                      sold(context, snapshot.data!.sold),
                       description(context, snapshot.data!.description),
                     ],
                   ),

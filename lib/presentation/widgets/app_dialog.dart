@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
 import '../../app/routes/app_routes.dart';
 import '../../app/themes/app_sizes.dart';
-import 'app_progress_indicator.dart';
-
 import 'app_button.dart';
+import 'app_progress_indicator.dart';
 
 class AppDialog {
   static Future<dynamic> show({

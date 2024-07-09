@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../app/const/const.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../../app/services/auth/auth_service.dart';
@@ -14,8 +15,8 @@ import '../../../domain/usecases/product_usecases.dart';
 import '../../../domain/usecases/ququed_action_usecases.dart';
 import '../../../domain/usecases/transaction_usecases.dart';
 import '../../../domain/usecases/user_usecases.dart';
-import '../products/products_provider.dart';
 import '../../../service_locator.dart';
+import '../products/products_provider.dart';
 
 class MainProvider extends ChangeNotifier {
   final UserRepository userRepository;

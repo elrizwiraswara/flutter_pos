@@ -3,13 +3,13 @@ import 'dart:convert';
 import '../../app/const/const.dart';
 import '../../app/services/connectivity/connectivity_service.dart';
 import '../../core/usecase/usecase.dart';
+import '../../domain/entities/product_entity.dart';
+import '../../domain/repositories/product_repository.dart';
 import '../data_sources/local/product_local_datasource_impl.dart';
 import '../data_sources/local/queued_action_local_datasource_impl.dart';
 import '../data_sources/remote/product_remote_datasource_impl.dart';
 import '../models/product_model.dart';
 import '../models/queued_action_model.dart';
-import '../../domain/entities/product_entity.dart';
-import '../../domain/repositories/product_repository.dart';
 
 class ProductRepositoryImpl extends ProductRepository {
   final ProductLocalDatasourceImpl productLocalDatasource;

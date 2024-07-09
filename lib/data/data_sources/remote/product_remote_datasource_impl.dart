@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../interfaces/product_datasource.dart';
+
 import '../../models/product_model.dart';
+import '../interfaces/product_datasource.dart';
 
 class ProductRemoteDatasourceImpl extends ProductDatasource {
   final FirebaseFirestore _firebaseFirestore;

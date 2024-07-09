@@ -1,4 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get_it/get_it.dart';
+import 'package:provider/provider.dart';
+import 'package:provider/single_child_widget.dart';
+
 import 'app/database/app_database.dart';
 import 'data/data_sources/local/product_local_datasource_impl.dart';
 import 'data/data_sources/local/queued_action_local_datasource_impl.dart';
@@ -21,9 +25,6 @@ import 'presentation/providers/products/products_provider.dart';
 import 'presentation/providers/theme/theme_provider.dart';
 import 'presentation/providers/transactions/transaction_detail_provider.dart';
 import 'presentation/providers/transactions/transactions_provider.dart';
-import 'package:get_it/get_it.dart';
-import 'package:provider/provider.dart';
-import 'package:provider/single_child_widget.dart';
 
 final GetIt sl = GetIt.instance;
 

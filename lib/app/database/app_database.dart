@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
-import '../utilities/console_log.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+
+import '../utilities/console_log.dart';
 
 class AppDatabase {
   /// Make [AppDatabase] to be singleton
@@ -16,7 +17,7 @@ class AppDatabase {
   late Database database;
 
   Future<void> init() async {
-    await dropDatabase();
+    // await dropDatabase();
 
     database = await openDatabase(
       join(await getDatabasesPath(), AppDatabaseConfig.dbPath),

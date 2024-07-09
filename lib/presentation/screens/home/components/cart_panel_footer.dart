@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
 import '../../../../app/themes/app_sizes.dart';
 import '../../../../app/utilities/currency_formatter.dart';
+import '../../../../service_locator.dart';
 import '../../../providers/home/home_provider.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_dialog.dart';
 import '../../../widgets/app_drop_down.dart';
 import '../../../widgets/app_text_field.dart';
-import '../../../../service_locator.dart';
-import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 
 class CartPanelFooter extends StatefulWidget {
   const CartPanelFooter({super.key});

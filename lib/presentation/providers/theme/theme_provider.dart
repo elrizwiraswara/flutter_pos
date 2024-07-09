@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../app/themes/app_theme.dart';
 
 class ThemeProvider extends ChangeNotifier {

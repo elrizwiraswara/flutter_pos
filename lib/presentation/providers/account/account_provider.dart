@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+
 import '../../../app/services/firebase_storage/firebase_storage_service.dart';
 import '../../../app/utilities/console_log.dart';
 import '../../../domain/entities/user_entity.dart';
