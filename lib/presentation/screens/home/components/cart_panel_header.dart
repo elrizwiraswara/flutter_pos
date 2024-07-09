@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/app/routes/app_routes.dart';
-import 'package:flutter_pos/app/themes/app_sizes.dart';
-import 'package:flutter_pos/presentation/providers/home/home_provider.dart';
-import 'package:flutter_pos/presentation/widgets/app_button.dart';
-import 'package:flutter_pos/presentation/widgets/app_dialog.dart';
+import '../../../../app/routes/app_routes.dart';
+import '../../../../app/themes/app_sizes.dart';
+import '../../../providers/home/home_provider.dart';
+import '../../../widgets/app_button.dart';
+import '../../../widgets/app_dialog.dart';
 import 'package:provider/provider.dart';
 
 class CartPanelHeader extends StatefulWidget {

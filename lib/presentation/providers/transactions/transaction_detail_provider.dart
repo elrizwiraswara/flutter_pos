@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_pos/domain/entities/transaction_entity.dart';
-import 'package:flutter_pos/domain/repositories/transaction_repository.dart';
-import 'package:flutter_pos/domain/usecases/transaction_usecases.dart';
+import '../../../domain/entities/transaction_entity.dart';
+import '../../../domain/repositories/transaction_repository.dart';
+import '../../../domain/usecases/transaction_usecases.dart';
 
 class TransactionDetailProvider extends ChangeNotifier {
   final TransactionRepository transactionRepository;

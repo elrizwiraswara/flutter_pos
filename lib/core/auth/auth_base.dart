@@ -1,4 +1,4 @@
-import 'package:flutter_pos/core/usecase/usecase.dart';
+import '../usecase/usecase.dart';
 
 abstract class AuthBase {
   Future<bool> isAuthenticated();

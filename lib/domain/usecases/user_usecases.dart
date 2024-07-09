@@ -1,6 +1,6 @@
-import 'package:flutter_pos/core/usecase/usecase.dart';
-import 'package:flutter_pos/domain/entities/user_entity.dart';
-import 'package:flutter_pos/domain/repositories/user_repository.dart';
+import '../../core/usecase/usecase.dart';
+import '../entities/user_entity.dart';
+import '../repositories/user_repository.dart';
 
 class GetUserUsecase extends UseCase<Result, String> {
   GetUserUsecase(this._userRepository);

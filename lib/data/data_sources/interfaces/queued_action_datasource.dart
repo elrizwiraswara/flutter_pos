@@ -1,4 +1,4 @@
-import 'package:flutter_pos/data/models/queued_action_model.dart';
+import '../../models/queued_action_model.dart';
 
 abstract class QueuedActionDatasource {
   Future<int> createQueuedAction(QueuedActionModel queue);

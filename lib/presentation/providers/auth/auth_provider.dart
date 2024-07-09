@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_pos/app/routes/app_routes.dart';
-import 'package:flutter_pos/app/services/auth/auth_service.dart';
-import 'package:flutter_pos/domain/entities/user_entity.dart';
-import 'package:flutter_pos/domain/repositories/user_repository.dart';
-import 'package:flutter_pos/domain/usecases/user_usecases.dart';
-import 'package:flutter_pos/presentation/widgets/app_dialog.dart';
+import '../../../app/routes/app_routes.dart';
+import '../../../app/services/auth/auth_service.dart';
+import '../../../domain/entities/user_entity.dart';
+import '../../../domain/repositories/user_repository.dart';
+import '../../../domain/usecases/user_usecases.dart';
+import '../../widgets/app_dialog.dart';
 
 class AuthProvider extends ChangeNotifier {
   final UserRepository userRepository;

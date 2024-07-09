@@ -1,5 +1,5 @@
-import 'package:flutter_pos/core/usecase/usecase.dart';
-import 'package:flutter_pos/domain/entities/transaction_entity.dart';
+import '../../core/usecase/usecase.dart';
+import '../entities/transaction_entity.dart';
 
 abstract class TransactionRepository {
   Future<Result<List<TransactionEntity>>> getAllUserTransactions(String userId);

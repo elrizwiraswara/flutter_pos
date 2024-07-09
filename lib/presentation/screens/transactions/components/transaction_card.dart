@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/app/themes/app_sizes.dart';
-import 'package:flutter_pos/app/utilities/currency_formatter.dart';
-import 'package:flutter_pos/app/utilities/date_formatter.dart';
-import 'package:flutter_pos/domain/entities/transaction_entity.dart';
+import '../../../../app/themes/app_sizes.dart';
+import '../../../../app/utilities/currency_formatter.dart';
+import '../../../../app/utilities/date_formatter.dart';
+import '../../../../domain/entities/transaction_entity.dart';
 import 'package:go_router/go_router.dart';
 
 class TransactionCard extends StatelessWidget {

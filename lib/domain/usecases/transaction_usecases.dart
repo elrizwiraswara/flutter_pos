@@ -1,6 +1,6 @@
-import 'package:flutter_pos/core/usecase/usecase.dart';
-import 'package:flutter_pos/domain/entities/transaction_entity.dart';
-import 'package:flutter_pos/domain/repositories/transaction_repository.dart';
+import '../../core/usecase/usecase.dart';
+import '../entities/transaction_entity.dart';
+import '../repositories/transaction_repository.dart';
 
 class GetAllTransactionsUsecase extends UseCase<Result, String> {
   GetAllTransactionsUsecase(this._transactionRepository);

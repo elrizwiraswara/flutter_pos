@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_pos/core/auth/auth_base.dart';
-import 'package:flutter_pos/core/errors/errors.dart';
-import 'package:flutter_pos/core/usecase/usecase.dart';
+import '../../../core/auth/auth_base.dart';
+import '../../../core/errors/errors.dart';
+import '../../../core/usecase/usecase.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService implements AuthBase {

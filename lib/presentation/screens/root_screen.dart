@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/app/assets/app_assets.dart';
-import 'package:flutter_pos/app/themes/app_sizes.dart';
-import 'package:flutter_pos/presentation/widgets/app_image.dart';
+import '../../app/assets/app_assets.dart';
+import '../../app/themes/app_sizes.dart';
+import '../widgets/app_image.dart';
 
 class RootScreen extends StatefulWidget {
   const RootScreen({super.key});

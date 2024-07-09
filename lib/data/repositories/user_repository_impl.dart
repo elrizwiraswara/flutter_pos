@@ -1,15 +1,15 @@
 import 'dart:convert';
 
-import 'package:flutter_pos/app/const/const.dart';
-import 'package:flutter_pos/app/services/connectivity/connectivity_service.dart';
-import 'package:flutter_pos/core/usecase/usecase.dart';
-import 'package:flutter_pos/data/data_sources/local/queued_action_local_datasource_impl.dart';
-import 'package:flutter_pos/data/data_sources/local/user_local_datasource_impl.dart';
-import 'package:flutter_pos/data/data_sources/remote/user_remote_datasource_impl.dart';
-import 'package:flutter_pos/data/models/queued_action_model.dart';
-import 'package:flutter_pos/data/models/user_model.dart';
-import 'package:flutter_pos/domain/entities/user_entity.dart';
-import 'package:flutter_pos/domain/repositories/user_repository.dart';
+import '../../app/const/const.dart';
+import '../../app/services/connectivity/connectivity_service.dart';
+import '../../core/usecase/usecase.dart';
+import '../data_sources/local/queued_action_local_datasource_impl.dart';
+import '../data_sources/local/user_local_datasource_impl.dart';
+import '../data_sources/remote/user_remote_datasource_impl.dart';
+import '../models/queued_action_model.dart';
+import '../models/user_model.dart';
+import '../../domain/entities/user_entity.dart';
+import '../../domain/repositories/user_repository.dart';
 
 class UserRepositoryImpl extends UserRepository {
   final UserLocalDatasourceImpl userLocalDatasource;

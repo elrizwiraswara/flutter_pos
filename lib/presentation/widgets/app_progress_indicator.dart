@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/app/themes/app_sizes.dart';
+import '../../app/themes/app_sizes.dart';
 
 // App Progress Indicator
 class AppProgressIndicator extends StatelessWidget {

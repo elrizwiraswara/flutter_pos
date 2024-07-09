@@ -1,22 +1,22 @@
 import 'dart:convert';
 
-import 'package:flutter_pos/app/services/connectivity/connectivity_service.dart';
-import 'package:flutter_pos/app/utilities/console_log.dart';
-import 'package:flutter_pos/core/usecase/usecase.dart';
-import 'package:flutter_pos/data/data_sources/local/queued_action_local_datasource_impl.dart';
-import 'package:flutter_pos/data/models/product_model.dart';
-import 'package:flutter_pos/data/models/queued_action_model.dart';
-import 'package:flutter_pos/data/models/transaction_model.dart';
-import 'package:flutter_pos/data/models/user_model.dart';
-import 'package:flutter_pos/data/repositories/product_repository_impl.dart';
-import 'package:flutter_pos/data/repositories/transaction_repository_impl.dart';
-import 'package:flutter_pos/data/repositories/user_repository_impl.dart';
-import 'package:flutter_pos/domain/entities/product_entity.dart';
-import 'package:flutter_pos/domain/entities/queued_action_entity.dart';
-import 'package:flutter_pos/domain/entities/transaction_entity.dart';
-import 'package:flutter_pos/domain/entities/user_entity.dart';
-import 'package:flutter_pos/domain/repositories/queued_action_repository.dart';
-import 'package:flutter_pos/service_locator.dart';
+import '../../app/services/connectivity/connectivity_service.dart';
+import '../../app/utilities/console_log.dart';
+import '../../core/usecase/usecase.dart';
+import '../data_sources/local/queued_action_local_datasource_impl.dart';
+import '../models/product_model.dart';
+import '../models/queued_action_model.dart';
+import '../models/transaction_model.dart';
+import '../models/user_model.dart';
+import 'product_repository_impl.dart';
+import 'transaction_repository_impl.dart';
+import 'user_repository_impl.dart';
+import '../../domain/entities/product_entity.dart';
+import '../../domain/entities/queued_action_entity.dart';
+import '../../domain/entities/transaction_entity.dart';
+import '../../domain/entities/user_entity.dart';
+import '../../domain/repositories/queued_action_repository.dart';
+import '../../service_locator.dart';
 
 class QueuedActionRepositoryImpl extends QueuedActionRepository {
   final QueuedActionLocalDatasourceImpl queuedActionLocalDatasourceImpl;

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/app/themes/app_sizes.dart';
-import 'package:flutter_pos/app/utilities/currency_formatter.dart';
-import 'package:flutter_pos/app/utilities/date_formatter.dart';
-import 'package:flutter_pos/presentation/providers/products/product_detail_provider.dart';
-import 'package:flutter_pos/presentation/screens/error_handler_screen.dart';
-import 'package:flutter_pos/presentation/widgets/app_button.dart';
-import 'package:flutter_pos/presentation/widgets/app_empty_state.dart';
-import 'package:flutter_pos/presentation/widgets/app_image.dart';
-import 'package:flutter_pos/presentation/widgets/app_progress_indicator.dart';
-import 'package:flutter_pos/service_locator.dart';
+import '../../../app/themes/app_sizes.dart';
+import '../../../app/utilities/currency_formatter.dart';
+import '../../../app/utilities/date_formatter.dart';
+import '../../providers/products/product_detail_provider.dart';
+import '../error_handler_screen.dart';
+import '../../widgets/app_button.dart';
+import '../../widgets/app_empty_state.dart';
+import '../../widgets/app_image.dart';
+import '../../widgets/app_progress_indicator.dart';
+import '../../../service_locator.dart';
 import 'package:go_router/go_router.dart';
 
 class ProductDetailScreen extends StatelessWidget {

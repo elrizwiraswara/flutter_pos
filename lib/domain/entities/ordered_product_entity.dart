@@ -1,4 +1,4 @@
-import 'package:flutter_pos/domain/entities/product_entity.dart';
+import 'product_entity.dart';
 
 class OrderedProductEntity {
   int? id;

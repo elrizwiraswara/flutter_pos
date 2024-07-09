@@ -2,10 +2,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_pos/app/database/app_database.dart';
-import 'package:flutter_pos/firebase_options.dart';
-import 'package:flutter_pos/presentation/providers/theme/theme_provider.dart';
-import 'package:flutter_pos/presentation/screens/error_handler_screen.dart';
+import 'app/database/app_database.dart';
+import 'firebase_options.dart';
+import 'presentation/providers/theme/theme_provider.dart';
+import 'presentation/screens/error_handler_screen.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 

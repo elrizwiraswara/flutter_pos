@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/app/routes/app_routes.dart';
-import 'package:flutter_pos/app/services/auth/auth_service.dart';
-import 'package:flutter_pos/app/themes/app_sizes.dart';
-import 'package:flutter_pos/presentation/providers/main/main_provider.dart';
-import 'package:flutter_pos/presentation/providers/theme/theme_provider.dart';
-import 'package:flutter_pos/presentation/widgets/app_button.dart';
-import 'package:flutter_pos/presentation/widgets/app_dialog.dart';
-import 'package:flutter_pos/presentation/widgets/app_image.dart';
+import '../../../app/routes/app_routes.dart';
+import '../../../app/services/auth/auth_service.dart';
+import '../../../app/themes/app_sizes.dart';
+import '../../providers/main/main_provider.dart';
+import '../../providers/theme/theme_provider.dart';
+import '../../widgets/app_button.dart';
+import '../../widgets/app_dialog.dart';
+import '../../widgets/app_image.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 

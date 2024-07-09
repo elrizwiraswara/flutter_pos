@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/app/themes/app_sizes.dart';
-import 'package:flutter_pos/domain/entities/product_entity.dart';
-import 'package:flutter_pos/presentation/providers/products/products_provider.dart';
-import 'package:flutter_pos/presentation/widgets/app_button.dart';
-import 'package:flutter_pos/presentation/widgets/app_empty_state.dart';
-import 'package:flutter_pos/presentation/widgets/app_progress_indicator.dart';
-import 'package:flutter_pos/presentation/widgets/app_text_field.dart';
-import 'package:flutter_pos/presentation/screens/products/components/products_card.dart';
-import 'package:flutter_pos/service_locator.dart';
+import '../../../app/themes/app_sizes.dart';
+import '../../../domain/entities/product_entity.dart';
+import '../../providers/products/products_provider.dart';
+import '../../widgets/app_button.dart';
+import '../../widgets/app_empty_state.dart';
+import '../../widgets/app_progress_indicator.dart';
+import '../../widgets/app_text_field.dart';
+import 'components/products_card.dart';
+import '../../../service_locator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 

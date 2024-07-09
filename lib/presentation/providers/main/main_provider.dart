@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/app/const/const.dart';
-import 'package:flutter_pos/app/routes/app_routes.dart';
-import 'package:flutter_pos/app/services/auth/auth_service.dart';
-import 'package:flutter_pos/app/services/connectivity/connectivity_service.dart';
-import 'package:flutter_pos/core/usecase/usecase.dart';
-import 'package:flutter_pos/domain/entities/queued_action_entity.dart';
-import 'package:flutter_pos/domain/entities/user_entity.dart';
-import 'package:flutter_pos/domain/repositories/product_repository.dart';
-import 'package:flutter_pos/domain/repositories/queued_action_repository.dart';
-import 'package:flutter_pos/domain/repositories/transaction_repository.dart';
-import 'package:flutter_pos/domain/repositories/user_repository.dart';
-import 'package:flutter_pos/domain/usecases/product_usecases.dart';
-import 'package:flutter_pos/domain/usecases/ququed_action_usecases.dart';
-import 'package:flutter_pos/domain/usecases/transaction_usecases.dart';
-import 'package:flutter_pos/domain/usecases/user_usecases.dart';
-import 'package:flutter_pos/presentation/providers/products/products_provider.dart';
-import 'package:flutter_pos/service_locator.dart';
+import '../../../app/const/const.dart';
+import '../../../app/routes/app_routes.dart';
+import '../../../app/services/auth/auth_service.dart';
+import '../../../app/services/connectivity/connectivity_service.dart';
+import '../../../core/usecase/usecase.dart';
+import '../../../domain/entities/queued_action_entity.dart';
+import '../../../domain/entities/user_entity.dart';
+import '../../../domain/repositories/product_repository.dart';
+import '../../../domain/repositories/queued_action_repository.dart';
+import '../../../domain/repositories/transaction_repository.dart';
+import '../../../domain/repositories/user_repository.dart';
+import '../../../domain/usecases/product_usecases.dart';
+import '../../../domain/usecases/ququed_action_usecases.dart';
+import '../../../domain/usecases/transaction_usecases.dart';
+import '../../../domain/usecases/user_usecases.dart';
+import '../products/products_provider.dart';
+import '../../../service_locator.dart';
 
 class MainProvider extends ChangeNotifier {
   final UserRepository userRepository;
