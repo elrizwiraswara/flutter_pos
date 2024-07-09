@@ -59,14 +59,12 @@ class ProductFormProvider extends ChangeNotifier {
 
       var product = ProductEntity(
         createdById: AuthService().getAuthData()!.uid,
-        name: name!,
+        name: name ?? '',
         imageUrl: imageUrl ?? '',
         stock: stock ?? 0,
         sold: 0,
         price: price ?? 0,
         description: description ?? '',
-        createdAt: DateTime.now().toIso8601String(),
-        updatedAt: DateTime.now().toIso8601String(),
       );
 
       await CreateProductUsecase(productRepository).call(product);
@@ -98,8 +96,6 @@ class ProductFormProvider extends ChangeNotifier {
         sold: 0,
         price: price ?? 0,
         description: description ?? '',
-        createdAt: DateTime.now().toIso8601String(),
-        updatedAt: DateTime.now().toIso8601String(),
       );
 
       await UpdateProductUsecase(productRepository).call(product);
@@ -151,5 +147,16 @@ class ProductFormProvider extends ChangeNotifier {
   void onChangedDesc(String value) {
     description = value;
     notifyListeners();
+  }
+
+  bool isFormValid() {
+    List validator = [
+      AuthService().getAuthData()?.uid != null,
+      name?.isNotEmpty,
+      (price ?? 0) > 0,
+      (stock ?? 0) > 0,
+    ];
+
+    return !validator.contains(false);
   }
 }
