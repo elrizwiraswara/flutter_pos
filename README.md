@@ -10,7 +10,7 @@ A simple Point of Sale (POS) application built with Flutter. The application is 
 - **Product Management**: Add, update, and delete products.
 - **Sales Tracking**: Record and manage sales transactions.
 - **User Authentication**: Secure login and user management.
-- **Responsive UI**: Used Material UI 3, support dark & light mode.
+- **Responsive UI**: Used Material UI 3, support dark & light mode, and user-friendly erro handler UI.
 
 ## Getting Started
 
