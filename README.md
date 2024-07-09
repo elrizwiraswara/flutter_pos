@@ -1,7 +1,8 @@
 # Flutter POS
 
-A simple Point of Sale (POS) application built with Flutter. The application is designed to be used both online and offline. The application's local data (sqflite) will be automatically synchronized with the cloud data (firestore) when the application detects an internet connection. This application uses an offline-first approach, where data will be stored in the local database first and then in the cloud database if there is an internet connection. If there is no internet connection, all actions performed by the user (create, update, delete) will be recorded as 'QueuedActions' in local database and will be executed automatically when the internet connection available.
-
+A simple Point of Sale (POS) application built with Flutter with clean architecture design. The application is designed to be used both online and offline. The application's local data (sqflite) will be automatically synchronized with the cloud data (firestore) when the application detects an internet connection. This application uses an offline-first approach, where data will be stored in the local database first and then in the cloud database if there is an internet connection. If there is no internet connection, all actions performed by the user (create, update, delete) will be recorded as 'QueuedActions' in local database and will be executed automatically when the internet connection available.
+<br/>
+<br/>
 <p align="left">
   <img src="1.jpeg" alt="Image 1" height="350" style="margin-right: 10px;">
   <img src="5.jpeg" alt="Image 2" height="350" style="margin-right: 10px;">
@@ -25,7 +26,7 @@ A simple Point of Sale (POS) application built with Flutter. The application is 
 
 ### Prerequisites
 
-- [Flutter](https://flutter.dev/docs/get-started/install) (>= 3.0.0)
+- [Flutter](https://flutter.dev/docs/get-started/install) (>= .0.0)
 - [Dart](https://dart.dev/get-dart)
 - Firebase account for backend services
 
