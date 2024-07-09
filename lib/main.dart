@@ -2,9 +2,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_pos/app/themes/app_theme.dart';
-import 'package:flutter_pos/core/database/app_database.dart';
+import 'package:flutter_pos/app/database/app_database.dart';
 import 'package:flutter_pos/firebase_options.dart';
+import 'package:flutter_pos/presentation/providers/theme/theme_provider.dart';
 import 'package:flutter_pos/presentation/screens/error_handler_screen.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
@@ -51,19 +51,22 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = AppTheme().init();
-
     return MultiProvider(
       providers: providers,
-      child: MaterialApp.router(
-        title: 'Flutter POS',
-        theme: theme,
-        debugShowCheckedModeBanner: kDebugMode,
-        routerConfig: AppRoutes.router,
-        locale: AppLocale.defaultLocale,
-        supportedLocales: AppLocale.supportedLocales,
-        localizationsDelegates: AppLocale.localizationsDelegates,
-        builder: (context, child) => ErrorHandlerBuilder(child: child),
+      child: Selector<ThemeProvider, ThemeData>(
+        selector: (a, b) => b.theme,
+        builder: (context, theme, _) {
+          return MaterialApp.router(
+            title: 'Flutter POS',
+            theme: theme,
+            debugShowCheckedModeBanner: kDebugMode,
+            routerConfig: AppRoutes.router,
+            locale: AppLocale.defaultLocale,
+            supportedLocales: AppLocale.supportedLocales,
+            localizationsDelegates: AppLocale.localizationsDelegates,
+            builder: (context, child) => ErrorHandlerBuilder(child: child),
+          );
+        },
       ),
     );
   }
