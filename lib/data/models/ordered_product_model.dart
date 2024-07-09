@@ -51,8 +51,8 @@ class OrderedProductModel {
       quantity: entity.quantity,
       productId: entity.productId,
       product: entity.product != null ? ProductModel.fromEntity(entity.product!) : null,
-      createdAt: entity.createdAt,
-      updatedAt: entity.updatedAt,
+      createdAt: entity.createdAt ?? DateTime.now().toIso8601String(),
+      updatedAt: entity.updatedAt ?? DateTime.now().toIso8601String(),
     );
   }
 

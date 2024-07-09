@@ -13,6 +13,7 @@ class TransactionModel {
   int receivedAmount;
   int returnAmount;
   int totalAmount;
+  int totalOrderedProduct;
   String? createdAt;
   String? updatedAt;
 
@@ -27,6 +28,7 @@ class TransactionModel {
     required this.receivedAmount,
     required this.returnAmount,
     required this.totalAmount,
+    required this.totalOrderedProduct,
     this.createdAt,
     this.updatedAt,
   });
@@ -45,6 +47,7 @@ class TransactionModel {
       receivedAmount: json['receivedAmount'],
       returnAmount: json['returnAmount'],
       totalAmount: json['totalAmount'],
+      totalOrderedProduct: json['totalOrderedProduct'],
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
     );
@@ -62,6 +65,7 @@ class TransactionModel {
       'receivedAmount': receivedAmount,
       'returnAmount': returnAmount,
       'totalAmount': totalAmount,
+      'totalOrderedProduct': totalOrderedProduct,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
@@ -79,8 +83,9 @@ class TransactionModel {
       receivedAmount: entity.receivedAmount,
       returnAmount: entity.returnAmount,
       totalAmount: entity.totalAmount,
-      createdAt: entity.createdAt,
-      updatedAt: entity.updatedAt,
+      totalOrderedProduct: entity.totalOrderedProduct,
+      createdAt: entity.createdAt ?? DateTime.now().toIso8601String(),
+      updatedAt: entity.updatedAt ?? DateTime.now().toIso8601String(),
     );
   }
 
@@ -96,6 +101,7 @@ class TransactionModel {
       receivedAmount: receivedAmount,
       returnAmount: returnAmount,
       totalAmount: totalAmount,
+      totalOrderedProduct: totalOrderedProduct,
       createdAt: createdAt,
       updatedAt: updatedAt,
     );

@@ -60,8 +60,8 @@ class UserModel {
       gender: entity.gender,
       birthdate: entity.birthdate,
       imageUrl: entity.imageUrl,
-      createdAt: entity.createdAt,
-      updatedAt: entity.updatedAt,
+      createdAt: entity.createdAt ?? DateTime.now().toIso8601String(),
+      updatedAt: entity.updatedAt ?? DateTime.now().toIso8601String(),
     );
   }
 
