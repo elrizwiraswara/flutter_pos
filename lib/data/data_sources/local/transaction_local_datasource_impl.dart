@@ -35,14 +35,15 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
           );
 
           // Update product stock and sold
-          int stock = (order.product?.stock ?? 0) - order.quantity;
-          int sold = (order.product?.sold ?? 0) + order.quantity;
+          order.product?.stock -= order.quantity;
+          order.product?.sold += order.quantity;
 
           await trx.update(
             AppDatabaseConfig.productTableName,
-            {'stock': stock, 'sold': sold},
+            order.product?.toJson() ?? {},
             where: 'id = ?',
             whereArgs: [order.productId],
+            conflictAlgorithm: ConflictAlgorithm.ignore,
           );
         }
       }
@@ -72,14 +73,15 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
           );
 
           // Update product stock and sold
-          int stock = (order.product?.stock ?? 0) - order.quantity;
-          int sold = (order.product?.sold ?? 0) + order.quantity;
+          order.product?.stock -= order.quantity;
+          order.product?.sold += order.quantity;
 
           await trx.update(
             AppDatabaseConfig.productTableName,
-            {'stock': stock, 'sold': sold},
+            order.product?.toJson() ?? {},
             where: 'id = ?',
-            whereArgs: [order.id],
+            whereArgs: [order.productId],
+            conflictAlgorithm: ConflictAlgorithm.ignore,
           );
         }
       }
@@ -120,6 +122,9 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
 
       var orderedProducts = (rawOrderedProducts as List).map((e) => OrderedProductModel.fromJson(e)).toList();
 
+      // Set ordered products to transaction
+      transaction.orderedProducts = orderedProducts;
+
       // Get created by
       var rawCreatedBy = await trx.query(
         AppDatabaseConfig.userTableName,
@@ -127,6 +132,7 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
         whereArgs: [transaction.createdById],
       );
 
+      // Set created by to transaction
       if (rawCreatedBy.isNotEmpty) {
         transaction.createdBy = UserModel.fromJson(rawCreatedBy.first);
       }
@@ -147,9 +153,6 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
         }
       }
 
-      // Set ordered products to transaction
-      transaction.orderedProducts = orderedProducts;
-
       return transaction;
     });
   }
@@ -162,20 +165,6 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
       whereArgs: [userId],
     );
 
-    if (rawTransactions.isEmpty) {
-      return [];
-    }
-
-    List<TransactionModel> transactions = [];
-
-    for (var transaction in rawTransactions) {
-      var data = await getTransaction(transaction['id'] as int);
-
-      if (data == null) continue;
-
-      transactions.add(data);
-    }
-
-    return transactions;
+    return rawTransactions.map((e) => TransactionModel.fromJson(e)).toList();
   }
 }
