@@ -24,7 +24,7 @@ class AccountProvider extends ChangeNotifier {
     name = null;
   }
 
-  Future<void> getUserDetail(String id) async {
+  Future<UserEntity?> getUserDetail(String id) async {
     var res = await GetUserUsecase(userRepository).call(id);
 
     if (res.isSuccess) {
@@ -33,6 +33,8 @@ class AccountProvider extends ChangeNotifier {
       email = res.data?.email;
       phone = res.data?.phone;
       notifyListeners();
+
+      return res.data;
     } else {
       throw res.error ?? 'Failed to load data';
     }
