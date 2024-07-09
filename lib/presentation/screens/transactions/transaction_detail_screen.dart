@@ -3,6 +3,7 @@ import 'package:flutter_pos/app/themes/app_colors.dart';
 import 'package:flutter_pos/app/themes/app_sizes.dart';
 import 'package:flutter_pos/app/utilities/currency_formatter.dart';
 import 'package:flutter_pos/app/utilities/date_formatter.dart';
+import 'package:flutter_pos/core/extensions/string_casing_extension.dart';
 import 'package:flutter_pos/domain/entities/ordered_product_entity.dart';
 import 'package:flutter_pos/domain/entities/transaction_entity.dart';
 import 'package:flutter_pos/presentation/providers/transactions/transaction_detail_provider.dart';
@@ -44,6 +45,7 @@ class TransactionDetailScreen extends StatelessWidget {
                 transactionDetail(context, snapshot.data!),
                 const SizedBox(height: AppSizes.padding),
                 paymentDetail(context, snapshot.data!),
+                const SizedBox(height: AppSizes.padding),
               ],
             ),
           );
@@ -104,7 +106,7 @@ class TransactionDetailScreen extends StatelessWidget {
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               Text(
-                transaction.paymentMethod,
+                transaction.paymentMethod.toTitleCase(),
                 style: Theme.of(context).textTheme.bodyMedium,
               )
             ],
@@ -137,6 +139,34 @@ class TransactionDetailScreen extends StatelessWidget {
               )
             ],
           ),
+          const SizedBox(height: AppSizes.padding),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Customer Name',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              Text(
+                transaction.customerName ?? '-',
+                style: Theme.of(context).textTheme.bodyMedium,
+              )
+            ],
+          ),
+          const SizedBox(height: AppSizes.padding),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Description',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              Text(
+                transaction.description ?? '-',
+                style: Theme.of(context).textTheme.bodyMedium,
+              )
+            ],
+          ),
         ],
       ),
     );
@@ -152,8 +182,25 @@ class TransactionDetailScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Ordered Products',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              Text(
+                '${transaction.orderedProducts?.length ?? '0'}',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+              )
+            ],
+          ),
+          const Divider(height: AppSizes.padding * 2),
           ...List.generate(transaction.orderedProducts?.length ?? 0, (i) {
-            return product(context, transaction.orderedProducts![i]);
+            return Padding(
+              padding: EdgeInsets.only(top: i == 0 ? 0 : AppSizes.padding / 2),
+              child: product(context, transaction.orderedProducts![i]),
+            );
           }),
           const Divider(height: AppSizes.padding * 2),
           Row(
@@ -210,7 +257,7 @@ class TransactionDetailScreen extends StatelessWidget {
           order.product?.name ?? '-',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
-        const SizedBox(height: AppSizes.padding / 2),
+        const SizedBox(height: AppSizes.padding / 4),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -219,7 +266,7 @@ class TransactionDetailScreen extends StatelessWidget {
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             Text(
-              CurrencyFormatter.format(order.product?.price ?? 0 * order.quantity),
+              CurrencyFormatter.format((order.product?.price ?? 0) * order.quantity),
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           ],

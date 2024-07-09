@@ -19,14 +19,11 @@ class TransactionCard extends StatelessWidget {
           onTap: () async {
             context.push('/transactions/transaction-detail/${transaction.id}');
           },
-          splashColor: Colors.black.withOpacity(0.06),
-          splashFactory: InkRipple.splashFactory,
-          highlightColor: Colors.black12,
           borderRadius: BorderRadius.circular(4),
           child: Ink(
             padding: const EdgeInsets.all(AppSizes.padding),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerLowest,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(6),
               border: Border.all(
                 width: 0.5,
@@ -41,7 +38,7 @@ class TransactionCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Transaction #${transaction.id}",
+                        "#${transaction.id}",
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
@@ -62,10 +59,11 @@ class TransactionCard extends StatelessWidget {
                     Text(
                       CurrencyFormatter.format(transaction.totalAmount),
                       overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
                     ),
+                    const SizedBox(height: AppSizes.padding / 2),
                     Text(
-                      "x ${transaction.orderedProducts?.length ?? 0}",
+                      "${transaction.totalOrderedProduct} Products",
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
