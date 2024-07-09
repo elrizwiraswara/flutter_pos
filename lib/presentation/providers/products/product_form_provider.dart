@@ -63,7 +63,6 @@ class ProductFormProvider extends ChangeNotifier {
         name: name ?? '',
         imageUrl: imageUrl ?? '',
         stock: stock ?? 0,
-        sold: 0,
         price: price ?? 0,
         description: description ?? '',
       );
@@ -94,7 +93,6 @@ class ProductFormProvider extends ChangeNotifier {
         name: name!,
         imageUrl: imageUrl ?? '',
         stock: stock ?? 0,
-        sold: 0,
         price: price ?? 0,
         description: description ?? '',
       );

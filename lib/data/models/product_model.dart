@@ -62,7 +62,7 @@ class ProductModel {
       name: entity.name,
       imageUrl: entity.imageUrl,
       stock: entity.stock,
-      sold: entity.sold,
+      sold: entity.sold ?? 0,
       price: entity.price,
       description: entity.description,
       createdAt: entity.createdAt ?? DateTime.now().toIso8601String(),
