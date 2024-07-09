@@ -50,9 +50,8 @@ class HomeProvider extends ChangeNotifier {
         createdById: AuthService().getAuthData()!.uid,
         receivedAmount: receivedAmount,
         returnAmount: receivedAmount - getTotalAmount(),
+        totalOrderedProduct: orderedProducts.length,
         totalAmount: getTotalAmount(),
-        createdAt: DateTime.now().toIso8601String(),
-        updatedAt: DateTime.now().toIso8601String(),
       );
 
       var res = await CreateTransactionUsecase(transactionRepository).call(transaction);
@@ -105,6 +104,21 @@ class HomeProvider extends ChangeNotifier {
 
   void onChangedReceivedAmount(int value) {
     receivedAmount = value;
+    notifyListeners();
+  }
+
+  void onChangedPaymentMethod(String? value) {
+    selectedPaymentMethod = value ?? selectedPaymentMethod;
+    notifyListeners();
+  }
+
+  void onChangedCustomerName(String value) {
+    customerName = value;
+    notifyListeners();
+  }
+
+  void onChangedDescription(String value) {
+    description = value;
     notifyListeners();
   }
 
