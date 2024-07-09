@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
 import '../../../../app/themes/app_sizes.dart';
 import '../../../../app/utilities/currency_formatter.dart';
 import '../../../../app/utilities/date_formatter.dart';
 import '../../../../domain/entities/transaction_entity.dart';
-import 'package:go_router/go_router.dart';
 
 class TransactionCard extends StatelessWidget {
   final TransactionEntity transaction;

@@ -2,15 +2,15 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'app/database/app_database.dart';
-import 'firebase_options.dart';
-import 'presentation/providers/theme/theme_provider.dart';
-import 'presentation/screens/error_handler_screen.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
+import 'app/database/app_database.dart';
 import 'app/locale/app_locale.dart';
 import 'app/routes/app_routes.dart';
+import 'firebase_options.dart';
+import 'presentation/providers/theme/theme_provider.dart';
+import 'presentation/screens/error_handler_screen.dart';
 import 'service_locator.dart';
 
 void main() async {

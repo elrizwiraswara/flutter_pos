@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import '../../../../app/themes/app_sizes.dart';
 import '../../../../app/utilities/currency_formatter.dart';
 import '../../../providers/home/home_provider.dart';
-import 'order_card.dart';
 import '../../../widgets/app_empty_state.dart';
-import 'package:provider/provider.dart';
+import 'order_card.dart';
 
 class CartPanelBody extends StatefulWidget {
   const CartPanelBody({super.key});

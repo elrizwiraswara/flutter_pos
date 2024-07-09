@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../interfaces/transaction_datasource.dart';
+
 import '../../models/ordered_product_model.dart';
 import '../../models/product_model.dart';
 import '../../models/transaction_model.dart';
 import '../../models/user_model.dart';
+import '../interfaces/transaction_datasource.dart';
 
 class TransactionRemoteDatasourceImpl extends TransactionDatasource {
   final FirebaseFirestore _firebaseFirestore;

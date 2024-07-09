@@ -1,14 +1,15 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+
 import '../../../app/services/auth/auth_service.dart';
 import '../../../app/services/firebase_storage/firebase_storage_service.dart';
 import '../../../app/utilities/console_log.dart';
 import '../../../domain/entities/product_entity.dart';
 import '../../../domain/repositories/product_repository.dart';
 import '../../../domain/usecases/product_usecases.dart';
-import 'products_provider.dart';
 import '../../../service_locator.dart';
+import 'products_provider.dart';
 
 class ProductFormProvider extends ChangeNotifier {
   final ProductRepository productRepository;

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+
 import '../../../domain/entities/product_entity.dart';
 import '../../../domain/repositories/product_repository.dart';
 import '../../../domain/usecases/product_usecases.dart';

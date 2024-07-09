@@ -1,6 +1,6 @@
+import '../../domain/entities/transaction_entity.dart';
 import 'ordered_product_model.dart';
 import 'user_model.dart';
-import '../../domain/entities/transaction_entity.dart';
 
 class TransactionModel {
   int? id;

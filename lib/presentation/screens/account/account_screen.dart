@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
 import '../../../app/routes/app_routes.dart';
 import '../../../app/services/auth/auth_service.dart';
 import '../../../app/themes/app_sizes.dart';
@@ -7,8 +10,6 @@ import '../../providers/theme/theme_provider.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
 import '../../widgets/app_image.dart';
-import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../providers/main/main_provider.dart';
-import '../root_screen.dart';
-import '../../../service_locator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+
+import '../../../service_locator.dart';
+import '../../providers/main/main_provider.dart';
+import '../root_screen.dart';
 
 class MainScreen extends StatefulWidget {
   final Widget child;

@@ -1,7 +1,8 @@
-import '../../../app/database/app_database.dart';
-import '../interfaces/user_datasource.dart';
-import '../../models/user_model.dart';
 import 'package:sqflite/sqflite.dart';
+
+import '../../../app/database/app_database.dart';
+import '../../models/user_model.dart';
+import '../interfaces/user_datasource.dart';
 
 class UserLocalDatasourceImpl extends UserDatasource {
   final AppDatabase _appDatabase;

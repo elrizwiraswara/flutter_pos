@@ -1,7 +1,8 @@
-import '../../../app/database/app_database.dart';
-import '../interfaces/product_datasource.dart';
-import '../../models/product_model.dart';
 import 'package:sqflite/sqflite.dart';
+
+import '../../../app/database/app_database.dart';
+import '../../models/product_model.dart';
+import '../interfaces/product_datasource.dart';
 
 class ProductLocalDatasourceImpl extends ProductDatasource {
   final AppDatabase _appDatabase;
