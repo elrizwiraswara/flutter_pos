@@ -3,12 +3,12 @@
 A simple Point of Sale (POS) application built with Flutter. The application is designed to be used both online and offline. The application's local data (sqflite) will be automatically synchronized with the cloud data (firestore) when the application detects an internet connection. This application uses an offline-first approach, where data will be stored in the local database first and then in the cloud database if there is an internet connection. If there is no internet connection, all actions performed by the user (create, update, delete) will be recorded as 'QueuedActions' in local database and will be executed automatically when the internet connection available.
 
 <p align="center">
-  <img src="1.jpeg" alt="Image 1" height="300" style="margin-right: 10px;">
-  <img src="2.jpeg" alt="Image 2" height="300" style="margin-right: 10px;">
-  <img src="3.jpeg" alt="Image 2" height="300" style="margin-right: 10px;">
-  <img src="4.jpeg" alt="Image 2" height="300" style="margin-right: 10px;">
-  <img src="5.jpeg" alt="Image 2" height="300" style="margin-right: 10px;">
-  <img src="6.jpeg" alt="Image 3" height="300">
+  <img src="1.jpeg" alt="Image 1" height="250" style="margin-right: 10px;">
+  <img src="2.jpeg" alt="Image 2" height="250" style="margin-right: 10px;">
+  <img src="3.jpeg" alt="Image 2" height="250" style="margin-right: 10px;">
+  <img src="4.jpeg" alt="Image 2" height="250" style="margin-right: 10px;">
+  <img src="5.jpeg" alt="Image 2" height="250" style="margin-right: 10px;">
+  <img src="6.jpeg" alt="Image 3" height="250">
 </p>
 
 ## Demo APK
