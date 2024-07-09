@@ -51,7 +51,7 @@ class _OrderCardState extends State<OrderCard> {
         child: Ink(
           padding: const EdgeInsets.all(AppSizes.padding),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerLowest,
+            color: Theme.of(context).colorScheme.surface,
             border: Border.all(
               width: 1,
               color: Theme.of(context).colorScheme.surfaceContainer,
@@ -69,7 +69,7 @@ class _OrderCardState extends State<OrderCard> {
                       widget.product.name,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodySmall,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     Column(
@@ -109,8 +109,15 @@ class _OrderCardState extends State<OrderCard> {
                     width: 70,
                     height: 70,
                     image: widget.product.imageUrl,
-                    borderRadius: AppSizes.radius,
-                    backgroundColor: Theme.of(context).colorScheme.surface,
+                    borderRadius: 4,
+                    borderWidth: 0.5,
+                    backgroundColor: Theme.of(context).colorScheme.surfaceContainerLowest,
+                    borderColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    errorWidget: Icon(
+                      Icons.image,
+                      color: Theme.of(context).colorScheme.surfaceDim,
+                      size: 32,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   if (widget.onTapRemove != null)
