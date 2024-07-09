@@ -16,7 +16,7 @@ class AppDatabase {
   late Database database;
 
   Future<void> init() async {
-    // await dropDatabase();
+    await dropDatabase();
 
     database = await openDatabase(
       join(await getDatabasesPath(), AppDatabaseConfig.dbPath),
@@ -28,6 +28,7 @@ class AppDatabase {
     await database.execute(AppDatabaseConfig.createProductTable);
     await database.execute(AppDatabaseConfig.createTransactionTable);
     await database.execute(AppDatabaseConfig.createOrderedProductTable);
+    await database.execute(AppDatabaseConfig.createQueuedActionTable);
   }
 
   Future<void> dropDatabase() async {
@@ -58,6 +59,7 @@ class AppDatabaseConfig {
   static const String productTableName = 'Product';
   static const String transactionTableName = 'Transaction';
   static const String orderedProductTableName = 'OrderedProduct';
+  static const String queuedActionTableName = 'QueuedAction';
 
   static String createUserTable = '''
 CREATE TABLE IF NOT EXISTS '$userTableName' (
@@ -76,7 +78,7 @@ CREATE TABLE IF NOT EXISTS '$userTableName' (
 
   static String createProductTable = '''
 CREATE TABLE IF NOT EXISTS '$productTableName' (
-    'id' INTEGER AUTO_INCREMENT NOT NULL,
+    'id' INTEGER NOT NULL,
     'createdById' TEXT,
     'name' TEXT,
     'imageUrl' TEXT,
@@ -101,6 +103,7 @@ CREATE TABLE IF NOT EXISTS '$transactionTableName' (
     'receivedAmount' INTEGER,
     'returnAmount' INTEGER,
     'totalAmount' INTEGER,
+    'totalOrderedProduct' INTEGER,
     'createdAt' DATETIME DEFAULT CURRENT_TIMESTAMP,
     'updatedAt' DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ('id'),
@@ -110,14 +113,26 @@ CREATE TABLE IF NOT EXISTS '$transactionTableName' (
 
   static String createOrderedProductTable = '''
 CREATE TABLE IF NOT EXISTS '$orderedProductTableName' (
-    'id' INTEGER AUTO_INCREMENT NOT NULL,
+    'id' INTEGER NOT NULL,
     'transactionId' INTEGER,
     'quantity' INTEGER,
     'productId' INTEGER,
     'createdAt' DATETIME DEFAULT CURRENT_TIMESTAMP,
     'updatedAt' DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY ('id'),
     FOREIGN KEY ('transactionId') REFERENCES 'Transaction' ('id'),
     FOREIGN KEY ('productId') REFERENCES 'Product' ('id')
+);
+''';
+
+  static String createQueuedActionTable = '''
+CREATE TABLE IF NOT EXISTS '$queuedActionTableName' (
+    'id' INTEGER NOT NULL,
+    'repository' TEXT,
+    'method' TEXT,
+    'param' TEXT,
+    'isCritical' INTEGER,
+    'createdAt' DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 ''';
 }
