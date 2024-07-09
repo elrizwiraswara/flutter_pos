@@ -40,8 +40,6 @@ class AuthProvider extends ChangeNotifier {
       imageUrl: authData.photoURL,
       phone: authData.phoneNumber ?? '',
       birthdate: null,
-      createdAt: DateTime.now().toIso8601String(),
-      updatedAt: DateTime.now().toIso8601String(),
     );
 
     await CreateUserUsecase(userRepository).call(user);

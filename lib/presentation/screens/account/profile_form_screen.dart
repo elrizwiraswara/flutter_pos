@@ -2,20 +2,20 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+
 import '../../../app/services/auth/auth_service.dart';
 import '../../../app/themes/app_sizes.dart';
+import '../../../service_locator.dart';
 import '../../providers/account/account_provider.dart';
-import '../../providers/products/product_form_provider.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
 import '../../widgets/app_icon_button.dart';
 import '../../widgets/app_image.dart';
 import '../../widgets/app_text_field.dart';
-import '../../../service_locator.dart';
-import 'package:go_router/go_router.dart';
-import 'package:image_cropper/image_cropper.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
 
 class ProfileFormScreen extends StatefulWidget {
   const ProfileFormScreen({super.key});
@@ -110,7 +110,7 @@ class _ProfileFormScreenState extends State<ProfileFormScreen> {
           style: Theme.of(context).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: AppSizes.padding / 2),
-        Consumer<ProductFormProvider>(
+        Consumer<AccountProvider>(
           builder: (context, provider, _) {
             return Stack(
               children: [
