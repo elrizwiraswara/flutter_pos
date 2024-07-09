@@ -66,9 +66,14 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
+      brightness: brightness,
       visualDensity: VisualDensity.adaptivePlatformDensity,
       scaffoldBackgroundColor: colorScheme.surfaceContainerLowest,
-      textTheme: textTheme,
+      textTheme: textTheme.apply(
+        bodyColor: colorScheme.onSurface,
+        displayColor: colorScheme.onSurface,
+        decorationColor: colorScheme.onSurface,
+      ),
       appBarTheme: AppBarTheme(
         backgroundColor: colorScheme.surfaceContainerLowest,
         shadowColor: colorScheme.surfaceContainerHighest,
@@ -78,6 +83,7 @@ class AppTheme {
         titleTextStyle: textTheme.titleLarge?.copyWith(
           fontWeight: FontWeight.bold,
           fontSize: 16,
+          color: colorScheme.onSurface,
         ),
       ),
       tabBarTheme: TabBarTheme(
