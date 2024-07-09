@@ -13,6 +13,7 @@ class TransactionEntity extends Equatable {
   final int receivedAmount;
   final int returnAmount;
   final int totalAmount;
+  final int totalOrderedProduct;
   final String? createdAt;
   final String? updatedAt;
 
@@ -27,6 +28,7 @@ class TransactionEntity extends Equatable {
     required this.receivedAmount,
     required this.returnAmount,
     required this.totalAmount,
+    required this.totalOrderedProduct,
     this.createdAt,
     this.updatedAt,
   });
@@ -42,6 +44,7 @@ class TransactionEntity extends Equatable {
     int? receivedAmount,
     int? returnAmount,
     int? totalAmount,
+    int? totalOrderedProduct,
     String? createdAt,
     String? updatedAt,
   }) {
@@ -56,6 +59,7 @@ class TransactionEntity extends Equatable {
       receivedAmount: receivedAmount ?? this.receivedAmount,
       returnAmount: returnAmount ?? this.returnAmount,
       totalAmount: totalAmount ?? this.totalAmount,
+      totalOrderedProduct: totalOrderedProduct ?? this.totalOrderedProduct,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -73,6 +77,7 @@ class TransactionEntity extends Equatable {
         receivedAmount,
         returnAmount,
         totalAmount,
+        totalOrderedProduct,
         createdAt,
         updatedAt
       ];
