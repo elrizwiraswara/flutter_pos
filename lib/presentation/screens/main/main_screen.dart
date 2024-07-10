@@ -21,7 +21,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  final _mainProvider = sl<MainProvider>();
+  final _mainProvider = sl<MainProvider>()..resetStates();
 
   @override
   void initState() {
