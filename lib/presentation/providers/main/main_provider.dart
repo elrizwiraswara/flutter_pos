@@ -31,29 +31,37 @@ class MainProvider extends ChangeNotifier {
   });
 
   bool isLoaded = false;
-  bool isHasInternet = false;
-  bool isDataSynced = false;
+  bool isHasInternet = true;
+  bool isHasQueuedActions = false;
   bool isSyncronizing = false;
 
   UserEntity? user;
 
+  void resetStates() {
+    isHasInternet = false;
+    isHasInternet = true;
+    isHasQueuedActions = false;
+    isSyncronizing = false;
+    user = null;
+  }
+
   Future<void> initMainProvider(BuildContext context) async {
-    isLoaded = false;
-    notifyListeners();
-
-    await ConnectivityService.initNetworkChecker(
-      onHasInternet: (value) => onHasInternet(context, value),
-    );
-
-    await checkAndSaveAllData();
-
-    isLoaded = true;
-    notifyListeners();
+    ConnectivityService.initNetworkChecker(onHasInternet: (value) => onHasInternet(context, value));
+    await checkAndLoadAllData();
   }
 
   Future<void> checkAndSyncAllData(BuildContext context) async {
     final theme = Theme.of(context);
     final messenger = ScaffoldMessenger.of(context);
+
+    // Prevent sync during first time app open
+    if (!isLoaded) return;
+
+    if (!ConnectivityService.isConnected) {
+      messenger.hideCurrentSnackBar();
+      messenger.showSnackBar(const SnackBar(content: Text(SYNC_PENDING_MESSAGE)));
+      return;
+    }
 
     try {
       messenger.hideCurrentSnackBar();
@@ -62,10 +70,10 @@ class MainProvider extends ChangeNotifier {
       isSyncronizing = true;
       notifyListeners();
 
-      await checkAndSaveAllData();
+      await checkAndLoadAllData();
 
-      // Check and execute all queued actions
-      int queueExecutedCount = await checkAndExecutePendingQueue();
+      // Execute all queued actions
+      int queueExecutedCount = await executeAllQueuedActions();
 
       messenger.hideCurrentSnackBar();
       messenger.showSnackBar(
@@ -74,8 +82,10 @@ class MainProvider extends ChangeNotifier {
         ),
       );
 
+      // Re-check queued actions
+      checkIsHasQueuedActions();
+
       isSyncronizing = false;
-      isDataSynced = true;
       notifyListeners();
     } catch (e) {
       isSyncronizing = false;
@@ -91,7 +101,7 @@ class MainProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> checkAndSaveAllData() async {
+  Future<void> checkAndLoadAllData() async {
     var auth = AuthService().getAuthData();
     if (auth == null) return;
 
@@ -112,9 +122,16 @@ class MainProvider extends ChangeNotifier {
 
     // Refresh products list
     sl<ProductsProvider>().getAllProducts();
+
+    // Check queued actions
+    checkIsHasQueuedActions();
+
+    // Notify to MainScreen
+    isLoaded = true;
+    notifyListeners();
   }
 
-  Future<int> checkAndExecutePendingQueue() async {
+  Future<int> executeAllQueuedActions() async {
     var queuedActions = await getQueuedActions();
 
     if (queuedActions.isNotEmpty) {
@@ -136,13 +153,11 @@ class MainProvider extends ChangeNotifier {
     isHasInternet = value;
     notifyListeners();
 
-    checkIsDataSynced();
-
     if (isHasInternet) checkAndSyncAllData(context);
   }
 
-  Future<void> checkIsDataSynced() async {
-    isDataSynced = (await getQueuedActions()).isEmpty;
+  Future<void> checkIsHasQueuedActions() async {
+    isHasQueuedActions = (await getQueuedActions()).isEmpty;
     notifyListeners();
   }
 }
