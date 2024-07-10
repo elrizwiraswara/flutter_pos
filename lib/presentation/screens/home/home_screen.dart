@@ -29,15 +29,19 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final _mainProvider = sl<MainProvider>();
   final _homeProvider = sl<HomeProvider>();
   final _productProvider = sl<ProductsProvider>();
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _productProvider.getAllProducts();
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => onRefresh());
     super.initState();
+  }
+
+  Future<void> onRefresh() async {
+    await _productProvider.getAllProducts();
+    await _mainProvider.checkIsDataSynced();
   }
 
   @override
@@ -229,7 +233,7 @@ class _HomeScreenState extends State<HomeScreen> {
         }
 
         return RefreshIndicator(
-          onRefresh: () => provider.getAllProducts(),
+          onRefresh: () => onRefresh(),
           child: GridView.builder(
             padding: const EdgeInsets.fromLTRB(AppSizes.padding, AppSizes.padding, AppSizes.padding, 200),
             gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
