@@ -92,7 +92,7 @@ class AppTextField extends StatelessWidget {
               counterText: showCounter ? null : '',
               isDense: true,
               filled: true,
-              fillColor: enabled ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.surface,
+              fillColor: Theme.of(context).colorScheme.surface,
               prefixIcon: prefixIcon,
               suffixIcon: suffixIcon,
               hintText: hintText,
