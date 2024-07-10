@@ -19,7 +19,7 @@ class TransactionsProvider extends ChangeNotifier {
       allTransactions = res.data ?? [];
       notifyListeners();
     } else {
-      throw res.error?.error ?? 'Failed to load data';
+      throw res.error?.message ?? 'Failed to load data';
     }
   }
 }

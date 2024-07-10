@@ -22,8 +22,6 @@ class HomeProvider extends ChangeNotifier {
 
   bool isPanelExpanded = false;
 
-  List<ProductEntity>? allProducts;
-
   List<OrderedProductEntity> orderedProducts = [];
   int receivedAmount = 0;
   String selectedPaymentMethod = 'cash';
@@ -32,7 +30,6 @@ class HomeProvider extends ChangeNotifier {
 
   void resetStates() {
     isPanelExpanded = false;
-    allProducts = null;
     orderedProducts = [];
     receivedAmount = 0;
     selectedPaymentMethod = 'cash';
@@ -66,7 +63,7 @@ class HomeProvider extends ChangeNotifier {
       return res;
     } catch (e) {
       cl('[createTransaction].error $e');
-      return Result.error(APIError(error: e.toString()));
+      return Result.error(UnknownError(message: e.toString()));
     }
   }
 

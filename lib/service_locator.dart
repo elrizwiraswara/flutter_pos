@@ -49,26 +49,29 @@ void setupServiceLocator() async {
     () => ProductRepositoryImpl(
       productLocalDatasource: sl<ProductLocalDatasourceImpl>(),
       productRemoteDatasource: sl<ProductRemoteDatasourceImpl>(),
-      queuedActionLocalDatasourceImpl: sl<QueuedActionLocalDatasourceImpl>(),
+      queuedActionLocalDatasource: sl<QueuedActionLocalDatasourceImpl>(),
     ),
   );
   sl.registerLazySingleton(
     () => TransactionRepositoryImpl(
       transactionLocalDatasource: sl<TransactionLocalDatasourceImpl>(),
       transactionRemoteDatasource: sl<TransactionRemoteDatasourceImpl>(),
-      queuedActionLocalDatasourceImpl: sl<QueuedActionLocalDatasourceImpl>(),
+      queuedActionLocalDatasource: sl<QueuedActionLocalDatasourceImpl>(),
     ),
   );
   sl.registerLazySingleton(
     () => UserRepositoryImpl(
       userLocalDatasource: sl<UserLocalDatasourceImpl>(),
       userRemoteDatasource: sl<UserRemoteDatasourceImpl>(),
-      queuedActionLocalDatasourceImpl: sl<QueuedActionLocalDatasourceImpl>(),
+      queuedActionLocalDatasource: sl<QueuedActionLocalDatasourceImpl>(),
     ),
   );
   sl.registerLazySingleton(
     () => QueuedActionRepositoryImpl(
-      queuedActionLocalDatasourceImpl: sl<QueuedActionLocalDatasourceImpl>(),
+      queuedActionLocalDatasource: sl<QueuedActionLocalDatasourceImpl>(),
+      userRemoteDatasource: sl<UserRemoteDatasourceImpl>(),
+      transactionRemoteDatasource: sl<TransactionRemoteDatasourceImpl>(),
+      productRemoteDatasource: sl<ProductRemoteDatasourceImpl>(),
     ),
   );
 

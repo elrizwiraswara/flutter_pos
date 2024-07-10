@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_pos/core/errors/errors.dart';
+import 'package:flutter_pos/core/usecase/usecase.dart';
 
 import '../../../app/services/auth/auth_service.dart';
 import '../../../app/services/firebase_storage/firebase_storage_service.dart';
@@ -46,11 +48,11 @@ class ProductFormProvider extends ChangeNotifier {
 
       notifyListeners();
     } else {
-      throw res.error?.error ?? 'Failed to load data';
+      throw res.error?.message ?? 'Failed to load data';
     }
   }
 
-  Future<String?> createProduct() async {
+  Future<Result<int>> createProduct() async {
     try {
       if (imageFile != null) {
         imageUrl = await FirebaseStorageService().uploadProductImage(imageFile!.path);
@@ -67,19 +69,19 @@ class ProductFormProvider extends ChangeNotifier {
         description: description ?? '',
       );
 
-      await CreateProductUsecase(productRepository).call(product);
+      var res = await CreateProductUsecase(productRepository).call(product);
 
       // Refresh products
       sl<ProductsProvider>().getAllProducts();
 
-      return null;
+      return res;
     } catch (e) {
       cl("[createProduct].error $e");
-      return e.toString();
+      return Result.error(UnknownError(message: e.toString()));
     }
   }
 
-  Future<String?> updatedProduct(int id) async {
+  Future<Result<void>> updatedProduct(int id) async {
     try {
       if (imageFile != null) {
         imageUrl = await FirebaseStorageService().uploadProductImage(imageFile!.path);
@@ -97,29 +99,29 @@ class ProductFormProvider extends ChangeNotifier {
         description: description ?? '',
       );
 
-      await UpdateProductUsecase(productRepository).call(product);
+      var res = await UpdateProductUsecase(productRepository).call(product);
 
       // Refresh products
       sl<ProductsProvider>().getAllProducts();
 
-      return null;
+      return res;
     } catch (e) {
       cl("[updatedProduct].error $e");
-      return e.toString();
+      return Result.error(UnknownError(message: e.toString()));
     }
   }
 
-  Future<String?> deleteProduct(int id) async {
+  Future<Result<void>> deleteProduct(int id) async {
     try {
-      await DeleteProductUsecase(productRepository).call(id);
+      var res = await DeleteProductUsecase(productRepository).call(id);
 
       // Refresh products
       sl<ProductsProvider>().getAllProducts();
 
-      return null;
+      return res;
     } catch (e) {
       cl("[deleteProduct].error $e");
-      return e.toString();
+      return Result.error(UnknownError(message: e.toString()));
     }
   }
 

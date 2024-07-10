@@ -41,7 +41,7 @@ class AuthService implements AuthBase {
 
       return Result.success(result);
     } catch (e) {
-      return Result.error(ServiceError(error: e.toString()));
+      return Result.error(ServiceError(message: e.toString()));
     }
   }
 

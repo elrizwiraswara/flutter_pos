@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/const/const.dart';
-import '../../../app/routes/app_routes.dart';
 import '../../../app/services/auth/auth_service.dart';
 import '../../../app/services/connectivity/connectivity_service.dart';
 import '../../../core/usecase/usecase.dart';
@@ -38,11 +37,13 @@ class MainProvider extends ChangeNotifier {
 
   UserEntity? user;
 
-  Future<void> initMainProvider() async {
+  Future<void> initMainProvider(BuildContext context) async {
     isLoaded = false;
     notifyListeners();
 
-    await ConnectivityService.initNetworkChecker(onHasInternet: onHasInternet);
+    await ConnectivityService.initNetworkChecker(
+      onHasInternet: (value) => onHasInternet(context, value),
+    );
 
     await checkAndSaveAllData();
 
@@ -50,8 +51,7 @@ class MainProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> checkAndSyncAllData() async {
-    final context = AppRoutes.rootNavigatorKey.currentState!.context;
+  Future<void> checkAndSyncAllData(BuildContext context) async {
     final theme = Theme.of(context);
     final messenger = ScaffoldMessenger.of(context);
 
@@ -132,13 +132,13 @@ class MainProvider extends ChangeNotifier {
     return res.data ?? [];
   }
 
-  Future<void> onHasInternet(bool value) async {
+  Future<void> onHasInternet(BuildContext context, bool value) async {
     isHasInternet = value;
     notifyListeners();
 
     checkIsDataSynced();
 
-    if (isHasInternet) checkAndSyncAllData();
+    if (isHasInternet) checkAndSyncAllData(context);
   }
 
   Future<void> checkIsDataSynced() async {

@@ -1,54 +1,68 @@
 import 'dart:convert';
 
+import 'package:flutter_pos/core/errors/errors.dart';
+import 'package:flutter_pos/data/datasources/remote/product_remote_datasource_impl.dart';
+import 'package:flutter_pos/data/datasources/remote/transaction_remote_datasource_impl.dart';
+import 'package:flutter_pos/data/datasources/remote/user_remote_datasource_impl.dart';
+
 import '../../app/services/connectivity/connectivity_service.dart';
 import '../../app/utilities/console_log.dart';
 import '../../core/usecase/usecase.dart';
-import '../../domain/entities/product_entity.dart';
 import '../../domain/entities/queued_action_entity.dart';
-import '../../domain/entities/transaction_entity.dart';
-import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/queued_action_repository.dart';
-import '../../service_locator.dart';
 import '../datasources/local/queued_action_local_datasource_impl.dart';
 import '../models/product_model.dart';
 import '../models/queued_action_model.dart';
 import '../models/transaction_model.dart';
 import '../models/user_model.dart';
-import 'product_repository_impl.dart';
-import 'transaction_repository_impl.dart';
-import 'user_repository_impl.dart';
 
 class QueuedActionRepositoryImpl extends QueuedActionRepository {
-  final QueuedActionLocalDatasourceImpl queuedActionLocalDatasourceImpl;
+  final QueuedActionLocalDatasourceImpl queuedActionLocalDatasource;
+  final UserRemoteDatasourceImpl userRemoteDatasource;
+  final TransactionRemoteDatasourceImpl transactionRemoteDatasource;
+  final ProductRemoteDatasourceImpl productRemoteDatasource;
 
   QueuedActionRepositoryImpl({
-    required this.queuedActionLocalDatasourceImpl,
+    required this.queuedActionLocalDatasource,
+    required this.userRemoteDatasource,
+    required this.transactionRemoteDatasource,
+    required this.productRemoteDatasource,
   });
+
   @override
   Future<Result<List<QueuedActionEntity>>> getAllQueuedAction() async {
-    var res = await queuedActionLocalDatasourceImpl.getAllUserQueuedAction();
-    return Result.success(res.map((e) => e.toEntity()).toList());
+    try {
+      var res = await queuedActionLocalDatasource.getAllUserQueuedAction();
+      return Result.success(res.map((e) => e.toEntity()).toList());
+    } catch (e) {
+      return Result.error(APIError(message: e.toString()));
+    }
   }
 
   @override
   Future<Result<List<bool>>> executeAllQueuedActions(List<QueuedActionEntity> queues) async {
-    if (queues.isEmpty) return Result.success([]);
+    try {
+      if (queues.isEmpty) return Result.success([]);
 
-    if (!ConnectivityService.isConnected) return Result.success([]);
+      List<bool> result = [];
 
-    List<bool> result = [];
+      for (var queue in queues) {
+        // Pass if the internet goes off in the process
+        if (!ConnectivityService.isConnected) continue;
 
-    for (var queue in queues) {
-      var res = await executeQueuedAction(queue);
+        var res = await executeQueuedAction(queue);
 
-      if (res.isSuccess) {
-        result.add(res.data ?? false);
-      } else {
-        result.add(false);
+        if (res.isSuccess) {
+          result.add(res.data ?? false);
+        } else {
+          result.add(false);
+        }
       }
-    }
 
-    return Result.success(result);
+      return Result.success(result);
+    } catch (e) {
+      return Result.error(APIError(message: e.toString()));
+    }
   }
 
   @override
@@ -56,16 +70,20 @@ class QueuedActionRepositoryImpl extends QueuedActionRepository {
     try {
       cl("[executeQueuedAction].queue = ${QueuedActionModel.fromEntity(queue).toJson()}");
 
-      var res = await _functionSelector(queue);
+      var res = await _functionSelector(queue).catchError((e) {
+        return Result.error(e);
+      });
 
       if (res.isSuccess) {
         // Delete executed queue from db
-        await queuedActionLocalDatasourceImpl.deleteQueuedAction(queue.id!);
+        await queuedActionLocalDatasource.deleteQueuedAction(queue.id!);
         return Result.success(true);
       } else {
+        cl("[executeQueuedAction].error = ${res.error}");
         return Result.error(null);
       }
     } catch (e) {
+      cl("[executeQueuedAction].error = $e");
       return Result.error(null);
     }
   }
@@ -73,57 +91,60 @@ class QueuedActionRepositoryImpl extends QueuedActionRepository {
   Future<Result> _functionSelector(QueuedActionEntity queue) async {
     if (queue.repository == 'UserRepositoryImpl') {
       if (queue.method == 'createUser') {
-        UserEntity param = UserModel.fromJson(jsonDecode(queue.param)).toEntity();
-        return sl<UserRepositoryImpl>().createUser(param);
+        UserModel param = UserModel.fromJson(jsonDecode(queue.param));
+        await userRemoteDatasource.createUser(param);
+        return Result.success(null);
       }
 
       if (queue.method == 'deleteUser') {
         var param = queue.param;
-        await sl<UserRepositoryImpl>().deleteUser(param);
+        await userRemoteDatasource.deleteUser(param);
         return Result.success(null);
       }
 
       if (queue.method == 'updateUser') {
-        UserEntity param = UserModel.fromJson(jsonDecode(queue.param)).toEntity();
-        await sl<UserRepositoryImpl>().updateUser(param);
+        UserModel param = UserModel.fromJson(jsonDecode(queue.param));
+        await userRemoteDatasource.updateUser(param);
         return Result.success(null);
       }
     }
 
     if (queue.repository == 'TransactionRepositoryImpl') {
       if (queue.method == 'createTransaction') {
-        TransactionEntity param = TransactionModel.fromJson(jsonDecode(queue.param)).toEntity();
-        return sl<TransactionRepositoryImpl>().createTransaction(param);
+        TransactionModel param = TransactionModel.fromJson(jsonDecode(queue.param));
+        await transactionRemoteDatasource.createTransaction(param);
+        return Result.success(null);
       }
 
       if (queue.method == 'deleteTransaction') {
         var param = int.parse(queue.param);
-        await sl<TransactionRepositoryImpl>().deleteTransaction(param);
+        await transactionRemoteDatasource.deleteTransaction(param);
         return Result.success(null);
       }
 
       if (queue.method == 'updateTransaction') {
-        TransactionEntity param = TransactionModel.fromJson(jsonDecode(queue.param)).toEntity();
-        await sl<TransactionRepositoryImpl>().updateTransaction(param);
+        TransactionModel param = TransactionModel.fromJson(jsonDecode(queue.param));
+        await transactionRemoteDatasource.updateTransaction(param);
         return Result.success(null);
       }
     }
 
     if (queue.repository == 'ProductRepositoryImpl') {
       if (queue.method == 'createProduct') {
-        ProductEntity param = ProductModel.fromJson(jsonDecode(queue.param)).toEntity();
-        return sl<ProductRepositoryImpl>().createProduct(param);
+        ProductModel param = ProductModel.fromJson(jsonDecode(queue.param));
+        await productRemoteDatasource.createProduct(param);
+        return Result.success(null);
       }
 
       if (queue.method == 'deleteProduct') {
         var param = int.parse(queue.param);
-        await sl<ProductRepositoryImpl>().deleteProduct(param);
+        await productRemoteDatasource.deleteProduct(param);
         return Result.success(null);
       }
 
       if (queue.method == 'updateProduct') {
-        ProductEntity param = ProductModel.fromJson(jsonDecode(queue.param)).toEntity();
-        await sl<ProductRepositoryImpl>().updateProduct(param);
+        ProductModel param = ProductModel.fromJson(jsonDecode(queue.param));
+        await productRemoteDatasource.updateProduct(param);
         return Result.success(null);
       }
     }

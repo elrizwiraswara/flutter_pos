@@ -1,37 +1,34 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_pos/core/errors/errors.dart';
+import 'package:flutter_pos/core/usecase/usecase.dart';
 
-import '../../../app/routes/app_routes.dart';
 import '../../../app/services/auth/auth_service.dart';
 import '../../../domain/entities/user_entity.dart';
 import '../../../domain/repositories/user_repository.dart';
 import '../../../domain/usecases/user_usecases.dart';
-import '../../widgets/app_dialog.dart';
 
 class AuthProvider extends ChangeNotifier {
   final UserRepository userRepository;
 
   AuthProvider({required this.userRepository});
 
-  void signIn() async {
+  Future<Result<String>> signIn() async {
     try {
-      AppDialog.showDialogProgress();
-
       var res = await AuthService().signIn();
 
-      AppDialog.closeDialog();
-
-      if (res.isSuccess) {
-        await saveUser();
-        AppRoutes.router.refresh();
-      } else {
-        AppDialog.showErrorDialog(error: res.error?.error);
+      if (res.isHasError) {
+        return Result.error(res.error);
       }
+
+      var saveUserRes = await saveUser();
+
+      return saveUserRes;
     } catch (e) {
-      AppDialog.showErrorDialog(error: e.toString());
+      return Result.error(UnknownError(message: e.toString()));
     }
   }
 
-  Future<void> saveUser() async {
+  Future<Result<String>> saveUser() async {
     var authData = AuthService().getAuthData();
 
     var user = UserEntity(
@@ -43,6 +40,6 @@ class AuthProvider extends ChangeNotifier {
       birthdate: null,
     );
 
-    await CreateUserUsecase(userRepository).call(user);
+    return await CreateUserUsecase(userRepository).call(user);
   }
 }
