@@ -123,15 +123,16 @@ class AppRoutes {
   );
 
   static final _transactions = GoRoute(
-      path: '/transactions',
-      pageBuilder: (context, state) {
-        return const NoTransitionPage<void>(
-          child: TransactionsScreen(),
-        );
-      },
-      routes: [
-        _transactionDetail,
-      ]);
+    path: '/transactions',
+    pageBuilder: (context, state) {
+      return const NoTransitionPage<void>(
+        child: TransactionsScreen(),
+      );
+    },
+    routes: [
+      _transactionDetail,
+    ],
+  );
 
   static final _account = GoRoute(
     path: '/account',
@@ -162,9 +163,7 @@ class AppRoutes {
         throw 'Required productId is not provided!';
       }
 
-      return ProductFormScreen(
-        id: id,
-      );
+      return ProductFormScreen(id: id);
     },
   );
 
@@ -177,9 +176,7 @@ class AppRoutes {
         throw 'Required productId is not provided!';
       }
 
-      return ProductDetailScreen(
-        id: id,
-      );
+      return ProductDetailScreen(id: id);
     },
   );
 
@@ -192,9 +189,7 @@ class AppRoutes {
         throw 'Required productId is not provided!';
       }
 
-      return TransactionDetailScreen(
-        id: id,
-      );
+      return TransactionDetailScreen(id: id);
     },
   );
 
