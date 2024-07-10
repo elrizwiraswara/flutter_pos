@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_pos/app/const/const.dart';
+import 'package:flutter_pos/presentation/screens/error_handler_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -32,8 +34,15 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Consumer<MainProvider>(builder: (context, provider, _) {
+      // Display RootScreen when data is being load
       if (!provider.isLoaded) {
         return const RootScreen();
+      }
+
+      // User data might still null for the first time app open or login without internet connection
+      // So, display error screen with a first time internet error message
+      if (provider.isLoaded && provider.user == null && !provider.isHasInternet) {
+        return const ErrorScreen(errorMessage: FIRST_TIME_INTERNET_ERROR_MESSAGE);
       }
 
       return Scaffold(
