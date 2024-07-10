@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_pos/app/themes/app_sizes.dart';
 
 import '../../../../app/utilities/currency_formatter.dart';
 import '../../../../domain/entities/product_entity.dart';
-import '../../../widgets/app_button.dart';
 import '../../../widgets/app_image.dart';
 
 class ProductsCard extends StatelessWidget {
@@ -67,9 +67,15 @@ class ProductsCard extends StatelessWidget {
                                 color: Colors.white70,
                                 borderRadius: BorderRadius.circular(4),
                               ),
-                              child: AppButton(
-                                padding: EdgeInsets.zero,
-                                buttonColor: Theme.of(context).colorScheme.surfaceContainerLowest,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: AppSizes.padding / 4,
+                                  horizontal: AppSizes.padding / 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.surfaceContainerLowest,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
@@ -78,13 +84,14 @@ class ProductsCard extends StatelessWidget {
                                       color: Theme.of(context).colorScheme.outline,
                                       size: 10,
                                     ),
-                                    const SizedBox(width: 2),
+                                    const SizedBox(width: 4),
                                     Flexible(
                                       child: Text(
                                         'Out of stock',
                                         overflow: TextOverflow.ellipsis,
                                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
                                               color: Theme.of(context).colorScheme.outline,
+                                              fontWeight: FontWeight.bold,
                                             ),
                                       ),
                                     ),
@@ -113,7 +120,7 @@ class ProductsCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      'Stock ${product.stock}  |  Terjual ${product.sold}',
+                      'Stock ${product.stock}  |  Sold ${product.sold}',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 8),
                     ),
                   ],
