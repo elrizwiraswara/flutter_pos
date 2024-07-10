@@ -1,8 +1,8 @@
 // ignore_for_file: constant_identifier_names
 
 const String SYNCED_MESSAGE = 'Data synced';
-const String SYNCRONIZING_MESSAGE = 'Running data syncronizing';
-const String SYNC_PENDING_MESSAGE = 'Data will sync when internet available';
+const String SYNCRONIZING_MESSAGE = 'Running data syncronization';
+const String SYNC_PENDING_MESSAGE = 'Data will automatically sync when internet available';
 const String ONLINE_MESSAGE = 'Online mode';
 const String OFFLINE_MESSAGE = 'No internet connection, running in offline mode';
 const String FIRST_TIME_INTERNET_ERROR_MESSAGE =
