@@ -10,7 +10,6 @@ import '../../presentation/screens/main/main_screen.dart';
 import '../../presentation/screens/products/product_detail_screen.dart';
 import '../../presentation/screens/products/product_form_screen.dart';
 import '../../presentation/screens/products/products_screen.dart';
-import '../../presentation/screens/root_screen.dart';
 import '../../presentation/screens/transactions/transaction_detail_screen.dart';
 import '../../presentation/screens/transactions/transactions_screen.dart';
 import '../services/auth/auth_service.dart';
@@ -30,26 +29,19 @@ class AppRoutes {
     errorBuilder: (context, state) => ErrorScreen(
       errorMessage: state.error?.message,
     ),
-    routes: [_root, _error],
-  );
-
-  static final _root = GoRoute(
-    path: '/',
-    builder: (context, state) {
-      return const RootScreen();
-    },
     redirect: (context, state) async {
-      // if isAuthenticated = false, go to login screen
+      // if isAuthenticated = false, go to sign-in screen
       // else continue to current intended route screen
       if (!await AuthService().isAuthenticated()) {
         return '/auth/sign-in';
       } else {
-        return state.fullPath == '/' ? '/home' : null;
+        return null;
       }
     },
     routes: [
       _main,
       _auth,
+      _error,
     ],
   );
 
@@ -63,22 +55,22 @@ class AppRoutes {
   );
 
   static final _auth = GoRoute(
-    path: 'auth',
+    path: '/auth',
     redirect: (context, state) async {
       // if isAuthenticated = false, go to intended route screen
       // else back to main screen
       if (!await AuthService().isAuthenticated()) {
-        return null;
+        return '/auth/sign-in';
       } else {
-        return '/';
+        return '/home';
       }
     },
     routes: [
-      _login,
+      _signIn,
     ],
   );
 
-  static final _login = GoRoute(
+  static final _signIn = GoRoute(
     path: 'sign-in',
     builder: (context, state) {
       return const SignInScreen();
@@ -99,7 +91,16 @@ class AppRoutes {
   );
 
   static final _home = GoRoute(
-    path: 'home',
+    path: '/home',
+    redirect: (context, state) async {
+      // if isAuthenticated = true, go to intended route screen
+      // else return to auth screen
+      if (!await AuthService().isAuthenticated()) {
+        return '/auth';
+      } else {
+        return '/home';
+      }
+    },
     pageBuilder: (context, state) {
       return const NoTransitionPage<void>(
         child: HomeScreen(),
@@ -108,7 +109,7 @@ class AppRoutes {
   );
 
   static final _products = GoRoute(
-    path: 'products',
+    path: '/products',
     pageBuilder: (context, state) {
       return const NoTransitionPage<void>(
         child: ProductsScreen(),
@@ -122,7 +123,7 @@ class AppRoutes {
   );
 
   static final _transactions = GoRoute(
-      path: 'transactions',
+      path: '/transactions',
       pageBuilder: (context, state) {
         return const NoTransitionPage<void>(
           child: TransactionsScreen(),
@@ -133,7 +134,7 @@ class AppRoutes {
       ]);
 
   static final _account = GoRoute(
-    path: 'account',
+    path: '/account',
     pageBuilder: (context, state) {
       return const NoTransitionPage<void>(
         child: AccountScreen(),
