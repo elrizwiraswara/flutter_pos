@@ -23,11 +23,11 @@ class ConnectivityService {
 
   static String host = 'google.com';
 
-  static bool isConnected = false;
+  static bool isConnected = true;
 
   static StreamSubscription<List<ConnectivityResult>>? _subscription;
 
-  static Future<void> initNetworkChecker({Function(bool)? onHasInternet}) async {
+  static void initNetworkChecker({Function(bool)? onHasInternet}) {
     if (_subscription != null) cancelSubs();
 
     _subscription = connectivity.onConnectivityChanged.listen((results) async {
