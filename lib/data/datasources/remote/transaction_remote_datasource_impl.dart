@@ -24,25 +24,32 @@ class TransactionRemoteDatasourceImpl extends TransactionDatasource {
             ..remove('createdBy'));
 
       if (transaction.orderedProducts?.isNotEmpty ?? false) {
-        for (var order in transaction.orderedProducts!) {
+        for (var orderedProduct in transaction.orderedProducts!) {
           // Create ordered product
-          order.id ??= DateTime.now().millisecondsSinceEpoch;
-          order.transactionId = transaction.id!;
-          var orderedProductDocRef = _firebaseFirestore.collection('OrderedProduct').doc('${order.id}');
+          orderedProduct.id ??= DateTime.now().millisecondsSinceEpoch;
+          orderedProduct.transactionId = transaction.id!;
+          var orderedProductDocRef = _firebaseFirestore.collection('OrderedProduct').doc('${orderedProduct.id}');
 
           trx.set(
             orderedProductDocRef,
-            order.toJson()..remove('product'),
+            orderedProduct.toJson()..remove('product'),
           );
 
+          // Get product
+          var productDocRef = _firebaseFirestore.collection('Product').doc('${orderedProduct.productId}');
+          var rawProduct = await trx.get(productDocRef);
+
+          if (rawProduct.data() == null) continue;
+
+          var product = ProductModel.fromJson(rawProduct.data()!);
+
           // Update product stock and sold
-          order.product?.stock -= order.quantity;
-          order.product?.sold += order.quantity;
-          var productDocRef = _firebaseFirestore.collection('Product').doc('${order.productId}');
+          int stock = product.stock - orderedProduct.quantity;
+          int sold = product.sold + orderedProduct.quantity;
 
           trx.set(
             productDocRef,
-            order.product?.toJson(),
+            {'stock': stock, 'sold': sold},
             SetOptions(merge: true),
           );
         }
@@ -66,24 +73,31 @@ class TransactionRemoteDatasourceImpl extends TransactionDatasource {
       );
 
       if (transaction.orderedProducts?.isNotEmpty ?? false) {
-        for (var order in transaction.orderedProducts!) {
+        for (var orderedProduct in transaction.orderedProducts!) {
           // Update ordered product
-          var orderedProductDocRef = _firebaseFirestore.collection('OrderedProduct').doc('${order.id}');
+          var orderedProductDocRef = _firebaseFirestore.collection('OrderedProduct').doc('${orderedProduct.id}');
 
           trx.set(
             orderedProductDocRef,
-            order.toJson()..remove('product'),
+            orderedProduct.toJson()..remove('product'),
             SetOptions(merge: true),
           );
 
+          // Get product
+          var productDocRef = _firebaseFirestore.collection('Product').doc('${orderedProduct.productId}');
+          var rawProduct = await trx.get(productDocRef);
+
+          if (rawProduct.data() == null) continue;
+
+          var product = ProductModel.fromJson(rawProduct.data()!);
+
           // Update product stock and sold
-          order.product?.stock -= order.quantity;
-          order.product?.sold += order.quantity;
-          var productDocRef = _firebaseFirestore.collection('Product').doc('${order.productId}');
+          int stock = product.stock - orderedProduct.quantity;
+          int sold = product.sold + orderedProduct.quantity;
 
           trx.set(
             productDocRef,
-            order.product?.toJson(),
+            {'stock': stock, 'sold': sold},
             SetOptions(merge: true),
           );
         }
@@ -125,19 +139,6 @@ class TransactionRemoteDatasourceImpl extends TransactionDatasource {
       // Set created by to transaction
       if (rawCreatedBy.data() != null) {
         transaction.createdBy = UserModel.fromJson(rawCreatedBy.data()!);
-      }
-
-      // Get products of ordered products
-      if (orderedProducts.isNotEmpty) {
-        for (var order in orderedProducts) {
-          var rawProductDocRef = _firebaseFirestore.collection('Product').doc('${order.productId}');
-          var rawProducts = await trx.get(rawProductDocRef);
-
-          if (rawProducts.data() == null) continue;
-
-          // Set product to ordered product
-          order.product = ProductModel.fromJson(rawProducts.data()!);
-        }
       }
 
       return transaction;

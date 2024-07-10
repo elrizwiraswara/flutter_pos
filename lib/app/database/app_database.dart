@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -17,7 +18,10 @@ class AppDatabase {
   late Database database;
 
   Future<void> init() async {
-    // await dropDatabase();
+    if (kDebugMode) {
+      // Only for development purpose
+      // await dropDatabase();
+    }
 
     database = await openDatabase(
       join(await getDatabasesPath(), AppDatabaseConfig.dbPath),
@@ -25,11 +29,13 @@ class AppDatabase {
     );
 
     // Create tables
-    await database.execute(AppDatabaseConfig.createUserTable);
-    await database.execute(AppDatabaseConfig.createProductTable);
-    await database.execute(AppDatabaseConfig.createTransactionTable);
-    await database.execute(AppDatabaseConfig.createOrderedProductTable);
-    await database.execute(AppDatabaseConfig.createQueuedActionTable);
+    await Future.wait([
+      database.execute(AppDatabaseConfig.createUserTable),
+      database.execute(AppDatabaseConfig.createProductTable),
+      database.execute(AppDatabaseConfig.createTransactionTable),
+      database.execute(AppDatabaseConfig.createOrderedProductTable),
+      database.execute(AppDatabaseConfig.createQueuedActionTable),
+    ]);
   }
 
   Future<void> dropDatabase() async {
@@ -117,12 +123,14 @@ CREATE TABLE IF NOT EXISTS '$orderedProductTableName' (
     'id' INTEGER NOT NULL,
     'transactionId' INTEGER,
     'quantity' INTEGER,
-    'productId' INTEGER,
+    'stock' INTEGER,
+    'name' TEXT,
+    'imageUrl' TEXT,
+    'price' INTEGER,
     'createdAt' DATETIME DEFAULT CURRENT_TIMESTAMP,
     'updatedAt' DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ('id'),
-    FOREIGN KEY ('transactionId') REFERENCES 'Transaction' ('id'),
-    FOREIGN KEY ('productId') REFERENCES 'Product' ('id')
+    FOREIGN KEY ('transactionId') REFERENCES 'Transaction' ('id')
 );
 ''';
 
