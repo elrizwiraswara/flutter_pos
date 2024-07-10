@@ -5,6 +5,6 @@ abstract class ProductRepository {
   Future<Result<List<ProductEntity>>> getAllUserProducts(String userId);
   Future<Result<ProductEntity>> getProduct(int productId);
   Future<Result<int>> createProduct(ProductEntity product);
-  Future<void> updateProduct(ProductEntity product);
-  Future<void> deleteProduct(int productId);
+  Future<Result<void>> updateProduct(ProductEntity product);
+  Future<Result<void>> deleteProduct(int productId);
 }

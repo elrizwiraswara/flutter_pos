@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_pos/app/routes/app_routes.dart';
+import 'package:flutter_pos/presentation/widgets/app_dialog.dart';
 
 import '../../../../app/assets/app_assets.dart';
 import '../../../../app/themes/app_sizes.dart';
@@ -63,7 +65,19 @@ class _SignInScreenState extends State<SignInScreen> {
   Widget signInButton() {
     return AppButton(
       text: 'Sign In With Google',
-      onTap: _authProvider.signIn,
+      onTap: () async {
+        AppDialog.showDialogProgress();
+
+        var res = await _authProvider.signIn();
+
+        AppDialog.closeDialog();
+
+        if (res.isSuccess) {
+          AppRoutes.router.refresh();
+        } else {
+          AppDialog.showErrorDialog(error: res.error?.message);
+        }
+      },
     );
   }
 }

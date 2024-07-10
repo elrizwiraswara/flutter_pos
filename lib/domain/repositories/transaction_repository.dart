@@ -5,6 +5,6 @@ abstract class TransactionRepository {
   Future<Result<List<TransactionEntity>>> getAllUserTransactions(String userId);
   Future<Result<TransactionEntity>> getTransaction(int transactionId);
   Future<Result<int>> createTransaction(TransactionEntity transaction);
-  Future<void> updateTransaction(TransactionEntity transaction);
-  Future<void> deleteTransaction(int transactionId);
+  Future<Result<void>> updateTransaction(TransactionEntity transaction);
+  Future<Result<void>> deleteTransaction(int transactionId);
 }

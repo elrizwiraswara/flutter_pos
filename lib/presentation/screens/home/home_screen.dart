@@ -166,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
               if (provider.isHasInternet && !provider.isSyncronizing) {
                 message = SYNCRONIZING_MESSAGE;
-                provider.checkAndSyncAllData();
+                provider.checkAndSyncAllData(context);
               }
 
               if (!provider.isHasInternet && !provider.isSyncronizing) {

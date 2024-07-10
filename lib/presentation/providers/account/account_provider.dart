@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_pos/core/errors/errors.dart';
+import 'package:flutter_pos/core/usecase/usecase.dart';
 
 import '../../../app/services/firebase_storage/firebase_storage_service.dart';
 import '../../../app/utilities/console_log.dart';
@@ -25,7 +27,7 @@ class AccountProvider extends ChangeNotifier {
     name = null;
   }
 
-  Future<UserEntity?> getUserDetail(String id) async {
+  Future<void> getUserDetail(String id) async {
     var res = await GetUserUsecase(userRepository).call(id);
 
     if (res.isSuccess) {
@@ -34,14 +36,12 @@ class AccountProvider extends ChangeNotifier {
       email = res.data?.email;
       phone = res.data?.phone;
       notifyListeners();
-
-      return res.data;
     } else {
       throw res.error ?? 'Failed to load data';
     }
   }
 
-  Future<String?> updatedUser(String id) async {
+  Future<Result<void>> updatedUser(String id) async {
     try {
       if (imageFile != null) {
         imageUrl = await FirebaseStorageService().uploadUserPhoto(imageFile!.path);
@@ -57,12 +57,12 @@ class AccountProvider extends ChangeNotifier {
         imageUrl: imageUrl ?? '',
       );
 
-      await UpateUserUsecase(userRepository).call(product);
+      var res = await UpateUserUsecase(userRepository).call(product);
 
-      return null;
+      return res;
     } catch (e) {
       cl("[updatedUser].error $e");
-      return e.toString();
+      return Result.error(UnknownError(message: e.toString()));
     }
   }
 

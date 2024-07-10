@@ -29,20 +29,20 @@ class CreateProductUsecase extends UseCase<Result, ProductEntity> {
   Future<Result<int>> call(ProductEntity params) async => _productRepository.createProduct(params);
 }
 
-class UpdateProductUsecase extends UseCase<void, ProductEntity> {
+class UpdateProductUsecase extends UseCase<Result<void>, ProductEntity> {
   UpdateProductUsecase(this._productRepository);
 
   final ProductRepository _productRepository;
 
   @override
-  Future<void> call(ProductEntity params) async => _productRepository.updateProduct(params);
+  Future<Result<void>> call(ProductEntity params) async => _productRepository.updateProduct(params);
 }
 
-class DeleteProductUsecase extends UseCase<void, int> {
+class DeleteProductUsecase extends UseCase<Result<void>, int> {
   DeleteProductUsecase(this._productRepository);
 
   final ProductRepository _productRepository;
 
   @override
-  Future<void> call(int params) async => _productRepository.deleteProduct(params);
+  Future<Result<void>> call(int params) async => _productRepository.deleteProduct(params);
 }

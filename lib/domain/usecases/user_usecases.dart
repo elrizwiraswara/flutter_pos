@@ -20,20 +20,20 @@ class CreateUserUsecase extends UseCase<Result, UserEntity> {
   Future<Result<String>> call(UserEntity params) async => _userRepository.createUser(params);
 }
 
-class UpateUserUsecase extends UseCase<void, UserEntity> {
+class UpateUserUsecase extends UseCase<Result<void>, UserEntity> {
   UpateUserUsecase(this._userRepository);
 
   final UserRepository _userRepository;
 
   @override
-  Future<void> call(UserEntity params) async => _userRepository.updateUser(params);
+  Future<Result<void>> call(UserEntity params) async => _userRepository.updateUser(params);
 }
 
-class DeleteUserUsecase extends UseCase<void, String> {
+class DeleteUserUsecase extends UseCase<Result<void>, String> {
   DeleteUserUsecase(this._userRepository);
 
   final UserRepository _userRepository;
 
   @override
-  Future<void> call(String params) async => _userRepository.deleteUser(params);
+  Future<Result<void>> call(String params) async => _userRepository.deleteUser(params);
 }

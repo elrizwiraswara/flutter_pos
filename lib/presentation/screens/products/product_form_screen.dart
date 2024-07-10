@@ -285,15 +285,15 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
     AppDialog.showDialogProgress();
 
-    var err = await _productFormProvider.createProduct();
+    var res = await _productFormProvider.createProduct();
 
     AppDialog.closeDialog();
 
-    if (err == null) {
+    if (res.isSuccess) {
       router.go('/products');
       messenger.showSnackBar(const SnackBar(content: Text('Product created')));
     } else {
-      AppDialog.showErrorDialog(error: err);
+      AppDialog.showErrorDialog(error: res.error?.message);
     }
   }
 
@@ -303,15 +303,15 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
     AppDialog.showDialogProgress();
 
-    var err = await _productFormProvider.updatedProduct(widget.id!);
+    var res = await _productFormProvider.updatedProduct(widget.id!);
 
     AppDialog.closeDialog();
 
-    if (err == null) {
+    if (res.isSuccess) {
       router.pop();
       messenger.showSnackBar(const SnackBar(content: Text('Product updated')));
     } else {
-      AppDialog.showErrorDialog(error: err);
+      AppDialog.showErrorDialog(error: res.error?.message);
     }
   }
 
@@ -321,15 +321,15 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
     AppDialog.showDialogProgress();
 
-    var err = await _productFormProvider.deleteProduct(widget.id!);
+    var res = await _productFormProvider.deleteProduct(widget.id!);
 
     AppDialog.closeDialog();
 
-    if (err == null) {
+    if (res.isSuccess) {
       router.go('/products');
       messenger.showSnackBar(const SnackBar(content: Text('Product deleted')));
     } else {
-      AppDialog.showErrorDialog(error: err);
+      AppDialog.showErrorDialog(error: res.error?.message);
     }
   }
 }

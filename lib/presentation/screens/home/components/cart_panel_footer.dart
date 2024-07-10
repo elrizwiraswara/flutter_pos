@@ -199,7 +199,7 @@ class _CartPanelFooterState extends State<CartPanelFooter> {
       router.go('/transactions/transaction-detail/${res.data}');
       messenger.showSnackBar(const SnackBar(content: Text('Transaction created')));
     } else {
-      AppDialog.showErrorDialog(error: res.error?.error);
+      AppDialog.showErrorDialog(error: res.error?.message);
     }
   }
 }

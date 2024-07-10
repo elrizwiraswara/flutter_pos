@@ -30,20 +30,20 @@ class CreateTransactionUsecase extends UseCase<Result, TransactionEntity> {
   Future<Result<int>> call(TransactionEntity params) async => _transactionRepository.createTransaction(params);
 }
 
-class UpateTransactionUsecase extends UseCase<void, TransactionEntity> {
+class UpateTransactionUsecase extends UseCase<Result<void>, TransactionEntity> {
   UpateTransactionUsecase(this._transactionRepository);
 
   final TransactionRepository _transactionRepository;
 
   @override
-  Future<void> call(TransactionEntity params) async => _transactionRepository.updateTransaction(params);
+  Future<Result<void>> call(TransactionEntity params) async => _transactionRepository.updateTransaction(params);
 }
 
-class DeleteTransactionUsecase extends UseCase<void, int> {
+class DeleteTransactionUsecase extends UseCase<Result<void>, int> {
   DeleteTransactionUsecase(this._transactionRepository);
 
   final TransactionRepository _transactionRepository;
 
   @override
-  Future<void> call(int params) async => _transactionRepository.deleteTransaction(params);
+  Future<Result<void>> call(int params) async => _transactionRepository.deleteTransaction(params);
 }

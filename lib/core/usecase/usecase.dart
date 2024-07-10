@@ -13,13 +13,13 @@ class NoParams extends Equatable {
 
 class Result<T> {
   final T? data;
-  final Error? error;
+  final ErrorBase? error;
 
   Result._({this.data, this.error});
 
   factory Result.success(T? data) => Result._(data: data);
 
-  factory Result.error(Error? error) => Result._(error: error);
+  factory Result.error(ErrorBase? error) => Result._(error: error);
 
   bool get isSuccess => error == null;
 

@@ -210,15 +210,15 @@ class _ProfileFormScreenState extends State<ProfileFormScreen> {
 
     AppDialog.showDialogProgress();
 
-    var err = await accountProvider.updatedUser(AuthService().getAuthData()!.uid);
+    var res = await accountProvider.updatedUser(AuthService().getAuthData()!.uid);
 
     AppDialog.closeDialog();
 
-    if (err == null) {
+    if (res.isSuccess) {
       router.pop();
       messenger.showSnackBar(const SnackBar(content: Text('Profile updated')));
     } else {
-      AppDialog.showErrorDialog(error: err);
+      AppDialog.showErrorDialog(error: res.error?.message);
     }
   }
 }
