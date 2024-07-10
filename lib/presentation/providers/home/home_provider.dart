@@ -73,10 +73,20 @@ class HomeProvider extends ChangeNotifier {
   }
 
   void onAddOrderedProduct(ProductEntity product, int qty) {
-    if (orderedProducts.where((e) => e.productId == product.id).isNotEmpty) {
-      orderedProducts.firstWhere((e) => e.productId == product.id).quantity = qty;
+    var orderedProduct = orderedProducts.where((e) => e.productId == product.id).firstOrNull;
+
+    if (orderedProduct != null) {
+      orderedProduct = orderedProduct.copyWith(quantity: qty);
     } else {
-      var order = OrderedProductEntity(quantity: qty, product: product, productId: product.id!);
+      var order = OrderedProductEntity(
+        productId: product.id!,
+        quantity: qty,
+        stock: product.stock,
+        name: product.name,
+        imageUrl: product.imageUrl,
+        price: product.price,
+      );
+
       orderedProducts.add(order);
     }
 
@@ -96,7 +106,7 @@ class HomeProvider extends ChangeNotifier {
   }
 
   void onChangedOrderedProductQuantity(int index, int value) {
-    orderedProducts[index].quantity = value;
+    orderedProducts[index] = orderedProducts[index].copyWith(quantity: value);
     notifyListeners();
   }
 
@@ -122,6 +132,6 @@ class HomeProvider extends ChangeNotifier {
 
   int getTotalAmount() {
     if (orderedProducts.isEmpty) return 0;
-    return orderedProducts.map((e) => (e.product?.price ?? 0) * e.quantity).reduce((a, b) => a + b);
+    return orderedProducts.map((e) => e.price * e.quantity).reduce((a, b) => a + b);
   }
 }

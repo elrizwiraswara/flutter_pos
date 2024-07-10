@@ -41,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> onRefresh() async {
     await _productProvider.getAllProducts();
-    await _mainProvider.checkIsDataSynced();
+    await _mainProvider.checkIsHasQueuedActions();
   }
 
   @override
@@ -124,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
             height: 26,
             borderRadius: BorderRadius.circular(4),
             padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding / 2),
-            buttonColor: provider.isDataSynced && !provider.isSyncronizing
+            buttonColor: provider.isHasQueuedActions && !provider.isSyncronizing
                 ? Theme.of(context).colorScheme.surfaceContainer
                 : Theme.of(context).colorScheme.shadow.withOpacity(0.06),
             child: Row(
@@ -132,11 +132,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 Icon(
                   provider.isSyncronizing
                       ? Icons.sync
-                      : provider.isDataSynced
+                      : provider.isHasQueuedActions
                           ? Icons.cloud_done_sharp
                           : Icons.sync_problem_sharp,
                   size: 12,
-                  color: provider.isDataSynced && !provider.isSyncronizing
+                  color: provider.isHasQueuedActions && !provider.isSyncronizing
                       ? Theme.of(context).colorScheme.primary
                       : Theme.of(context).colorScheme.outline,
                 ),
@@ -144,13 +144,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 Text(
                   provider.isSyncronizing
                       ? 'Syncronizing'
-                      : provider.isDataSynced
+                      : provider.isHasQueuedActions
                           ? 'Synced'
                           : 'Pending',
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
-                        color: provider.isDataSynced && !provider.isSyncronizing
+                        color: provider.isHasQueuedActions && !provider.isSyncronizing
                             ? Theme.of(context).colorScheme.primary
                             : Theme.of(context).colorScheme.outline,
                       ),
@@ -158,22 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             onTap: () {
-              var message = '';
-
-              if (provider.isSyncronizing) {
-                message = SYNCED_MESSAGE;
-              }
-
-              if (provider.isHasInternet && !provider.isSyncronizing) {
-                message = SYNCRONIZING_MESSAGE;
-                provider.checkAndSyncAllData(context);
-              }
-
-              if (!provider.isHasInternet && !provider.isSyncronizing) {
-                message = SYNC_PENDING_MESSAGE;
-              }
-
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+              provider.checkAndSyncAllData(context);
             },
           ),
         );
@@ -259,15 +244,18 @@ class _HomeScreenState extends State<HomeScreen> {
       onTap: () {
         if (product.stock == 0) return;
 
-        int qty = _homeProvider.orderedProducts.where((e) => e.productId == product.id).firstOrNull?.quantity ?? 0;
+        int currentQty = _homeProvider.orderedProducts.where((e) => e.id == product.id).firstOrNull?.quantity ?? 0;
 
         AppDialog.show(
           title: 'Enter Amount',
           child: OrderCard(
-            product: product,
-            initialQuantity: qty,
+            name: product.name,
+            imageUrl: product.imageUrl,
+            stock: product.stock,
+            price: product.price,
+            initialQuantity: currentQty,
             onChangedQuantity: (val) {
-              qty = val;
+              currentQty = val;
             },
           ),
           rightButtonText: 'Add To Cart',
@@ -276,7 +264,7 @@ class _HomeScreenState extends State<HomeScreen> {
             GoRouter.of(context).pop();
           },
           onTapRightButton: () {
-            _homeProvider.onAddOrderedProduct(product, qty == 0 ? 1 : qty);
+            _homeProvider.onAddOrderedProduct(product, currentQty == 0 ? 1 : currentQty);
             GoRouter.of(context).pop();
           },
         );

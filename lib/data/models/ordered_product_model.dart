@@ -1,21 +1,26 @@
 import '../../domain/entities/ordered_product_entity.dart';
-import 'product_model.dart';
 
 class OrderedProductModel {
   int? id;
   int? transactionId;
-  int quantity;
   int productId;
-  ProductModel? product;
+  int quantity;
+  int stock;
+  String name;
+  String imageUrl;
+  int price;
   String? createdAt;
   String? updatedAt;
 
   OrderedProductModel({
     this.id,
     this.transactionId,
-    required this.quantity,
     required this.productId,
-    this.product,
+    required this.quantity,
+    required this.stock,
+    required this.name,
+    required this.imageUrl,
+    required this.price,
     this.createdAt,
     this.updatedAt,
   });
@@ -24,9 +29,12 @@ class OrderedProductModel {
     return OrderedProductModel(
       id: json['id'],
       transactionId: json['transactionId'],
-      quantity: json['quantity'],
       productId: json['productId'],
-      product: json['product'],
+      quantity: json['quantity'],
+      stock: json['stock'],
+      name: json['name'],
+      imageUrl: json['imageUrl'],
+      price: json['price'],
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
     );
@@ -36,9 +44,12 @@ class OrderedProductModel {
     return {
       'id': id,
       'transactionId': transactionId,
-      'quantity': quantity,
       'productId': productId,
-      'product': product,
+      'quantity': quantity,
+      'stock': stock,
+      'name': name,
+      'imageUrl': imageUrl,
+      'price': price,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
@@ -48,9 +59,12 @@ class OrderedProductModel {
     return OrderedProductModel(
       id: entity.id,
       transactionId: entity.transactionId,
-      quantity: entity.quantity,
       productId: entity.productId,
-      product: entity.product != null ? ProductModel.fromEntity(entity.product!) : null,
+      quantity: entity.quantity,
+      stock: entity.stock,
+      name: entity.name,
+      imageUrl: entity.imageUrl,
+      price: entity.price,
       createdAt: entity.createdAt ?? DateTime.now().toIso8601String(),
       updatedAt: entity.updatedAt ?? DateTime.now().toIso8601String(),
     );
@@ -60,9 +74,12 @@ class OrderedProductModel {
     return OrderedProductEntity(
       id: id,
       transactionId: transactionId,
-      quantity: quantity,
       productId: productId,
-      product: product?.toEntity(),
+      quantity: quantity,
+      stock: stock,
+      name: name,
+      imageUrl: imageUrl,
+      price: price,
       createdAt: createdAt,
       updatedAt: updatedAt,
     );

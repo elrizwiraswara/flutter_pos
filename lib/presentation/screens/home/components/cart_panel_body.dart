@@ -48,7 +48,10 @@ class _CartPanelBodyState extends State<CartPanelBody> {
           return Padding(
             padding: const EdgeInsets.only(bottom: AppSizes.padding),
             child: OrderCard(
-              product: provider.orderedProducts[i].product!,
+              name: provider.orderedProducts[i].name,
+              imageUrl: provider.orderedProducts[i].imageUrl,
+              stock: provider.orderedProducts[i].stock,
+              price: provider.orderedProducts[i].price,
               initialQuantity: provider.orderedProducts[i].quantity,
               onChangedQuantity: (val) {
                 provider.onChangedOrderedProductQuantity(i, val);

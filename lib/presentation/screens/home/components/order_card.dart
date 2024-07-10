@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 import '../../../../app/routes/app_routes.dart';
 import '../../../../app/themes/app_sizes.dart';
 import '../../../../app/utilities/currency_formatter.dart';
-import '../../../../domain/entities/product_entity.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_dialog.dart';
 import '../../../widgets/app_image.dart';
 
 class OrderCard extends StatefulWidget {
-  final ProductEntity product;
+  final String name;
+  final String imageUrl;
+  final int stock;
+  final int price;
   final int initialQuantity;
   final Function()? onTapCard;
   final Function()? onTapRemove;
@@ -17,8 +19,11 @@ class OrderCard extends StatefulWidget {
 
   const OrderCard({
     super.key,
+    required this.name,
+    required this.imageUrl,
+    required this.stock,
+    required this.price,
     this.initialQuantity = 0,
-    required this.product,
     this.onTapCard,
     this.onTapRemove,
     required this.onChangedQuantity,
@@ -67,7 +72,7 @@ class _OrderCardState extends State<OrderCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.product.name,
+                      widget.name,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold),
@@ -79,7 +84,7 @@ class _OrderCardState extends State<OrderCard> {
                         Row(
                           children: [
                             Text(
-                              CurrencyFormatter.format(widget.product.price),
+                              CurrencyFormatter.format(widget.price),
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(width: 4),
@@ -91,7 +96,7 @@ class _OrderCardState extends State<OrderCard> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Stock: ${widget.product.stock}',
+                          'Stock: ${widget.stock}',
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 10),
                         ),
                         const SizedBox(height: 6),
@@ -109,7 +114,7 @@ class _OrderCardState extends State<OrderCard> {
                   AppImage(
                     width: 70,
                     height: 70,
-                    image: widget.product.imageUrl,
+                    image: widget.imageUrl,
                     borderRadius: 4,
                     borderWidth: 0.5,
                     backgroundColor: Theme.of(context).colorScheme.surfaceContainerLowest,
@@ -208,7 +213,7 @@ class _OrderCardState extends State<OrderCard> {
                     ),
               ),
               onTap: () {
-                if (quantity < widget.product.stock) {
+                if (quantity < widget.stock) {
                   quantity += 1;
                   setState(() {});
 

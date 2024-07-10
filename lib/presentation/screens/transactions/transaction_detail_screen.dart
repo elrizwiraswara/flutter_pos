@@ -255,7 +255,7 @@ class TransactionDetailScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          order.product?.name ?? '-',
+          order.name,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: AppSizes.padding / 4),
@@ -263,11 +263,11 @@ class TransactionDetailScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '${CurrencyFormatter.format(order.product?.price ?? 0)} x ${order.quantity}',
+              '${CurrencyFormatter.format(order.price)} x ${order.quantity}',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             Text(
-              CurrencyFormatter.format((order.product?.price ?? 0) * order.quantity),
+              CurrencyFormatter.format((order.price) * order.quantity),
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           ],

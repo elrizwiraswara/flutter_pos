@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_pos/app/utilities/console_log.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -199,6 +200,7 @@ class _CartPanelFooterState extends State<CartPanelFooter> {
       router.go('/transactions/transaction-detail/${res.data}');
       messenger.showSnackBar(const SnackBar(content: Text('Transaction created')));
     } else {
+      cl('[createTransaction].error ${res.error}');
       AppDialog.showErrorDialog(error: res.error?.message);
     }
   }

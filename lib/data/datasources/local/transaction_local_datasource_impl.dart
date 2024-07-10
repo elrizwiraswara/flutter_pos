@@ -26,24 +26,36 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
       );
 
       if (transaction.orderedProducts?.isNotEmpty ?? false) {
-        for (var order in transaction.orderedProducts!) {
+        for (var orderedProduct in transaction.orderedProducts!) {
           // Create ordered product
-          order.id ??= DateTime.now().millisecondsSinceEpoch;
-          order.transactionId = transactionId;
+          orderedProduct.id ??= DateTime.now().millisecondsSinceEpoch;
+          orderedProduct.transactionId = transactionId;
+
           await trx.insert(
             AppDatabaseConfig.orderedProductTableName,
-            order.toJson()..remove('product'),
+            orderedProduct.toJson()..remove('product'),
           );
 
+          // Get product
+          var rawProduct = await trx.query(
+            AppDatabaseConfig.productTableName,
+            where: 'id = ?',
+            whereArgs: [orderedProduct.productId],
+          );
+
+          if (rawProduct.isEmpty) continue;
+
+          var product = ProductModel.fromJson(rawProduct.first);
+
           // Update product stock and sold
-          order.product?.stock -= order.quantity;
-          order.product?.sold += order.quantity;
+          int stock = product.stock - orderedProduct.quantity;
+          int sold = product.sold + orderedProduct.quantity;
 
           await trx.update(
             AppDatabaseConfig.productTableName,
-            order.product?.toJson() ?? {},
+            {'stock': stock, 'sold': sold},
             where: 'id = ?',
-            whereArgs: [order.productId],
+            whereArgs: [product.id],
             conflictAlgorithm: ConflictAlgorithm.ignore,
           );
         }
@@ -66,22 +78,33 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
       );
 
       if (transaction.orderedProducts?.isNotEmpty ?? false) {
-        for (var order in transaction.orderedProducts!) {
+        for (var orderedProduct in transaction.orderedProducts!) {
           // Update ordered product
           await trx.update(
             AppDatabaseConfig.orderedProductTableName,
-            order.toJson()..remove('product'),
+            orderedProduct.toJson()..remove('product'),
           );
 
+          // Get product
+          var rawProduct = await trx.query(
+            AppDatabaseConfig.productTableName,
+            where: 'id = ?',
+            whereArgs: [orderedProduct.productId],
+          );
+
+          if (rawProduct.isEmpty) continue;
+
+          var product = ProductModel.fromJson(rawProduct.first);
+
           // Update product stock and sold
-          order.product?.stock -= order.quantity;
-          order.product?.sold += order.quantity;
+          int stock = product.stock - orderedProduct.quantity;
+          int sold = product.sold + orderedProduct.quantity;
 
           await trx.update(
             AppDatabaseConfig.productTableName,
-            order.product?.toJson() ?? {},
+            {'stock': stock, 'sold': sold},
             where: 'id = ?',
-            whereArgs: [order.productId],
+            whereArgs: [product.id],
             conflictAlgorithm: ConflictAlgorithm.ignore,
           );
         }
@@ -136,22 +159,6 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
       // Set created by to transaction
       if (rawCreatedBy.isNotEmpty) {
         transaction.createdBy = UserModel.fromJson(rawCreatedBy.first);
-      }
-
-      // Get products of ordered products
-      if (orderedProducts.isNotEmpty) {
-        for (var order in orderedProducts) {
-          var rawProducts = await trx.query(
-            AppDatabaseConfig.productTableName,
-            where: 'id = ?',
-            whereArgs: [order.productId],
-          );
-
-          if (rawProducts.isEmpty) continue;
-
-          // Set product to ordered product
-          order.product = ProductModel.fromJson(rawProducts.first);
-        }
       }
 
       return transaction;
