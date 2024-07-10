@@ -105,7 +105,7 @@ class MainProvider extends ChangeNotifier {
     ]);
 
     // Set and notify user state
-    if (res.first.isSuccess) {
+    if (res.isNotEmpty && res.first.isSuccess) {
       user = res.first.data as UserEntity?;
       notifyListeners();
     }
@@ -134,9 +134,15 @@ class MainProvider extends ChangeNotifier {
 
   Future<void> onHasInternet(bool value) async {
     isHasInternet = value;
-    isDataSynced = (await getQueuedActions()).isNotEmpty;
     notifyListeners();
 
+    checkIsDataSynced();
+
     if (isHasInternet) checkAndSyncAllData();
+  }
+
+  Future<void> checkIsDataSynced() async {
+    isDataSynced = (await getQueuedActions()).isEmpty;
+    notifyListeners();
   }
 }
