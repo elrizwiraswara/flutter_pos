@@ -71,7 +71,7 @@ class QueuedActionRepositoryImpl extends QueuedActionRepository {
       cl("[executeQueuedAction].queue = ${QueuedActionModel.fromEntity(queue).toJson()}");
 
       var res = await _functionSelector(queue).catchError((e) {
-        return Result.error(e);
+        return Result.error(APIError(message: e.toString()));
       });
 
       if (res.isSuccess) {
@@ -80,11 +80,11 @@ class QueuedActionRepositoryImpl extends QueuedActionRepository {
         return Result.success(true);
       } else {
         cl("[executeQueuedAction].error = ${res.error}");
-        return Result.error(null);
+        return Result.error(res.error);
       }
     } catch (e) {
       cl("[executeQueuedAction].error = $e");
-      return Result.error(null);
+      return Result.error(APIError(message: e.toString()));
     }
   }
 
