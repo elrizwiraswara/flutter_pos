@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_pos/presentation/widgets/app_progress_indicator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -25,31 +26,29 @@ class ProfileFormScreen extends StatefulWidget {
 }
 
 class _ProfileFormScreenState extends State<ProfileFormScreen> {
-  final accountProvider = sl<AccountProvider>();
+  final accountProvider = sl<AccountProvider>()..resetStates();
 
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
+  final nameController = TextEditingController();
+  final emailController = TextEditingController();
+  final phoneController = TextEditingController();
 
   @override
   void initState() {
-    accountProvider.clearStates();
-
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await accountProvider.getUserDetail(AuthService().getAuthData()!.uid);
+      await accountProvider.initProfileForm(AuthService().getAuthData()!.uid);
 
-      _nameController.text = accountProvider.name ?? '';
-      _emailController.text = accountProvider.email ?? '';
-      _phoneController.text = accountProvider.phone ?? '';
+      nameController.text = accountProvider.name ?? '';
+      emailController.text = accountProvider.email ?? '';
+      phoneController.text = accountProvider.phone ?? '';
     });
     super.initState();
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _phoneController.dispose();
+    nameController.dispose();
+    emailController.dispose();
+    phoneController.dispose();
     super.dispose();
   }
 
@@ -59,9 +58,7 @@ class _ProfileFormScreenState extends State<ProfileFormScreen> {
       imageQuality: 50,
     );
 
-    if (pickedFile == null) {
-      return;
-    }
+    if (pickedFile == null) return;
 
     CroppedFile? croppedFile = await ImageCropper().cropImage(
       sourcePath: pickedFile.path,
@@ -85,18 +82,27 @@ class _ProfileFormScreenState extends State<ProfileFormScreen> {
         title: const Text('Edit Profile'),
         titleSpacing: 0,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSizes.padding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            image(),
-            name(),
-            email(),
-            phone(),
-            button(),
-          ],
-        ),
+      body: Selector<AccountProvider, bool>(
+        selector: (context, provider) => provider.isLoaded,
+        builder: (context, isLoaded, _) {
+          if (!isLoaded) {
+            return const AppProgressIndicator();
+          }
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(AppSizes.padding),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                image(),
+                name(),
+                email(),
+                phone(),
+                button(),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -106,7 +112,7 @@ class _ProfileFormScreenState extends State<ProfileFormScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Profile Photo',
+          'Profile Image',
           style: Theme.of(context).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: AppSizes.padding / 2),
@@ -155,7 +161,7 @@ class _ProfileFormScreenState extends State<ProfileFormScreen> {
     return Padding(
       padding: const EdgeInsets.only(top: AppSizes.padding),
       child: AppTextField(
-        controller: _nameController,
+        controller: nameController,
         labelText: 'Name',
         hintText: 'Your name...',
         onChanged: accountProvider.onChangedName,
@@ -167,7 +173,7 @@ class _ProfileFormScreenState extends State<ProfileFormScreen> {
     return Padding(
       padding: const EdgeInsets.only(top: AppSizes.padding),
       child: AppTextField(
-        controller: _emailController,
+        controller: emailController,
         labelText: 'Email',
         hintText: 'Your email...',
         onChanged: accountProvider.onChangedEmail,
@@ -179,7 +185,7 @@ class _ProfileFormScreenState extends State<ProfileFormScreen> {
     return Padding(
       padding: const EdgeInsets.only(top: AppSizes.padding),
       child: AppTextField(
-        controller: _phoneController,
+        controller: phoneController,
         labelText: 'Phone Number',
         hintText: 'Your phone number...',
         keyboardType: TextInputType.number,

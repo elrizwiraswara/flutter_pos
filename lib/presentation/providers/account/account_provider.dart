@@ -21,13 +21,18 @@ class AccountProvider extends ChangeNotifier {
   String? email;
   String? phone;
 
-  void clearStates() {
+  bool isLoaded = false;
+
+  void resetStates() {
     imageFile = null;
     imageUrl = null;
     name = null;
+    email = null;
+    phone = null;
+    isLoaded = false;
   }
 
-  Future<void> getUserDetail(String id) async {
+  Future<void> initProfileForm(String id) async {
     var res = await GetUserUsecase(userRepository).call(id);
 
     if (res.isSuccess) {
@@ -35,6 +40,8 @@ class AccountProvider extends ChangeNotifier {
       name = res.data?.name;
       email = res.data?.email;
       phone = res.data?.phone;
+
+      isLoaded = true;
       notifyListeners();
     } else {
       throw res.error ?? 'Failed to load data';
