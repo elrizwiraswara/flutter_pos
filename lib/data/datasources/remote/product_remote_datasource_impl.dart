@@ -71,7 +71,9 @@ class ProductRemoteDatasourceImpl extends ProductDatasource {
         .limit(limit);
 
     if (lastSnapshot != null) {
-      query.startAfterDocument(lastSnapshot);
+      query = query.startAfterDocument(lastSnapshot);
+    } else {
+      return [];
     }
 
     var rawProducts = await query.get();

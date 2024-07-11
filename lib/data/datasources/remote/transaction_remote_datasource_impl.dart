@@ -178,7 +178,9 @@ class TransactionRemoteDatasourceImpl extends TransactionDatasource {
         .limit(limit);
 
     if (lastSnapshot != null) {
-      query.startAfterDocument(lastSnapshot);
+      query = query.startAfterDocument(lastSnapshot);
+    } else {
+      return [];
     }
 
     var rawTransactions = await query.get();

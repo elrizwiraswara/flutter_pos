@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_pos/presentation/widgets/app_loading_more_indicator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -37,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
+    scrollController.addListener(scrollListener);
     WidgetsBinding.instance.addPostFrameCallback((_) => onRefresh());
     super.initState();
   }
@@ -48,10 +50,10 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  void scrollListener() {
+  void scrollListener() async {
     // Automatically load more data on end of scroll position
     if (scrollController.offset == scrollController.position.maxScrollExtent) {
-      productProvider.getAllProducts(offset: productProvider.allProducts?.length);
+      await productProvider.getAllProducts(offset: productProvider.allProducts?.length);
     }
   }
 
@@ -235,19 +237,31 @@ class _HomeScreenState extends State<HomeScreen> {
 
         return RefreshIndicator(
           onRefresh: () => onRefresh(),
-          child: GridView.builder(
-            padding: const EdgeInsets.fromLTRB(AppSizes.padding, AppSizes.padding, AppSizes.padding, 200),
-            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 200,
-              childAspectRatio: 1 / 1.5,
-              crossAxisSpacing: AppSizes.padding / 2,
-              mainAxisSpacing: AppSizes.padding / 2,
+          child: SingleChildScrollView(
+            controller: scrollController,
+            child: Column(
+              children: [
+                GridView.builder(
+                  padding: const EdgeInsets.fromLTRB(AppSizes.padding, AppSizes.padding, AppSizes.padding, 0),
+                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: 200,
+                    childAspectRatio: 1 / 1.5,
+                    crossAxisSpacing: AppSizes.padding / 2,
+                    mainAxisSpacing: AppSizes.padding / 2,
+                  ),
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: provider.allProducts!.length,
+                  itemBuilder: (context, i) {
+                    return productCard(provider.allProducts![i]);
+                  },
+                ),
+                AppLoadingMoreIndicator(
+                  isLoading: provider.isLoadingMore,
+                  padding: const EdgeInsets.only(top: AppSizes.padding, bottom: 160),
+                ),
+              ],
             ),
-            physics: const BouncingScrollPhysics(),
-            itemCount: provider.allProducts!.length,
-            itemBuilder: (context, i) {
-              return productCard(provider.allProducts![i]);
-            },
           ),
         );
       }),
