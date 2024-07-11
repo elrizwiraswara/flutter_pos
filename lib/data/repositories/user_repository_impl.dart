@@ -83,10 +83,12 @@ class UserRepositoryImpl extends UserRepository {
       } else {
         await queuedActionLocalDatasource.createQueuedAction(
           QueuedActionModel(
+            id: DateTime.now().millisecondsSinceEpoch,
             repository: 'UserRepositoryImpl',
             method: 'createUser',
             param: jsonEncode((UserModel.fromEntity(user)..id = id).toJson()),
             isCritical: false,
+            createdAt: DateTime.now().toIso8601String(),
           ),
         );
       }
@@ -107,10 +109,12 @@ class UserRepositoryImpl extends UserRepository {
       } else {
         await queuedActionLocalDatasource.createQueuedAction(
           QueuedActionModel(
+            id: DateTime.now().millisecondsSinceEpoch,
             repository: 'UserRepositoryImpl',
             method: 'deleteUser',
             param: userId,
             isCritical: false,
+            createdAt: DateTime.now().toIso8601String(),
           ),
         );
       }
@@ -131,10 +135,12 @@ class UserRepositoryImpl extends UserRepository {
       } else {
         await queuedActionLocalDatasource.createQueuedAction(
           QueuedActionModel(
+            id: DateTime.now().millisecondsSinceEpoch,
             repository: 'UserRepositoryImpl',
             method: 'updateUser',
             param: jsonEncode(UserModel.fromEntity(user).toJson()),
             isCritical: false,
+            createdAt: DateTime.now().toIso8601String(),
           ),
         );
       }

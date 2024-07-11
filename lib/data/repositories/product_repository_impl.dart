@@ -25,18 +25,138 @@ class ProductRepositoryImpl extends ProductRepository {
   });
 
   @override
-  Future<Result<List<ProductEntity>>> getAllUserProducts(String userId) async {
+  Future<Result<int>> syncAllUserProducts(String userId) async {
     try {
-      var local = await productLocalDatasource.getAllUserProduct(userId);
-
       if (ConnectivityService.isConnected) {
-        var remote = await productRemoteDatasource.getAllUserProduct(userId);
+        var local = await productLocalDatasource.getAllUserProducts(userId);
+        var remote = await productRemoteDatasource.getAllUserProducts(userId);
 
         if (remote.isEmpty && local.isNotEmpty) {
           for (var data in local) {
             // Store local data to remote db
             await productRemoteDatasource.createProduct(data);
           }
+
+          // Return synced data count
+          return Result.success(local.length);
+        }
+
+        if (remote.isNotEmpty && local.isEmpty) {
+          for (var data in remote) {
+            // Store remote data to local db
+            await productLocalDatasource.createProduct(data);
+          }
+
+          // Return synced data count
+          return Result.success(remote.length);
+        }
+
+        int syncedDataCount = 0;
+
+        if (remote.isNotEmpty && local.isNotEmpty) {
+          // Local first
+          for (var localData in local) {
+            var matchRemoteData = remote.where((remoteData) => remoteData.id == localData.id).firstOrNull;
+
+            if (matchRemoteData != null) {
+              var updatedAtLocal = DateTime.tryParse(localData.updatedAt ?? DateTime.now().toIso8601String());
+              var updatedAtRemote = DateTime.tryParse(matchRemoteData.updatedAt ?? DateTime.now().toIso8601String());
+              var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
+              // Check is the difference is above the minimum interval sync tolerance
+              var isRemoteNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
+              var isLocalNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
+
+              if (isRemoteNewer) {
+                syncedDataCount += 1;
+                // Save remote data to local db
+                await productLocalDatasource.updateProduct(matchRemoteData);
+              }
+
+              if (isLocalNewer) {
+                syncedDataCount += 1;
+                // Update remote with local data
+                await productRemoteDatasource.updateProduct(localData);
+              }
+            } else {
+              syncedDataCount += 1;
+              // No matching remote product, create it
+              await productRemoteDatasource.createProduct(localData);
+            }
+          }
+
+          // Remote first
+          for (var remoteData in remote) {
+            var matchLocalData = local.where((localData) => localData.id == remoteData.id).firstOrNull;
+
+            if (matchLocalData != null) {
+              var updatedAtLocal = DateTime.tryParse(remoteData.updatedAt ?? DateTime.now().toIso8601String());
+              var updatedAtRemote = DateTime.tryParse(matchLocalData.updatedAt ?? DateTime.now().toIso8601String());
+              var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
+              // Check is the difference is above the minimum interval sync tolerance
+              var isRemoteNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
+              var isLocalNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
+
+              if (isRemoteNewer) {
+                syncedDataCount += 1;
+                // Save remote data to local db
+                await productLocalDatasource.updateProduct(remoteData);
+              }
+
+              if (isLocalNewer) {
+                syncedDataCount += 1;
+                // Update remote with local data
+                await productRemoteDatasource.updateProduct(matchLocalData);
+              }
+            } else {
+              syncedDataCount += 1;
+              // No matching remote product, create it
+              await productLocalDatasource.createProduct(remoteData);
+            }
+          }
+        }
+
+        // Return synced data count
+        return Result.success(syncedDataCount);
+      }
+
+      return Result.success(0);
+    } catch (e) {
+      return Result.error(APIError(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Result<List<ProductEntity>>> getUserProducts(
+    String userId, {
+    String orderBy = 'createdAt',
+    String sortBy = 'DESC',
+    int limit = 10,
+    int? offset,
+  }) async {
+    try {
+      var local = await productLocalDatasource.getUserProducts(
+        userId,
+        orderBy: orderBy,
+        sortBy: sortBy,
+        limit: limit,
+        offset: offset,
+      );
+
+      if (ConnectivityService.isConnected) {
+        var remote = await productRemoteDatasource.getUserProducts(
+          userId,
+          orderBy: orderBy,
+          sortBy: sortBy,
+          limit: limit,
+          offset: offset,
+        );
+
+        if (remote.isEmpty && local.isNotEmpty) {
+          for (var data in local) {
+            // Store local data to remote db
+            await productRemoteDatasource.createProduct(data);
+          }
+
           // Return local data
           return Result.success(local.map((e) => e.toEntity()).toList());
         }
@@ -46,27 +166,34 @@ class ProductRepositoryImpl extends ProductRepository {
             // Store remote data to local db
             await productLocalDatasource.createProduct(data);
           }
-          // Return remote data
+
+          // Return local data
           return Result.success(remote.map((e) => e.toEntity()).toList());
         }
 
         if (remote.isNotEmpty && local.isNotEmpty) {
           List<bool> isRemoteHasNewerData = [];
 
+          // Local first only
           for (var localData in local) {
             var matchRemoteData = remote.where((remoteData) => remoteData.id == localData.id).firstOrNull;
 
             if (matchRemoteData != null) {
+              // Compare local & remote data updatedAt difference
               var updatedAtLocal = DateTime.tryParse(localData.updatedAt ?? DateTime.now().toIso8601String());
               var updatedAtRemote = DateTime.tryParse(matchRemoteData.updatedAt ?? DateTime.now().toIso8601String());
               var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
-              var isRemoteNewer = differenceInMinutes > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
+              // Check is the difference is above the minimum interval sync tolerance
+              var isRemoteNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
+              var isLocalNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
 
               if (isRemoteNewer) {
                 isRemoteHasNewerData.add(true);
                 // Save remote data to local db
                 await productLocalDatasource.updateProduct(matchRemoteData);
-              } else {
+              }
+
+              if (isLocalNewer) {
                 // Update remote with local data
                 await productRemoteDatasource.updateProduct(localData);
               }
@@ -118,7 +245,9 @@ class ProductRepositoryImpl extends ProductRepository {
           var updatedAtLocal = DateTime.tryParse(local.updatedAt ?? DateTime.now().toIso8601String());
           var updatedAtRemote = DateTime.tryParse(remote.updatedAt ?? DateTime.now().toIso8601String());
           var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
-          var isRemoteNewer = differenceInMinutes > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
+          // Check is the difference is above the minimum interval sync tolerance
+          var isRemoteNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
+          var isLocalNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
 
           // Compare local & remote data updatedAt difference
           if (isRemoteNewer) {
@@ -126,7 +255,9 @@ class ProductRepositoryImpl extends ProductRepository {
             await productLocalDatasource.updateProduct(remote);
             // Return remote data
             return Result.success(remote.toEntity());
-          } else {
+          }
+
+          if (isLocalNewer) {
             // Store local data to remote db
             await productRemoteDatasource.updateProduct(local);
             // Return local data
@@ -144,17 +275,21 @@ class ProductRepositoryImpl extends ProductRepository {
   @override
   Future<Result<int>> createProduct(ProductEntity product) async {
     try {
-      var productId = await productLocalDatasource.createProduct(ProductModel.fromEntity(product));
+      var data = ProductModel.fromEntity(product);
+
+      var productId = await productLocalDatasource.createProduct(data);
 
       if (ConnectivityService.isConnected) {
-        await productRemoteDatasource.createProduct(ProductModel.fromEntity(product)..id = productId);
+        await productRemoteDatasource.createProduct(data);
       } else {
         await queuedActionLocalDatasource.createQueuedAction(
           QueuedActionModel(
+            id: DateTime.now().millisecond,
             repository: 'ProductRepositoryImpl',
             method: 'createProduct',
-            param: jsonEncode((ProductModel.fromEntity(product)..id = productId).toJson()),
+            param: jsonEncode((data).toJson()),
             isCritical: true,
+            createdAt: DateTime.now().toIso8601String(),
           ),
         );
       }
@@ -175,10 +310,12 @@ class ProductRepositoryImpl extends ProductRepository {
       } else {
         await queuedActionLocalDatasource.createQueuedAction(
           QueuedActionModel(
+            id: DateTime.now().millisecond,
             repository: 'ProductRepositoryImpl',
             method: 'deleteProduct',
             param: productId.toString(),
             isCritical: true,
+            createdAt: DateTime.now().toIso8601String(),
           ),
         );
       }
@@ -199,10 +336,12 @@ class ProductRepositoryImpl extends ProductRepository {
       } else {
         await queuedActionLocalDatasource.createQueuedAction(
           QueuedActionModel(
+            id: DateTime.now().millisecond,
             repository: 'ProductRepositoryImpl',
             method: 'updateProduct',
             param: jsonEncode(ProductModel.fromEntity(product).toJson()),
             isCritical: true,
+            createdAt: DateTime.now().toIso8601String(),
           ),
         );
       }
