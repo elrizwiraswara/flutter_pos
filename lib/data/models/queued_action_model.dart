@@ -1,20 +1,20 @@
 import '../../domain/entities/queued_action_entity.dart';
 
 class QueuedActionModel {
-  int? id;
+  int id;
   String repository;
   String method;
   String param;
   bool isCritical;
-  String? createdAt;
+  String createdAt;
 
   QueuedActionModel({
-    this.id,
+    required this.id,
     required this.repository,
     required this.method,
     required this.param,
     required this.isCritical,
-    this.createdAt,
+    required this.createdAt,
   });
 
   factory QueuedActionModel.fromJson(Map<String, dynamic> json) {
@@ -41,12 +41,12 @@ class QueuedActionModel {
 
   factory QueuedActionModel.fromEntity(QueuedActionEntity entity) {
     return QueuedActionModel(
-      id: entity.id,
+      id: entity.id ?? DateTime.now().millisecondsSinceEpoch,
       repository: entity.repository,
       method: entity.method,
       param: entity.param,
       isCritical: entity.isCritical,
-      createdAt: entity.createdAt,
+      createdAt: entity.createdAt ?? DateTime.now().toIso8601String(),
     );
   }
 
