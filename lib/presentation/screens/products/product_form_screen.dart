@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_pos/app/locale/app_locale.dart';
+import 'package:flutter_pos/presentation/widgets/app_progress_indicator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -30,36 +32,32 @@ class ProductFormScreen extends StatefulWidget {
 }
 
 class _ProductFormScreenState extends State<ProductFormScreen> {
-  final _productFormProvider = sl<ProductFormProvider>();
+  final productFormProvider = sl<ProductFormProvider>()..resetStates();
 
-  final _nameController = TextEditingController();
-  final _priceController = TextEditingController();
-  final _stockController = TextEditingController();
-  final _descController = TextEditingController();
+  final nameController = TextEditingController();
+  final priceController = TextEditingController();
+  final stockController = TextEditingController();
+  final descController = TextEditingController();
 
   @override
   void initState() {
-    _productFormProvider.clearStates();
-
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (widget.id != null) {
-        await _productFormProvider.getProductDetail(widget.id!);
+      await productFormProvider.initProductForm(widget.id);
 
-        _nameController.text = _productFormProvider.name ?? '';
-        _priceController.text = _productFormProvider.price.toString();
-        _stockController.text = _productFormProvider.stock.toString();
-        _descController.text = _productFormProvider.description ?? '';
-      }
+      nameController.text = productFormProvider.name ?? '';
+      priceController.text = productFormProvider.price?.toString() ?? '';
+      stockController.text = productFormProvider.stock?.toString() ?? '';
+      descController.text = productFormProvider.description ?? '';
     });
     super.initState();
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _priceController.dispose();
-    _stockController.dispose();
-    _descController.dispose();
+    nameController.dispose();
+    priceController.dispose();
+    stockController.dispose();
+    descController.dispose();
     super.dispose();
   }
 
@@ -69,9 +67,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       imageQuality: 50,
     );
 
-    if (pickedFile == null) {
-      return;
-    }
+    if (pickedFile == null) return;
 
     CroppedFile? croppedFile = await ImageCropper().cropImage(
       sourcePath: pickedFile.path,
@@ -84,7 +80,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
     if (croppedFile != null) {
       var file = File(croppedFile.path);
-      _productFormProvider.onChangedImage(file);
+      productFormProvider.onChangedImage(file);
     }
   }
 
@@ -92,24 +88,32 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Product'),
+        title: Text(widget.id == null ? 'Create Product' : 'Edit Product'),
         titleSpacing: 0,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSizes.padding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            image(),
-            name(),
-            price(),
-            stock(),
-            description(),
-            createOrUpdateButton(),
-            deleteButton(),
-          ],
-        ),
-      ),
+      body: Selector<ProductFormProvider, bool>(
+          selector: (context, provider) => provider.isLoaded,
+          builder: (context, isLoaded, _) {
+            if (!isLoaded) {
+              return const AppProgressIndicator();
+            }
+
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(AppSizes.padding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  image(),
+                  name(),
+                  price(),
+                  stock(),
+                  description(),
+                  createOrUpdateButton(),
+                  deleteButton(),
+                ],
+              ),
+            );
+          }),
     );
   }
 
@@ -120,7 +124,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Foto Produk',
+              'Product Image',
               style: Theme.of(context).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: AppSizes.padding / 2),
@@ -167,10 +171,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     return Padding(
       padding: const EdgeInsets.only(top: AppSizes.padding),
       child: AppTextField(
-        controller: _nameController,
-        labelText: 'Nama',
-        hintText: 'Masukkan nama produk...',
-        onChanged: _productFormProvider.onChangedName,
+        controller: nameController,
+        labelText: 'Name',
+        hintText: 'Product name...',
+        onChanged: productFormProvider.onChangedName,
       ),
     );
   }
@@ -179,15 +183,15 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     return Padding(
       padding: const EdgeInsets.only(top: AppSizes.padding),
       child: AppTextField(
-        controller: _priceController,
-        labelText: 'Harga',
-        hintText: 'Masukkan harga produk...',
+        controller: priceController,
+        labelText: 'Price',
+        hintText: 'Product price...',
         keyboardType: TextInputType.number,
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         prefixIcon: Padding(
           padding: const EdgeInsets.all(16),
           child: Text(
-            'Rp',
+            AppLocale.defaultCurrencyCode,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.bold,
@@ -195,7 +199,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                 ),
           ),
         ),
-        onChanged: _productFormProvider.onChangedPrice,
+        onChanged: productFormProvider.onChangedPrice,
       ),
     );
   }
@@ -204,12 +208,12 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     return Padding(
       padding: const EdgeInsets.only(top: AppSizes.padding),
       child: AppTextField(
-        controller: _stockController,
-        labelText: 'Stok',
-        hintText: 'Masukkan stok produk...',
+        controller: stockController,
+        labelText: 'Stock',
+        hintText: 'Product stock...',
         keyboardType: TextInputType.number,
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        onChanged: _productFormProvider.onChangedStock,
+        onChanged: productFormProvider.onChangedStock,
       ),
     );
   }
@@ -218,11 +222,11 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     return Padding(
       padding: const EdgeInsets.only(top: AppSizes.padding),
       child: AppTextField(
-        controller: _descController,
-        labelText: 'Deskripsi',
-        hintText: 'Masukkan deskripsi produk...',
+        controller: descController,
+        labelText: 'Description',
+        hintText: 'Product description...',
         maxLines: 4,
-        onChanged: _productFormProvider.onChangedDesc,
+        onChanged: productFormProvider.onChangedDesc,
       ),
     );
   }
@@ -285,7 +289,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
     AppDialog.showDialogProgress();
 
-    var res = await _productFormProvider.createProduct();
+    var res = await productFormProvider.createProduct();
 
     AppDialog.closeDialog();
 
@@ -303,7 +307,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
     AppDialog.showDialogProgress();
 
-    var res = await _productFormProvider.updatedProduct(widget.id!);
+    var res = await productFormProvider.updatedProduct(widget.id!);
 
     AppDialog.closeDialog();
 
@@ -321,7 +325,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
     AppDialog.showDialogProgress();
 
-    var res = await _productFormProvider.deleteProduct(widget.id!);
+    var res = await productFormProvider.deleteProduct(widget.id!);
 
     AppDialog.closeDialog();
 
