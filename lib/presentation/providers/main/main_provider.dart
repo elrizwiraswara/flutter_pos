@@ -70,10 +70,11 @@ class MainProvider extends ChangeNotifier {
       isSyncronizing = true;
       notifyListeners();
 
-      await getAndSyncAllUserData();
-
       // Execute all queued actions
       int queueExecutedCount = await executeAllQueuedActions();
+
+      // Sync all data
+      await getAndSyncAllUserData();
 
       messenger.hideCurrentSnackBar();
       messenger.showSnackBar(

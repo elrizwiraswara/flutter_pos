@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/presentation/widgets/app_loading_more_indicator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -15,6 +14,7 @@ import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
 import '../../widgets/app_empty_state.dart';
 import '../../widgets/app_image.dart';
+import '../../widgets/app_loading_more_indicator.dart';
 import '../../widgets/app_progress_indicator.dart';
 import '../products/components/products_card.dart';
 import 'components/cart_panel_body.dart';
@@ -274,7 +274,8 @@ class _HomeScreenState extends State<HomeScreen> {
       onTap: () {
         if (product.stock == 0) return;
 
-        int currentQty = homeProvider.orderedProducts.where((e) => e.id == product.id).firstOrNull?.quantity ?? 0;
+        int currentQty =
+            homeProvider.orderedProducts.where((e) => e.productId == product.id).firstOrNull?.quantity ?? 0;
 
         AppDialog.show(
           title: 'Enter Amount',
