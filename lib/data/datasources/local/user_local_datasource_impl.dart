@@ -11,13 +11,12 @@ class UserLocalDatasourceImpl extends UserDatasource {
 
   @override
   Future<String> createUser(UserModel user) async {
-    user.id ??= user.email;
     await _appDatabase.database.insert(
       AppDatabaseConfig.userTableName,
       user.toJson(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    return user.id!;
+    return user.id;
   }
 
   @override

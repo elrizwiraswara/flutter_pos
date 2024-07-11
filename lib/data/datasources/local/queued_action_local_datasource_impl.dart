@@ -11,13 +11,12 @@ class QueuedActionLocalDatasourceImpl extends QueuedActionDatasource {
 
   @override
   Future<int> createQueuedAction(QueuedActionModel queue) async {
-    queue.id ??= DateTime.now().millisecondsSinceEpoch;
     await _appDatabase.database.insert(
       AppDatabaseConfig.queuedActionTableName,
       queue.toJson(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    return queue.id!;
+    return queue.id;
   }
 
   @override
