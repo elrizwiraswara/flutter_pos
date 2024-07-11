@@ -47,10 +47,13 @@ class UserRepositoryImpl extends UserRepository {
         }
 
         if (remote != null && local != null) {
+          // Compare local & remote data updatedAt difference
           var updatedAtLocal = DateTime.tryParse(local.updatedAt ?? DateTime.now().toIso8601String());
           var updatedAtRemote = DateTime.tryParse(remote.updatedAt ?? DateTime.now().toIso8601String());
           var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
-          var isRemoteNewer = differenceInMinutes > MIN_SYNC_INTERVAL_TOLERANCE_FOR_LESS_CRITICAL_IN_MINUTES;
+          // Check is the difference is above the minimum interval sync tolerance
+          var isRemoteNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_LESS_CRITICAL_IN_MINUTES;
+          var isLocalNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_LESS_CRITICAL_IN_MINUTES;
 
           // Compare local & remote data updatedAt difference
           if (isRemoteNewer) {
@@ -58,7 +61,9 @@ class UserRepositoryImpl extends UserRepository {
             await userLocalDatasource.updateUser(remote);
             // Return remote data
             return Result.success(remote.toEntity());
-          } else {
+          }
+
+          if (isLocalNewer) {
             // Store local data to remote db
             await userRemoteDatasource.updateUser(local);
             // Return local data
