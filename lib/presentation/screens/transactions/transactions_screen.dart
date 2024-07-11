@@ -16,14 +16,31 @@ class TransactionsScreen extends StatefulWidget {
 }
 
 class _TransactionsScreenState extends State<TransactionsScreen> {
-  final _transactionProvider = sl<TransactionsProvider>();
+  final transactionProvider = sl<TransactionsProvider>();
+
+  final scrollController = ScrollController();
 
   @override
   void initState() {
+    scrollController.addListener(scrollListener);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _transactionProvider.getAllTransactions();
+      transactionProvider.getAllTransactions();
     });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    scrollController.removeListener(scrollListener);
+    scrollController.dispose();
+    super.dispose();
+  }
+
+  void scrollListener() {
+    // Automatically load more data on end of scroll position
+    if (scrollController.offset == scrollController.position.maxScrollExtent) {
+      transactionProvider.getAllTransactions(offset: transactionProvider.allTransactions?.length);
+    }
   }
 
   @override
@@ -42,6 +59,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         }
 
         return ListView.builder(
+          controller: scrollController,
           padding: const EdgeInsets.all(AppSizes.padding),
           itemCount: provider.allTransactions!.length,
           itemBuilder: (context, i) {

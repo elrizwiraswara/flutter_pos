@@ -29,9 +29,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final _mainProvider = sl<MainProvider>();
-  final _homeProvider = sl<HomeProvider>();
-  final _productProvider = sl<ProductsProvider>();
+  final mainProvider = sl<MainProvider>();
+  final homeProvider = sl<HomeProvider>();
+  final productProvider = sl<ProductsProvider>();
+
+  final scrollController = ScrollController();
 
   @override
   void initState() {
@@ -39,16 +41,30 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    scrollController.removeListener(scrollListener);
+    scrollController.dispose();
+    super.dispose();
+  }
+
+  void scrollListener() {
+    // Automatically load more data on end of scroll position
+    if (scrollController.offset == scrollController.position.maxScrollExtent) {
+      productProvider.getAllProducts(offset: productProvider.allProducts?.length);
+    }
+  }
+
   Future<void> onRefresh() async {
-    await _productProvider.getAllProducts();
-    await _mainProvider.checkIsHasQueuedActions();
+    await productProvider.getAllProducts();
+    await mainProvider.checkIsHasQueuedActions();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SlidingUpPanel(
-        controller: _homeProvider.panelController,
+        controller: homeProvider.panelController,
         minHeight: 88,
         maxHeight: AppSizes.screenHeight(context) - AppSizes.appBarHeight() - AppSizes.viewPadding(context).top,
         color: Theme.of(context).colorScheme.surfaceContainerLowest,
@@ -67,8 +83,8 @@ class _HomeScreenState extends State<HomeScreen> {
         header: const CartPanelHeader(),
         panel: const CartPanelBody(),
         footer: const CartPanelFooter(),
-        onPanelOpened: () => _homeProvider.onChangedIsPanelExpanded(true),
-        onPanelClosed: () => _homeProvider.onChangedIsPanelExpanded(false),
+        onPanelOpened: () => homeProvider.onChangedIsPanelExpanded(true),
+        onPanelClosed: () => homeProvider.onChangedIsPanelExpanded(false),
       ),
     );
   }
@@ -244,7 +260,7 @@ class _HomeScreenState extends State<HomeScreen> {
       onTap: () {
         if (product.stock == 0) return;
 
-        int currentQty = _homeProvider.orderedProducts.where((e) => e.id == product.id).firstOrNull?.quantity ?? 0;
+        int currentQty = homeProvider.orderedProducts.where((e) => e.id == product.id).firstOrNull?.quantity ?? 0;
 
         AppDialog.show(
           title: 'Enter Amount',
@@ -264,7 +280,7 @@ class _HomeScreenState extends State<HomeScreen> {
             GoRouter.of(context).pop();
           },
           onTapRightButton: () {
-            _homeProvider.onAddOrderedProduct(product, currentQty == 0 ? 1 : currentQty);
+            homeProvider.onAddOrderedProduct(product, currentQty == 0 ? 1 : currentQty);
             GoRouter.of(context).pop();
           },
         );
