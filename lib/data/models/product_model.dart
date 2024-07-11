@@ -1,7 +1,7 @@
 import '../../domain/entities/product_entity.dart';
 
 class ProductModel {
-  int? id;
+  int id;
   String createdById;
   String name;
   String imageUrl;
@@ -13,7 +13,7 @@ class ProductModel {
   String? updatedAt;
 
   ProductModel({
-    this.id,
+    required this.id,
     required this.createdById,
     required this.name,
     required this.imageUrl,
@@ -57,7 +57,7 @@ class ProductModel {
 
   factory ProductModel.fromEntity(ProductEntity entity) {
     return ProductModel(
-      id: entity.id,
+      id: entity.id ?? DateTime.now().millisecondsSinceEpoch,
       createdById: entity.createdById,
       name: entity.name,
       imageUrl: entity.imageUrl,

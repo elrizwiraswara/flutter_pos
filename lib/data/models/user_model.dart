@@ -1,7 +1,7 @@
 import '../../domain/entities/user_entity.dart';
 
 class UserModel {
-  String? id;
+  String id;
   String? email;
   String? phone;
   String? name;
@@ -12,7 +12,7 @@ class UserModel {
   String? updatedAt;
 
   UserModel({
-    this.id,
+    required this.id,
     this.email,
     this.phone,
     this.name,

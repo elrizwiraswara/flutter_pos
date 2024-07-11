@@ -3,7 +3,7 @@ import 'ordered_product_model.dart';
 import 'user_model.dart';
 
 class TransactionModel {
-  int? id;
+  int id;
   String paymentMethod;
   String? customerName;
   String? description;
@@ -18,7 +18,7 @@ class TransactionModel {
   String? updatedAt;
 
   TransactionModel({
-    this.id,
+    required this.id,
     required this.paymentMethod,
     this.customerName,
     this.description,
@@ -73,7 +73,7 @@ class TransactionModel {
 
   factory TransactionModel.fromEntity(TransactionEntity entity) {
     return TransactionModel(
-      id: entity.id,
+      id: entity.id ?? DateTime.now().millisecondsSinceEpoch,
       paymentMethod: entity.paymentMethod,
       customerName: entity.customerName,
       description: entity.description,

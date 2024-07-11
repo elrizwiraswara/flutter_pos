@@ -1,8 +1,8 @@
 import '../../domain/entities/ordered_product_entity.dart';
 
 class OrderedProductModel {
-  int? id;
-  int? transactionId;
+  int id;
+  int transactionId;
   int productId;
   int quantity;
   int stock;
@@ -13,8 +13,8 @@ class OrderedProductModel {
   String? updatedAt;
 
   OrderedProductModel({
-    this.id,
-    this.transactionId,
+    required this.id,
+    required this.transactionId,
     required this.productId,
     required this.quantity,
     required this.stock,
@@ -57,8 +57,8 @@ class OrderedProductModel {
 
   factory OrderedProductModel.fromEntity(OrderedProductEntity entity) {
     return OrderedProductModel(
-      id: entity.id,
-      transactionId: entity.transactionId,
+      id: entity.id ?? DateTime.now().millisecondsSinceEpoch,
+      transactionId: entity.transactionId ?? DateTime.now().millisecondsSinceEpoch,
       productId: entity.productId,
       quantity: entity.quantity,
       stock: entity.stock,
