@@ -50,6 +50,7 @@ A simple Point of Sale (POS) application built with Flutter with clean architect
     - Follow the instructions to add Firebase to your Flutter app [here](https://firebase.google.com/docs/flutter/setup).
     - Enable google authentication provider
     - Update cloud firestore rules to allow read write operation
+    <br/>
 
     ```
     service cloud.firestore {
@@ -61,7 +62,7 @@ A simple Point of Sale (POS) application built with Flutter with clean architect
     }
     ```
     - Add cloud firestore indexes for enable query
-
+    <br/>
     <img src="indexes.png" alt="Cloud Firestore Indexes" width=800px>
 
 
