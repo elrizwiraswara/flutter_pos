@@ -61,7 +61,7 @@ A simple Point of Sale (POS) application built with Flutter with clean architect
       }
     }
     ```
-    - Add cloud firestore indexes for enable query
+    - Add cloud firestore indexes to enable query
     <br/>
     <img src="indexes.png" alt="Cloud Firestore Indexes" width=800px>
 
