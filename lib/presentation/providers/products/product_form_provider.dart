@@ -25,17 +25,26 @@ class ProductFormProvider extends ChangeNotifier {
   int? stock;
   String? description;
 
-  void clearStates() {
+  bool isLoaded = false;
+
+  void resetStates() {
     imageFile = null;
     imageUrl = null;
     name = null;
     price = null;
     stock = null;
     description = null;
+    isLoaded = false;
   }
 
-  Future<void> getProductDetail(int id) async {
-    var res = await GetProductUsecase(productRepository).call(id);
+  Future<void> initProductForm(int? productId) async {
+    if (productId == null) {
+      isLoaded = true;
+      notifyListeners();
+      return;
+    }
+
+    var res = await GetProductUsecase(productRepository).call(productId);
 
     if (res.isSuccess) {
       var product = res.data;
@@ -46,6 +55,7 @@ class ProductFormProvider extends ChangeNotifier {
       stock = product?.stock;
       description = product?.description;
 
+      isLoaded = true;
       notifyListeners();
     } else {
       throw res.error?.message ?? 'Failed to load data';
