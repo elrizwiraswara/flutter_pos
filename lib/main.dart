@@ -54,7 +54,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: providers,
       child: Selector<ThemeProvider, ThemeData>(
-        selector: (a, b) => b.theme,
+        selector: (context, provider) => provider.theme,
         builder: (context, theme, _) {
           return MaterialApp.router(
             title: 'Flutter POS',
