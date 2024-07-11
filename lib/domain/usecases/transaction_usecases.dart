@@ -1,15 +1,33 @@
+import 'package:flutter_pos/domain/usecases/params/base_params.dart';
+
 import '../../core/usecase/usecase.dart';
 import '../entities/transaction_entity.dart';
 import '../repositories/transaction_repository.dart';
 
-class GetAllTransactionsUsecase extends UseCase<Result, String> {
-  GetAllTransactionsUsecase(this._transactionRepository);
+class SyncAllUserTransactionsUsecase extends UseCase<Result, String> {
+  SyncAllUserTransactionsUsecase(this._transactionRepository);
 
   final TransactionRepository _transactionRepository;
 
   @override
-  Future<Result<List<TransactionEntity>>> call(String params) async =>
-      _transactionRepository.getAllUserTransactions(params);
+  Future<Result<int>> call(String params) async => _transactionRepository.syncAllUserTransactions(params);
+}
+
+class GetUserTransactionsUsecase extends UseCase<Result, BaseParams> {
+  GetUserTransactionsUsecase(this._transactionRepository);
+
+  final TransactionRepository _transactionRepository;
+
+  @override
+  Future<Result<List<TransactionEntity>>> call(BaseParams params) async {
+    return _transactionRepository.getUserTransactions(
+      params.param,
+      orderBy: params.orderBy,
+      sortBy: params.sortBy,
+      limit: params.limit,
+      offset: params.offset,
+    );
+  }
 }
 
 class GetTransactionUsecase extends UseCase<Result, int> {

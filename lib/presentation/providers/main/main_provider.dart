@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_pos/domain/usecases/params/no_params.dart';
 
 import '../../../app/const/const.dart';
 import '../../../app/services/auth/auth_service.dart';
 import '../../../app/services/connectivity/connectivity_service.dart';
-import '../../../core/usecase/usecase.dart';
 import '../../../domain/entities/queued_action_entity.dart';
 import '../../../domain/entities/user_entity.dart';
 import '../../../domain/repositories/product_repository.dart';
@@ -47,7 +47,7 @@ class MainProvider extends ChangeNotifier {
 
   Future<void> initMainProvider(BuildContext context) async {
     ConnectivityService.initNetworkChecker(onHasInternet: (value) => onHasInternet(context, value));
-    await checkAndLoadAllData();
+    await getAndSyncAllUserData();
   }
 
   Future<void> checkAndSyncAllData(BuildContext context) async {
@@ -70,7 +70,7 @@ class MainProvider extends ChangeNotifier {
       isSyncronizing = true;
       notifyListeners();
 
-      await checkAndLoadAllData();
+      await getAndSyncAllUserData();
 
       // Execute all queued actions
       int queueExecutedCount = await executeAllQueuedActions();
@@ -101,17 +101,17 @@ class MainProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> checkAndLoadAllData() async {
+  Future<void> getAndSyncAllUserData() async {
     var auth = AuthService().getAuthData();
-    if (auth == null) return;
+    if (auth == null) throw 'Unauthenticated';
 
     // Run multiple futures simultaneusly
     // Because each repository has beed added data checker method
     // The local db will automatically sync with cloud db or vice versa
     var res = await Future.wait([
       GetUserUsecase(userRepository).call(auth.uid),
-      GetAllProductsUsecase(productRepository).call(auth.uid),
-      GetAllTransactionsUsecase(transactionRepository).call(auth.uid),
+      SyncAllUserProductsUsecase(productRepository).call(auth.uid),
+      SyncAllUserTransactionsUsecase(transactionRepository).call(auth.uid),
     ]);
 
     // Set and notify user state

@@ -1,14 +1,31 @@
+import 'package:flutter_pos/domain/usecases/params/base_params.dart';
+
 import '../../core/usecase/usecase.dart';
 import '../entities/product_entity.dart';
 import '../repositories/product_repository.dart';
 
-class GetAllProductsUsecase extends UseCase<Result, String> {
-  GetAllProductsUsecase(this._productRepository);
+class SyncAllUserProductsUsecase extends UseCase<Result, String> {
+  SyncAllUserProductsUsecase(this._productRepository);
 
   final ProductRepository _productRepository;
 
   @override
-  Future<Result<List<ProductEntity>>> call(String params) async => _productRepository.getAllUserProducts(params);
+  Future<Result<int>> call(String params) async => _productRepository.syncAllUserProducts(params);
+}
+
+class GetUserProductsUsecase extends UseCase<Result, BaseParams> {
+  GetUserProductsUsecase(this._productRepository);
+
+  final ProductRepository _productRepository;
+
+  @override
+  Future<Result<List<ProductEntity>>> call(BaseParams params) async => _productRepository.getUserProducts(
+        params.param,
+        orderBy: params.orderBy,
+        sortBy: params.sortBy,
+        limit: params.limit,
+        offset: params.offset,
+      );
 }
 
 class GetProductUsecase extends UseCase<Result, int> {

@@ -1,3 +1,5 @@
+import 'package:flutter_pos/domain/usecases/params/no_params.dart';
+
 import '../../core/usecase/usecase.dart';
 import '../entities/queued_action_entity.dart';
 import '../repositories/queued_action_repository.dart';
