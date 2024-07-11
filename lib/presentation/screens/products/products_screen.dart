@@ -20,14 +20,31 @@ class ProductsScreen extends StatefulWidget {
 }
 
 class _ProductsScreenState extends State<ProductsScreen> {
-  final _productProvider = sl<ProductsProvider>();
+  final productProvider = sl<ProductsProvider>();
+
+  final scrollController = ScrollController();
 
   @override
   void initState() {
+    scrollController.addListener(scrollListener);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _productProvider.getAllProducts();
+      productProvider.getAllProducts();
     });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    scrollController.removeListener(scrollListener);
+    scrollController.dispose();
+    super.dispose();
+  }
+
+  void scrollListener() {
+    // Automatically load more data on end of scroll position
+    if (scrollController.offset == scrollController.position.maxScrollExtent) {
+      productProvider.getAllProducts(offset: productProvider.allProducts?.length);
+    }
   }
 
   @override
@@ -57,6 +74,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
         }
 
         return GridView.builder(
+          controller: scrollController,
           padding: const EdgeInsets.all(AppSizes.padding),
           gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
             maxCrossAxisExtent: 200,
