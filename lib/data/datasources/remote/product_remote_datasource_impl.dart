@@ -10,9 +10,8 @@ class ProductRemoteDatasourceImpl extends ProductDatasource {
 
   @override
   Future<int> createProduct(ProductModel product) async {
-    product.id ??= DateTime.now().millisecondsSinceEpoch;
     await _firebaseFirestore.collection('Product').doc("${product.id}").set(product.toJson());
-    return product.id!;
+    return product.id;
   }
 
   @override
@@ -36,8 +35,47 @@ class ProductRemoteDatasourceImpl extends ProductDatasource {
   }
 
   @override
-  Future<List<ProductModel>> getAllUserProduct(String id) async {
-    var res = await _firebaseFirestore.collection('Product').where('createdById', isEqualTo: id).get();
+  Future<List<ProductModel>> getAllUserProducts(String userId) async {
+    var res = await _firebaseFirestore.collection('Product').where('createdById', isEqualTo: userId).get();
     return res.docs.map((e) => ProductModel.fromJson(e.data())).toList();
+  }
+
+  @override
+  Future<List<ProductModel>> getUserProducts(
+    String userId, {
+    String orderBy = 'createdAt',
+    String sortBy = 'DESC',
+    int limit = 10,
+    int? offset,
+  }) async {
+    // Because firestore doesnt suppport numeric offset
+    // Get last snapshot the pass it to startAfterDocument
+
+    DocumentSnapshot<Object?>? lastSnapshot;
+
+    if (offset != null) {
+      var temp = await _firebaseFirestore
+          .collection('Product')
+          .where('createdById', isEqualTo: userId)
+          .orderBy(orderBy, descending: sortBy == 'DESC')
+          .limit(offset)
+          .get();
+
+      lastSnapshot = temp.docs.last;
+    }
+
+    var query = _firebaseFirestore
+        .collection('Product')
+        .where('createdById', isEqualTo: userId)
+        .orderBy(orderBy, descending: sortBy == 'DESC')
+        .limit(limit);
+
+    if (lastSnapshot != null) {
+      query.startAfterDocument(lastSnapshot);
+    }
+
+    var rawProducts = await query.get();
+
+    return rawProducts.docs.map((e) => ProductModel.fromJson(e.data())).toList();
   }
 }

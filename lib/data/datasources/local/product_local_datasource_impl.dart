@@ -11,7 +11,6 @@ class ProductLocalDatasourceImpl extends ProductDatasource {
 
   @override
   Future<int> createProduct(ProductModel product) async {
-    product.id ??= DateTime.now().millisecondsSinceEpoch;
     return await _appDatabase.database.insert(
       AppDatabaseConfig.productTableName,
       product.toJson(),
@@ -55,11 +54,31 @@ class ProductLocalDatasourceImpl extends ProductDatasource {
   }
 
   @override
-  Future<List<ProductModel>> getAllUserProduct(String id) async {
+  Future<List<ProductModel>> getAllUserProducts(String userId) async {
     var res = await _appDatabase.database.query(
       AppDatabaseConfig.productTableName,
       where: 'createdById = ?',
-      whereArgs: [id],
+      whereArgs: [userId],
+    );
+
+    return res.map((e) => ProductModel.fromJson(e)).toList();
+  }
+
+  @override
+  Future<List<ProductModel>> getUserProducts(
+    String userId, {
+    String orderBy = 'createdAt',
+    String sortBy = 'DESC',
+    int limit = 10,
+    int? offset,
+  }) async {
+    var res = await _appDatabase.database.query(
+      AppDatabaseConfig.productTableName,
+      where: 'createdById = ?',
+      whereArgs: [userId],
+      orderBy: '$orderBy $sortBy',
+      limit: limit,
+      offset: offset,
     );
 
     return res.map((e) => ProductModel.fromJson(e)).toList();

@@ -14,10 +14,9 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
 
   @override
   Future<int> createTransaction(TransactionModel transaction) async {
-    transaction.id ??= DateTime.now().millisecondsSinceEpoch;
     return await _appDatabase.database.transaction((trx) async {
       // Create transaction
-      var transactionId = await trx.insert(
+      await trx.insert(
         AppDatabaseConfig.transactionTableName,
         transaction.toJson()
           ..remove('orderedProducts')
@@ -28,12 +27,12 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
       if (transaction.orderedProducts?.isNotEmpty ?? false) {
         for (var orderedProduct in transaction.orderedProducts!) {
           // Create ordered product
-          orderedProduct.id ??= DateTime.now().millisecondsSinceEpoch;
-          orderedProduct.transactionId = transactionId;
+          orderedProduct.transactionId = transaction.id;
 
           await trx.insert(
             AppDatabaseConfig.orderedProductTableName,
-            orderedProduct.toJson()..remove('product'),
+            orderedProduct.toJson(),
+            conflictAlgorithm: ConflictAlgorithm.replace,
           );
 
           // Get product
@@ -61,7 +60,7 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
         }
       }
 
-      return transactionId;
+      return transaction.id;
     });
   }
 
@@ -82,7 +81,7 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
           // Update ordered product
           await trx.update(
             AppDatabaseConfig.orderedProductTableName,
-            orderedProduct.toJson()..remove('product'),
+            orderedProduct.toJson(),
           );
 
           // Get product
@@ -171,6 +170,26 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
       AppDatabaseConfig.transactionTableName,
       where: 'createdById = ?',
       whereArgs: [userId],
+    );
+
+    return rawTransactions.map((e) => TransactionModel.fromJson(e)).toList();
+  }
+
+  @override
+  Future<List<TransactionModel>> getUserTransactions(
+    String userId, {
+    String orderBy = 'createdAt',
+    String sortBy = 'DESC',
+    int limit = 10,
+    int? offset,
+  }) async {
+    var rawTransactions = await _appDatabase.database.query(
+      AppDatabaseConfig.transactionTableName,
+      where: 'createdById = ?',
+      whereArgs: [userId],
+      orderBy: '$orderBy $sortBy',
+      limit: limit,
+      offset: offset,
     );
 
     return rawTransactions.map((e) => TransactionModel.fromJson(e)).toList();

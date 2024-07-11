@@ -10,14 +10,13 @@ class UserRemoteDatasourceImpl extends UserDatasource {
 
   @override
   Future<String> createUser(UserModel user) async {
-    user.id ??= user.email;
-    await _firebaseFirestore.collection('User').doc('${user.id}').set(user.toJson());
-    return user.id!;
+    await _firebaseFirestore.collection('User').doc(user.id).set(user.toJson());
+    return user.id;
   }
 
   @override
   Future<void> updateUser(UserModel user) async {
-    await _firebaseFirestore.collection('User').doc('${user.id}').set(
+    await _firebaseFirestore.collection('User').doc(user.id).set(
           user.toJson(),
           SetOptions(merge: true),
         );
