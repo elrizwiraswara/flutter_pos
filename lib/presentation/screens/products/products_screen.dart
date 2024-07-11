@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_pos/presentation/widgets/app_loading_more_indicator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -40,10 +41,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
     super.dispose();
   }
 
-  void scrollListener() {
+  void scrollListener() async {
     // Automatically load more data on end of scroll position
     if (scrollController.offset == scrollController.position.maxScrollExtent) {
-      productProvider.getAllProducts(offset: productProvider.allProducts?.length);
+      await productProvider.getAllProducts(offset: productProvider.allProducts?.length);
     }
   }
 
@@ -60,35 +61,48 @@ class _ProductsScreenState extends State<ProductsScreen> {
         //   child: searchField(),
         // ),
       ),
-      body: Consumer<ProductsProvider>(builder: (context, provider, _) {
-        if (provider.allProducts == null) {
-          return const AppProgressIndicator();
-        }
+      body: Consumer<ProductsProvider>(
+        builder: (context, provider, _) {
+          if (provider.allProducts == null) {
+            return const AppProgressIndicator();
+          }
 
-        if (provider.allProducts!.isEmpty) {
-          return AppEmptyState(
-            subtitle: 'No products available, add product to continue',
-            buttonText: 'Add Product',
-            onTapButton: () => context.go('/products/product-create'),
+          if (provider.allProducts!.isEmpty) {
+            return AppEmptyState(
+              subtitle: 'No products available, add product to continue',
+              buttonText: 'Add Product',
+              onTapButton: () => context.go('/products/product-create'),
+            );
+          }
+
+          return RefreshIndicator(
+            onRefresh: () => provider.getAllProducts(),
+            child: SingleChildScrollView(
+              controller: scrollController,
+              child: Column(
+                children: [
+                  GridView.builder(
+                    padding: const EdgeInsets.all(AppSizes.padding),
+                    gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: 200,
+                      childAspectRatio: 1 / 1.5,
+                      crossAxisSpacing: AppSizes.padding / 2,
+                      mainAxisSpacing: AppSizes.padding / 2,
+                    ),
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: provider.allProducts!.length,
+                    itemBuilder: (context, i) {
+                      return productCard(provider.allProducts![i]);
+                    },
+                  ),
+                  AppLoadingMoreIndicator(isLoading: provider.isLoadingMore),
+                ],
+              ),
+            ),
           );
-        }
-
-        return GridView.builder(
-          controller: scrollController,
-          padding: const EdgeInsets.all(AppSizes.padding),
-          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 200,
-            childAspectRatio: 1 / 1.5,
-            crossAxisSpacing: AppSizes.padding / 2,
-            mainAxisSpacing: AppSizes.padding / 2,
-          ),
-          physics: const BouncingScrollPhysics(),
-          itemCount: provider.allProducts!.length,
-          itemBuilder: (context, i) {
-            return productCard(provider.allProducts![i]);
-          },
-        );
-      }),
+        },
+      ),
     );
   }
 

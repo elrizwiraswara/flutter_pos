@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_pos/presentation/widgets/app_loading_more_indicator.dart';
 import 'package:provider/provider.dart';
 
 import '../../../app/themes/app_sizes.dart';
@@ -36,10 +37,10 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     super.dispose();
   }
 
-  void scrollListener() {
+  void scrollListener() async {
     // Automatically load more data on end of scroll position
     if (scrollController.offset == scrollController.position.maxScrollExtent) {
-      transactionProvider.getAllTransactions(offset: transactionProvider.allTransactions?.length);
+      await transactionProvider.getAllTransactions(offset: transactionProvider.allTransactions?.length);
     }
   }
 
@@ -49,24 +50,38 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       appBar: AppBar(
         title: const Text('Transactions'),
       ),
-      body: Consumer<TransactionsProvider>(builder: (context, provider, _) {
-        if (provider.allTransactions == null) {
-          return const AppProgressIndicator();
-        }
+      body: Consumer<TransactionsProvider>(
+        builder: (context, provider, _) {
+          if (provider.allTransactions == null) {
+            return const AppProgressIndicator();
+          }
 
-        if (provider.allTransactions!.isEmpty) {
-          return const AppEmptyState(subtitle: 'No transactions available');
-        }
+          if (provider.allTransactions!.isEmpty) {
+            return const AppEmptyState(subtitle: 'No transactions available');
+          }
 
-        return ListView.builder(
-          controller: scrollController,
-          padding: const EdgeInsets.all(AppSizes.padding),
-          itemCount: provider.allTransactions!.length,
-          itemBuilder: (context, i) {
-            return TransactionCard(transaction: provider.allTransactions![i]);
-          },
-        );
-      }),
+          return RefreshIndicator(
+            onRefresh: () => provider.getAllTransactions(),
+            child: SingleChildScrollView(
+              controller: scrollController,
+              child: Column(
+                children: [
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(AppSizes.padding),
+                    itemCount: provider.allTransactions!.length,
+                    itemBuilder: (context, i) {
+                      return TransactionCard(transaction: provider.allTransactions![i]);
+                    },
+                  ),
+                  AppLoadingMoreIndicator(isLoading: provider.isLoadingMore),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }
