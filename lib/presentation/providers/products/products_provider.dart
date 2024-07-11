@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_pos/domain/usecases/params/base_params.dart';
 
 import '../../../app/services/auth/auth_service.dart';
 import '../../../domain/entities/product_entity.dart';
@@ -12,8 +13,13 @@ class ProductsProvider extends ChangeNotifier {
 
   List<ProductEntity>? allProducts;
 
-  Future<void> getAllProducts() async {
-    var res = await GetAllProductsUsecase(productRepository).call(AuthService().getAuthData()!.uid);
+  Future<void> getAllProducts({int? offset}) async {
+    var params = BaseParams(
+      param: AuthService().getAuthData()!.uid,
+      offset: offset,
+    );
+
+    var res = await GetUserProductsUsecase(productRepository).call(params);
 
     if (res.isSuccess) {
       allProducts = res.data ?? [];

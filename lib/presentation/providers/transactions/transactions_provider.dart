@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_pos/domain/usecases/params/base_params.dart';
 
 import '../../../app/services/auth/auth_service.dart';
 import '../../../domain/entities/transaction_entity.dart';
@@ -12,8 +13,13 @@ class TransactionsProvider extends ChangeNotifier {
 
   List<TransactionEntity>? allTransactions;
 
-  Future<void> getAllTransactions() async {
-    var res = await GetAllTransactionsUsecase(transactionRepository).call(AuthService().getAuthData()!.uid);
+  Future<void> getAllTransactions({int? offset}) async {
+    var params = BaseParams(
+      param: AuthService().getAuthData()!.uid,
+      offset: offset,
+    );
+    
+    var res = await GetUserTransactionsUsecase(transactionRepository).call(params);
 
     if (res.isSuccess) {
       allTransactions = res.data ?? [];
