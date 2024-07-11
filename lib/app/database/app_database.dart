@@ -122,6 +122,7 @@ CREATE TABLE IF NOT EXISTS '$transactionTableName' (
 CREATE TABLE IF NOT EXISTS '$orderedProductTableName' (
     'id' INTEGER NOT NULL,
     'transactionId' INTEGER,
+    'productId' INTEGER,
     'quantity' INTEGER,
     'stock' INTEGER,
     'name' TEXT,
@@ -130,7 +131,8 @@ CREATE TABLE IF NOT EXISTS '$orderedProductTableName' (
     'createdAt' DATETIME DEFAULT CURRENT_TIMESTAMP,
     'updatedAt' DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ('id'),
-    FOREIGN KEY ('transactionId') REFERENCES 'Transaction' ('id')
+    FOREIGN KEY ('transactionId') REFERENCES 'Transaction' ('id'),
+    FOREIGN KEY ('productId') REFERENCES 'Product' ('id')
 );
 ''';
 
