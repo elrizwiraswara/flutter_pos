@@ -6,6 +6,7 @@ class BaseParams<T> extends Equatable {
   final String sortBy;
   final int limit;
   final int? offset;
+  final String? contains;
 
   const BaseParams({
     this.param,
@@ -13,6 +14,7 @@ class BaseParams<T> extends Equatable {
     this.sortBy = 'DESC',
     this.limit = 10,
     this.offset,
+    this.contains,
   });
 
   @override

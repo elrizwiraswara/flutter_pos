@@ -15,7 +15,7 @@ class ProductsProvider extends ChangeNotifier {
 
   bool isLoadingMore = false;
 
-  Future<void> getAllProducts({int? offset}) async {
+  Future<void> getAllProducts({int? offset, String? contains}) async {
     if (offset != null) {
       isLoadingMore = true;
       notifyListeners();
@@ -24,6 +24,7 @@ class ProductsProvider extends ChangeNotifier {
     var params = BaseParams(
       param: AuthService().getAuthData()!.uid,
       offset: offset,
+      contains: contains,
     );
 
     var res = await GetUserProductsUsecase(productRepository).call(params);

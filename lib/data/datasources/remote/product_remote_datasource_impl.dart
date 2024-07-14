@@ -47,6 +47,7 @@ class ProductRemoteDatasourceImpl extends ProductDatasource {
     String sortBy = 'DESC',
     int limit = 10,
     int? offset,
+    String? contains,
   }) async {
     // Because firestore doesnt suppport numeric offset
     // Get last snapshot the pass it to startAfterDocument
@@ -67,6 +68,7 @@ class ProductRemoteDatasourceImpl extends ProductDatasource {
     var query = _firebaseFirestore
         .collection('Product')
         .where('createdById', isEqualTo: userId)
+        .where('name', arrayContains: contains)
         .orderBy(orderBy, descending: sortBy == 'DESC')
         .limit(limit);
 

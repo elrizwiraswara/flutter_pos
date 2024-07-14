@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_pos/presentation/widgets/app_text_field.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -36,6 +37,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final scrollController = ScrollController();
 
+  final searchFieldController = TextEditingController();
+
   @override
   void initState() {
     scrollController.addListener(scrollListener);
@@ -47,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void dispose() {
     scrollController.removeListener(scrollListener);
     scrollController.dispose();
+    searchFieldController.dispose();
     super.dispose();
   }
 
@@ -99,28 +103,28 @@ class _HomeScreenState extends State<HomeScreen> {
             AppImage(
               image: provider.user?.imageUrl ?? '',
               borderRadius: 100,
-              width: 34,
-              height: 34,
+              width: 30,
+              height: 30,
               backgroundColor: Theme.of(context).colorScheme.surface,
               errorWidget: Icon(
                 Icons.person,
                 color: Theme.of(context).colorScheme.surfaceContainerHighest,
               ),
             ),
-            const SizedBox(width: AppSizes.padding / 2),
+            const SizedBox(width: 6),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   provider.user?.name ?? '',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         fontWeight: FontWeight.bold,
                         height: 0,
                       ),
                 ),
                 Text(
                   provider.user?.email ?? '',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         fontSize: 10,
                         color: Theme.of(context).colorScheme.outline,
                       ),
@@ -217,54 +221,108 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: title(),
+        elevation: 0,
+        shadowColor: Colors.transparent,
         actions: [
           syncButton(),
           networkInfo(),
         ],
       ),
-      body: Consumer<ProductsProvider>(builder: (context, provider, _) {
-        if (provider.allProducts == null) {
-          return const AppProgressIndicator();
-        }
-
-        if (provider.allProducts!.isEmpty) {
-          return AppEmptyState(
-            subtitle: 'No products available, add product to continue',
-            buttonText: 'Add Product',
-            onTapButton: () => context.push('/products/product-create'),
-          );
-        }
-
-        return RefreshIndicator(
-          onRefresh: () => onRefresh(),
-          child: SingleChildScrollView(
-            controller: scrollController,
-            child: Column(
-              children: [
-                GridView.builder(
-                  padding: const EdgeInsets.fromLTRB(AppSizes.padding, AppSizes.padding, AppSizes.padding, 0),
-                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 200,
-                    childAspectRatio: 1 / 1.5,
-                    crossAxisSpacing: AppSizes.padding / 2,
-                    mainAxisSpacing: AppSizes.padding / 2,
+      body: Consumer<ProductsProvider>(
+        builder: (context, provider, _) {
+          return RefreshIndicator(
+            onRefresh: () => onRefresh(),
+            child: Scrollbar(
+              child: CustomScrollView(
+                controller: scrollController,
+                // Disable scroll when data is null or empty
+                physics: (provider.allProducts?.isEmpty ?? true) ? const NeverScrollableScrollPhysics() : null,
+                slivers: [
+                  SliverAppBar(
+                    floating: true,
+                    snap: true,
+                    automaticallyImplyLeading: false,
+                    collapsedHeight: 70,
+                    titleSpacing: 0,
+                    title: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding),
+                      child: searchField(),
+                    ),
                   ),
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: provider.allProducts!.length,
-                  itemBuilder: (context, i) {
-                    return productCard(provider.allProducts![i]);
-                  },
-                ),
-                AppLoadingMoreIndicator(
-                  isLoading: provider.isLoadingMore,
-                  padding: const EdgeInsets.only(top: AppSizes.padding, bottom: 160),
-                ),
-              ],
+                  SliverLayoutBuilder(
+                    builder: (context, constraint) {
+                      if (provider.allProducts == null) {
+                        return const SliverFillRemaining(
+                          hasScrollBody: false,
+                          fillOverscroll: true,
+                          child: Padding(
+                            padding: EdgeInsets.only(bottom: 140),
+                            child: AppProgressIndicator(),
+                          ),
+                        );
+                      }
+
+                      if (provider.allProducts!.isEmpty) {
+                        return SliverFillRemaining(
+                          hasScrollBody: false,
+                          fillOverscroll: true,
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 140),
+                            child: AppEmptyState(
+                              subtitle: 'No products available, add product to continue',
+                              buttonText: 'Add Product',
+                              onTapButton: () => context.push('/products/product-create'),
+                            ),
+                          ),
+                        );
+                      }
+
+                      return SliverPadding(
+                        padding: const EdgeInsets.fromLTRB(AppSizes.padding, 2, AppSizes.padding, AppSizes.padding),
+                        sliver: SliverGrid.builder(
+                          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 200,
+                            childAspectRatio: 1 / 1.5,
+                            crossAxisSpacing: AppSizes.padding / 2,
+                            mainAxisSpacing: AppSizes.padding / 2,
+                          ),
+                          itemCount: provider.allProducts!.length,
+                          itemBuilder: (context, i) {
+                            return productCard(provider.allProducts![i]);
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                  SliverPadding(
+                    padding: const EdgeInsets.only(bottom: 140),
+                    sliver: SliverToBoxAdapter(
+                      child: AppLoadingMoreIndicator(isLoading: provider.isLoadingMore),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        );
-      }),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget searchField() {
+    return AppTextField(
+      controller: searchFieldController,
+      hintText: 'Search Products...',
+      type: AppTextFieldType.search,
+      textInputAction: TextInputAction.search,
+      onEditingComplete: () {
+        FocusScope.of(context).unfocus();
+        productProvider.allProducts = null;
+        productProvider.getAllProducts(contains: searchFieldController.text);
+      },
+      onTapClearButton: () {
+        productProvider.getAllProducts(contains: searchFieldController.text);
+      },
     );
   }
 
@@ -292,11 +350,11 @@ class _HomeScreenState extends State<HomeScreen> {
           rightButtonText: 'Add To Cart',
           leftButtonText: 'Cancel',
           onTapLeftButton: () {
-            GoRouter.of(context).pop();
+            context.pop();
           },
           onTapRightButton: () {
             homeProvider.onAddOrderedProduct(product, currentQty == 0 ? 1 : currentQty);
-            GoRouter.of(context).pop();
+            context.pop();
           },
         );
       },
