@@ -52,6 +52,7 @@ class TransactionRemoteDatasourceImpl extends TransactionDatasource {
         }
       }
 
+      // The id has been generated in models
       return transaction.id;
     });
   }

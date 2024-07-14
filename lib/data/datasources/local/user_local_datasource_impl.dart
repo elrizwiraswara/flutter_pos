@@ -16,6 +16,8 @@ class UserLocalDatasourceImpl extends UserDatasource {
       user.toJson(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+
+    // The id is uid from GoogleSignIn credential
     return user.id;
   }
 

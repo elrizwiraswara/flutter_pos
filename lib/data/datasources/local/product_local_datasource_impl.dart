@@ -11,11 +11,14 @@ class ProductLocalDatasourceImpl extends ProductDatasource {
 
   @override
   Future<int> createProduct(ProductModel product) async {
-    return await _appDatabase.database.insert(
+    await _appDatabase.database.insert(
       AppDatabaseConfig.productTableName,
       product.toJson(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+
+    // The id has been generated in models
+    return product.id;
   }
 
   @override
@@ -46,9 +49,7 @@ class ProductLocalDatasourceImpl extends ProductDatasource {
       whereArgs: [id],
     );
 
-    if (res.isEmpty) {
-      return null;
-    }
+    if (res.isEmpty) return null;
 
     return ProductModel.fromJson(res.first);
   }
