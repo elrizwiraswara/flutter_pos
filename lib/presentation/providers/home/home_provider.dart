@@ -73,10 +73,10 @@ class HomeProvider extends ChangeNotifier {
   }
 
   void onAddOrderedProduct(ProductEntity product, int qty) {
-    var orderedProduct = orderedProducts.where((e) => e.productId == product.id).firstOrNull;
+    var currentIndex = orderedProducts.indexWhere((e) => e.productId == product.id);
 
-    if (orderedProduct != null) {
-      orderedProduct = orderedProduct.copyWith(quantity: qty);
+    if (currentIndex != -1) {
+      orderedProducts[currentIndex] = orderedProducts[currentIndex].copyWith(quantity: qty);
     } else {
       var order = OrderedProductEntity(
         productId: product.id!,

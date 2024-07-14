@@ -83,7 +83,7 @@ class _CartPanelFooterState extends State<CartPanelFooter> {
       return AppButton(
         text: !provider.isPanelExpanded
             ? provider.orderedProducts.isNotEmpty
-                ? "${provider.orderedProducts.length} Item = ${CurrencyFormatter.format(provider.getTotalAmount())}"
+                ? "${provider.orderedProducts.length} Products = ${CurrencyFormatter.format(provider.getTotalAmount())}"
                 : 'Transaction'
             : 'Pay',
         enabled: provider.orderedProducts.isNotEmpty,
