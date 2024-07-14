@@ -12,11 +12,19 @@ class AppLoadingMoreIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: padding ?? const EdgeInsets.only(bottom: AppSizes.padding),
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300),
-        switchInCurve: Curves.easeInOut,
-        switchOutCurve: Curves.easeInOut,
-        child: isLoading ? const AppProgressIndicator() : null,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+        height: isLoading ? 112 : 0,
+        child: SingleChildScrollView(
+          physics: const NeverScrollableScrollPhysics(),
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            switchInCurve: Curves.easeInOut,
+            switchOutCurve: Curves.easeInOut,
+            child: isLoading ? const AppProgressIndicator() : null,
+          ),
+        ),
       ),
     );
   }

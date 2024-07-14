@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_pos/app/locale/app_locale.dart';
 import 'package:flutter_pos/presentation/widgets/app_progress_indicator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -186,19 +185,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         controller: priceController,
         labelText: 'Price',
         hintText: 'Product price...',
-        keyboardType: TextInputType.number,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        prefixIcon: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Text(
-            AppLocale.defaultCurrencyCode,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-          ),
-        ),
+        type: AppTextFieldType.currency,
         onChanged: productFormProvider.onChangedPrice,
       ),
     );
