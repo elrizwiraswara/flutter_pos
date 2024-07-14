@@ -2,15 +2,17 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-orange)](./LICENSE)
 [![Made with Flutter](https://img.shields.io/badge/made%20with-Flutter-blue)](https://flutter.dev/)
 
-A simple Point of Sale (POS) application built with Flutter with clean architecture design. The application is designed to be used both online and offline. The application's local data (sqflite) will be automatically synchronized with the cloud data (firestore) when the application detects an internet connection. This application uses an offline-first approach, where data will be stored in the local database first and then in the cloud database if there is an internet connection. If there is no internet connection, all actions performed by the user (create, update, delete) will be recorded as 'QueuedActions' in local database and will be executed automatically when the internet connection available.
+A simple Point of Sale (POS) application built with Flutter with clean architecture design. The application is designed to be used both online and offline. The application's local data (sqflite) will be automatically synchronized with the cloud data (firestore) when the application detects an internet connection.
+
+This application uses an offline-first approach, where data will be stored in the local database first and then in the cloud database if there is an internet connection. If there is no internet connection, all actions performed by the user (create, update, delete) will be recorded as 'QueuedActions' in local database and will be executed automatically when the internet connection available.
 <br/>
 <br/>
 <p align="left">
   <img src="1.jpeg" alt="Image 1" height="350" style="margin-right: 10px;">
-  <img src="5.jpeg" alt="Image 2" height="350" style="margin-right: 10px;">
   <img src="2.jpeg" alt="Image 2" height="350" style="margin-right: 10px;">
   <img src="3.jpeg" alt="Image 2" height="350" style="margin-right: 10px;">
-  <img src="4.jpeg" alt="Image 2" height="350">
+  <img src="4.jpeg" alt="Image 2" height="350" style="margin-right: 10px;">
+  <img src="5.jpeg" alt="Image 2" height="350">
 </p>
 
 ## Demo APK
@@ -23,6 +25,9 @@ A simple Point of Sale (POS) application built with Flutter with clean architect
 - **User Authentication**: Secure login and user management.
 - **Responsive UI**: Used Material UI 3, support dark & light mode, and user-friendly error handler UI.
 - **Customizeable Theme**: Customizeable & adaptive theme colors, text-style, etc.
+
+## Architecture
+<img src="6.png" alt="Image 2" height="600">
 
 ## Getting Started
 
