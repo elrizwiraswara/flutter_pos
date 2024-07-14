@@ -233,6 +233,10 @@ class _AppTextFieldState extends State<AppTextField> {
   }
 
   TextInputType? textInputType() {
+    if (widget.keyboardType != null) {
+      return widget.keyboardType!;
+    }
+
     if (widget.type == AppTextFieldType.currency) {
       return TextInputType.number;
     }
@@ -241,6 +245,10 @@ class _AppTextFieldState extends State<AppTextField> {
   }
 
   List<TextInputFormatter>? inputFormatters() {
+    if (widget.inputFormatters != null) {
+      return widget.inputFormatters!;
+    }
+
     if (widget.type == AppTextFieldType.currency) {
       return [FilteringTextInputFormatter.digitsOnly];
     }
@@ -249,6 +257,10 @@ class _AppTextFieldState extends State<AppTextField> {
   }
 
   TextInputAction? textInputAction() {
+    if (widget.textInputAction != null) {
+      return widget.textInputAction!;
+    }
+
     if (widget.type == AppTextFieldType.search) {
       return TextInputAction.search;
     }
