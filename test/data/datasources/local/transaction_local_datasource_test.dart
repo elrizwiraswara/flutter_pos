@@ -55,41 +55,41 @@ void main() {
       ],
     );
 
-    // Test: createTransaction inserts the product into the database
-    test('createTransaction inserts product into the database', () async {
+    // Test: createTransaction inserts the transaction into the database
+    test('createTransaction inserts transaction into the database', () async {
       // Call the createTransaction method
       final res = await datasource.createTransaction(transaction);
 
-      // Verify that the ID returned matches the product's ID
+      // Verify that the ID returned matches the transaction's ID
       expect(res, equals(transaction.id));
     });
 
-    // Test: updateTransaction updates the product in the database
-    test('updateTransaction updates product in the database', () async {
+    // Test: updateTransaction updates the transaction in the database
+    test('updateTransaction updates transaction in the database', () async {
       final updateTransaction = datasource.updateTransaction(transaction);
 
       // Expect that the update completes successfully
       expectLater(updateTransaction, completes);
     });
 
-    // Test: getTransaction retrieves the product from the database
-    test('getTransaction retrieves product from the database', () async {
+    // Test: getTransaction retrieves the transaction from the database
+    test('getTransaction retrieves transaction from the database', () async {
       final res = await datasource.getTransaction(transaction.id);
 
-      // Verify that the retrieved product's ID matches the expected ID
+      // Verify that the retrieved transaction's ID matches the expected ID
       expect(res?.id, equals(transaction.id));
     });
 
-    // Test: getAllUserTransactions retrieves all products for a given user
-    test('getAllUserTransactions retrieves all user products from the database', () async {
+    // Test: getAllUserTransactions retrieves all transactions for a given user
+    test('getAllUserTransactions retrieves all user transactions from the database', () async {
       final res = await datasource.getAllUserTransactions(userId);
 
       // Expect that the result is not empty
       expect(res, isNotEmpty);
     });
 
-    // Test: deleteTransaction deletes the product from the database
-    test('deleteTransaction deletes product from the database', () async {
+    // Test: deleteTransaction deletes the transaction from the database
+    test('deleteTransaction deletes transaction from the database', () async {
       final deleteTransaction = datasource.deleteTransaction(transaction.id);
 
       // Expect that the deletion completes successfully

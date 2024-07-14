@@ -23,7 +23,7 @@ void main() {
       id: 1,
       name: 'Sample Product',
       createdById: userId,
-      imageUrl: 'https://example.com/product.jpg',
+      imageUrl: '',
       price: 42,
       sold: 10,
       stock: 50,

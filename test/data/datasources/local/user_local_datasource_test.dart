@@ -32,36 +32,36 @@ void main() {
     final user = UserModel(
       id: "user123",
       name: 'Sample User',
-      imageUrl: 'https://example.com/product.jpg',
+      imageUrl: '',
     );
 
-    // Test: createUser inserts the product into the database
-    test('createUser inserts product into the database', () async {
+    // Test: createUser inserts the user into the database
+    test('createUser inserts user into the database', () async {
       // Call the createUser method
       final res = await datasource.createUser(user);
 
-      // Verify that the ID returned matches the product's ID
+      // Verify that the ID returned matches the user's ID
       expect(res, equals(user.id));
     });
 
-    // Test: updateUser updates the product in the database
-    test('updateUser updates product in the database', () async {
+    // Test: updateUser updates the user in the database
+    test('updateUser updates user in the database', () async {
       final updateUser = datasource.updateUser(user);
 
       // Expect that the update completes successfully
       expectLater(updateUser, completes);
     });
 
-    // Test: getUser retrieves the product from the database
-    test('getUser retrieves product from the database', () async {
+    // Test: getUser retrieves the user from the database
+    test('getUser retrieves user from the database', () async {
       final res = await datasource.getUser(user.id);
 
-      // Verify that the retrieved product's ID matches the expected ID
+      // Verify that the retrieved user's ID matches the expected ID
       expect(res?.id, equals(user.id));
     });
 
-    // Test: deleteUser deletes the product from the database
-    test('deleteUser deletes product from the database', () async {
+    // Test: deleteUser deletes the user from the database
+    test('deleteUser deletes user from the database', () async {
       final deleteUser = datasource.deleteUser(user.id);
 
       // Expect that the deletion completes successfully
