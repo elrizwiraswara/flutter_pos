@@ -19,20 +19,20 @@ void main() {
     final user = UserModel(
       id: "user123",
       name: 'Sample User',
-      imageUrl: 'https://example.com/product.jpg',
+      imageUrl: '',
     );
 
-    // Test: createUser inserts the transaction into the database
-    test('createUser inserts transaction into the database', () async {
+    // Test: createUser inserts the user into the database
+    test('createUser inserts user into the database', () async {
       // Call the createUser method
       final res = await datasource.createUser(user);
 
-      // Verify that the ID returned matches the transaction's ID
+      // Verify that the ID returned matches the user's ID
       expect(res, equals(user.id));
     });
 
-    // Test: updateUser updates the transaction in the database
-    test('updateUser updates transaction in the database', () async {
+    // Test: updateUser updates the user in the database
+    test('updateUser updates user in the database', () async {
       // Call the createUser method
       await datasource.createUser(user);
 
@@ -42,19 +42,19 @@ void main() {
       expectLater(updateUser, completes);
     });
 
-    // Test: getUser retrieves the transaction from the database
-    test('getUser retrieves transaction from the database', () async {
+    // Test: getUser retrieves the user from the database
+    test('getUser retrieves user from the database', () async {
       // Call the createUser method
       await datasource.createUser(user);
 
       final res = await datasource.getUser(user.id);
 
-      // Verify that the retrieved transaction's ID matches the expected ID
+      // Verify that the retrieved user's ID matches the expected ID
       expect(res?.id, equals(user.id));
     });
 
-    // Test: deleteUser deletes the transaction from the database
-    test('deleteUser deletes transaction from the database', () async {
+    // Test: deleteUser deletes the user from the database
+    test('deleteUser deletes user from the database', () async {
       final deleteUser = datasource.deleteUser(user.id);
 
       // Expect that the deletion completes successfully

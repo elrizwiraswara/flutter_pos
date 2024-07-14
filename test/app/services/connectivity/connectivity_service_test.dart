@@ -17,7 +17,7 @@ void main() {
   // Grouping the tests related to ConnectivityService
   group('$ConnectivityService', () {
     // Setting up the mock objects before all tests
-    setUpAll(() async {
+    setUp(() async {
       mockConnectivity = MockConnectivity();
       mockClient = MockClient();
 
