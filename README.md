@@ -27,7 +27,7 @@ This application uses an offline-first approach, where data will be stored in th
 - **Customizeable Theme**: Customizeable & adaptive theme colors, text-style, etc.
 
 ## Architecture
-<img src="6.png" alt="Image 2" height="600">
+<img src="6.png" alt="Architecture">
 
 ## Getting Started
 
