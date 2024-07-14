@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_pos/presentation/screens/account/about_screen.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../presentation/screens/account/account_screen.dart';
@@ -143,6 +144,7 @@ class AppRoutes {
     },
     routes: [
       _profileEdit,
+      _about,
     ],
   );
 
@@ -197,6 +199,13 @@ class AppRoutes {
     path: 'profile',
     builder: (context, state) {
       return const ProfileFormScreen();
+    },
+  );
+
+  static final _about = GoRoute(
+    path: 'about',
+    builder: (context, state) {
+      return const AboutScreen();
     },
   );
 }
