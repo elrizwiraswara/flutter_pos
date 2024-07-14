@@ -11,6 +11,7 @@ class UserRemoteDatasourceImpl extends UserDatasource {
   @override
   Future<String> createUser(UserModel user) async {
     await _firebaseFirestore.collection('User').doc(user.id).set(user.toJson());
+    // The id is uid from GoogleSignIn credential
     return user.id;
   }
 

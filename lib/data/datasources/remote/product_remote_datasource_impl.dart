@@ -11,6 +11,7 @@ class ProductRemoteDatasourceImpl extends ProductDatasource {
   @override
   Future<int> createProduct(ProductModel product) async {
     await _firebaseFirestore.collection('Product').doc("${product.id}").set(product.toJson());
+    // The id has been generated in models
     return product.id;
   }
 
