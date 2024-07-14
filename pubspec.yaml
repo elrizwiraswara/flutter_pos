@@ -61,6 +61,8 @@ dependencies:
   path: ^1.9.0
   connectivity_plus: ^6.0.3
   http: ^1.2.1
+  package_info_plus: ^8.0.0
+  url_launcher: ^6.3.0
 
 
 dev_dependencies:
