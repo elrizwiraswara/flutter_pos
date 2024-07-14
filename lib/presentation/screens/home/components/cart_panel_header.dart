@@ -55,7 +55,7 @@ class _CartPanelHeaderState extends State<CartPanelHeader> {
         width: 40,
         height: 4,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.shadow.withOpacity(0.10),
+          color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.54),
           borderRadius: BorderRadius.circular(100),
         ),
       ),
@@ -63,55 +63,57 @@ class _CartPanelHeaderState extends State<CartPanelHeader> {
   }
 
   Widget header() {
-    return Consumer<HomeProvider>(builder: (context, provider, _) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            '${provider.orderedProducts.length} Products',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
-          AppButton(
-            height: 26,
-            borderRadius: BorderRadius.circular(4),
-            padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding / 2),
-            buttonColor: Theme.of(context).colorScheme.errorContainer.withOpacity(0.32),
-            enabled: provider.orderedProducts.isNotEmpty,
-            onTap: () {
-              AppDialog.show(
-                title: 'Confirm',
-                text: 'Are you sure want to remove all product?',
-                rightButtonText: 'Remove',
-                leftButtonText: 'Cancel',
-                onTapRightButton: () {
-                  provider.onRemoveAllOrderedProduct();
-                  AppRoutes.router.pop();
-                },
-              );
-            },
-            child: Row(
-              children: [
-                Icon(
-                  Icons.clear_rounded,
-                  size: 12,
-                  color: Theme.of(context).colorScheme.error,
-                ),
-                const SizedBox(width: AppSizes.padding / 4),
-                Text(
-                  'Remove All',
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                ),
-              ],
+    return Consumer<HomeProvider>(
+      builder: (context, provider, _) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              '${provider.orderedProducts.length} Products',
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
-          ),
-        ],
-      );
-    });
+            AppButton(
+              height: 26,
+              borderRadius: BorderRadius.circular(4),
+              padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding / 2),
+              buttonColor: Theme.of(context).colorScheme.errorContainer.withOpacity(0.32),
+              enabled: provider.orderedProducts.isNotEmpty,
+              onTap: () {
+                AppDialog.show(
+                  title: 'Confirm',
+                  text: 'Are you sure want to remove all product?',
+                  rightButtonText: 'Remove',
+                  leftButtonText: 'Cancel',
+                  onTapRightButton: () {
+                    provider.onRemoveAllOrderedProduct();
+                    AppRoutes.router.pop();
+                  },
+                );
+              },
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.clear_rounded,
+                    size: 12,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                  const SizedBox(width: AppSizes.padding / 4),
+                  Text(
+                    'Remove All',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
