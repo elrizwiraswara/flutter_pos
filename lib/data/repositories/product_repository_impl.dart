@@ -132,6 +132,7 @@ class ProductRepositoryImpl extends ProductRepository {
     String sortBy = 'DESC',
     int limit = 10,
     int? offset,
+    String? contains,
   }) async {
     try {
       var local = await productLocalDatasource.getUserProducts(
@@ -140,6 +141,7 @@ class ProductRepositoryImpl extends ProductRepository {
         sortBy: sortBy,
         limit: limit,
         offset: offset,
+        contains: contains,
       );
 
       if (ConnectivityService.isConnected) {
@@ -149,6 +151,7 @@ class ProductRepositoryImpl extends ProductRepository {
           sortBy: sortBy,
           limit: limit,
           offset: offset,
+          contains: contains,
         );
 
         if (remote.isEmpty && local.isNotEmpty) {

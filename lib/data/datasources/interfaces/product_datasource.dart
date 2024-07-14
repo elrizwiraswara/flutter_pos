@@ -17,5 +17,6 @@ abstract class ProductDatasource {
     String sortBy,
     int limit,
     int? offset,
+    String? contains,
   });
 }

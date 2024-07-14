@@ -154,6 +154,7 @@ class TransactionRemoteDatasourceImpl extends TransactionDatasource {
     String sortBy = 'DESC',
     int limit = 10,
     int? offset,
+    String? contains,
   }) async {
     // Because firestore doesnt suppport numeric offset
     // Get last snapshot the pass it to startAfterDocument
@@ -174,6 +175,7 @@ class TransactionRemoteDatasourceImpl extends TransactionDatasource {
     var query = _firebaseFirestore
         .collection('Transaction')
         .where('createdById', isEqualTo: userId)
+        .where('id', arrayContains: contains)
         .orderBy(orderBy, descending: sortBy == 'DESC')
         .limit(limit);
 

@@ -182,11 +182,12 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
     String sortBy = 'DESC',
     int limit = 10,
     int? offset,
+    String? contains,
   }) async {
     var rawTransactions = await _appDatabase.database.query(
       AppDatabaseConfig.transactionTableName,
-      where: 'createdById = ?',
-      whereArgs: [userId],
+      where: 'createdById = ? AND id LIKE ?',
+      whereArgs: [userId, "%${contains ?? ''}%"],
       orderBy: '$orderBy $sortBy',
       limit: limit,
       offset: offset,

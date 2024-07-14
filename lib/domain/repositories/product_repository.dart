@@ -18,5 +18,6 @@ abstract class ProductRepository {
     String sortBy,
     int limit,
     int? offset,
+    String? contains,
   });
 }

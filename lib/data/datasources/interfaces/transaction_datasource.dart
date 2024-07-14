@@ -17,5 +17,6 @@ abstract class TransactionDatasource {
     String sortBy,
     int limit,
     int? offset,
+    String? contains,
   });
 }

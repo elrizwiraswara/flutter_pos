@@ -26,6 +26,7 @@ class GetUserTransactionsUsecase extends UseCase<Result, BaseParams> {
       sortBy: params.sortBy,
       limit: params.limit,
       offset: params.offset,
+      contains: params.contains,
     );
   }
 }

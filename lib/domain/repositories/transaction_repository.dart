@@ -18,5 +18,6 @@ abstract class TransactionRepository {
     String sortBy,
     int limit,
     int? offset,
+    String? contains,
   });
 }
