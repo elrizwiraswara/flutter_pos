@@ -73,7 +73,8 @@ dev_dependencies:
   mockito: ^5.4.4
   json_serializable: ^6.8.0
   build_runner: ^2.4.6
-  floor_generator: ^1.4.2
+  sqflite_common_ffi: ^2.3.3
+  fake_cloud_firestore: ^3.0.1
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

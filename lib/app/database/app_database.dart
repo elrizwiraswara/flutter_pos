@@ -17,16 +17,21 @@ class AppDatabase {
 
   late Database database;
 
-  Future<void> init() async {
+  Future<void> init({Database? testDatabase}) async {
     if (kDebugMode) {
       // Only for development purpose
       // await dropDatabase();
     }
 
-    database = await openDatabase(
-      join(await getDatabasesPath(), AppDatabaseConfig.dbPath),
-      version: AppDatabaseConfig.version,
-    );
+    if (testDatabase != null) {
+      // For unit testing
+      database = testDatabase;
+    } else {
+      database = await openDatabase(
+        join(await getDatabasesPath(), AppDatabaseConfig.dbPath),
+        version: AppDatabaseConfig.version,
+      );
+    }
 
     // Create tables
     await Future.wait([

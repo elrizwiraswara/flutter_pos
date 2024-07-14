@@ -25,6 +25,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.4.1"
+  antlr4:
+    dependency: transitive
+    description:
+      name: antlr4
+      sha256: "96f576fcb88202a327b28f40485d99ca6987246ff37805488be06bcf05dc227f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.13.1"
   args:
     dependency: transitive
     description:
@@ -137,6 +145,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+  cel:
+    dependency: transitive
+    description:
+      name: cel
+      sha256: "2b5adb2c4866311817f6444996a67fd14f016cfcfb57a8d9c7fb0defeea2eb62"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.3"
   characters:
     dependency: transitive
     description:
@@ -289,6 +305,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.1"
+  fake_cloud_firestore:
+    dependency: "direct dev"
+    description:
+      name: fake_cloud_firestore
+      sha256: "2a3754f074d3993a4a62240b4b9b71f1d0c1290cb63a0fa76b57aa1779d37aa8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.1"
+  fake_firebase_security_rules:
+    dependency: transitive
+    description:
+      name: fake_firebase_security_rules
+      sha256: "7a9011d42d99848ece92784fed5a20167ad76da66de2c1102a2bc053e66b0305"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.3"
   ffi:
     dependency: transitive
     description:
@@ -417,22 +449,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
-  floor_annotation:
-    dependency: transitive
-    description:
-      name: floor_annotation
-      sha256: a40949580a7ab0eee572686e2d3b1638fd6bd6a753e661d792ab4236b365b23b
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.5.0"
-  floor_generator:
-    dependency: "direct dev"
-    description:
-      name: floor_generator
-      sha256: "1499b3ab878a807e6fbe6f140dc014124845cd1df3090a113aae5fa7577a1e77"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.5.0"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -836,14 +852,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
-  lists:
-    dependency: transitive
-    description:
-      name: lists
-      sha256: "4ca5c19ae4350de036a7e996cdd1ee39c93ac0a2b840f4915459b7d0a7d4ab27"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.1"
   logger:
     dependency: "direct main"
     description:
@@ -892,6 +900,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
+  mock_exceptions:
+    dependency: transitive
+    description:
+      name: mock_exceptions
+      sha256: "6e3e623712d2c6106ffe9e14732912522b565ddaa82a8dcee6cd4441b5984056"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.8.2"
   mockito:
     dependency: "direct dev"
     description:
@@ -900,6 +916,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.4.4"
+  more:
+    dependency: transitive
+    description:
+      name: more
+      sha256: b9372ef11909cb88a7a29e221d96fbe17eb04394f022e374a4299a6c72946108
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.2.0"
   nested:
     dependency: transitive
     description:
@@ -1084,6 +1108,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.0"
+  quiver:
+    dependency: transitive
+    description:
+      name: quiver
+      sha256: b1c1ac5ce6688d77f65f3375a9abb9319b3cb32486bdc7a1e0fdf004d7ba4e47
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.2.1"
+  rx:
+    dependency: transitive
+    description:
+      name: rx
+      sha256: "7f54bd39cc63a01c770c1de4b6ce8e135eb13119614cba2216bd9a93ccd29e56"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.0"
   rxdart:
     dependency: transitive
     description:
@@ -1169,6 +1209,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.5.4"
+  sqflite_common_ffi:
+    dependency: "direct dev"
+    description:
+      name: sqflite_common_ffi
+      sha256: "4d6137c29e930d6e4a8ff373989dd9de7bac12e3bc87bce950f6e844e8ad3bb5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.3"
+  sqlite3:
+    dependency: transitive
+    description:
+      name: sqlite3
+      sha256: "6d17989c0b06a5870b2190d391925186f944cb943e5262d0d3f778fcfca3bc6e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.4.4"
   stack_trace:
     dependency: transitive
     description:
@@ -1201,14 +1257,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
-  strings:
-    dependency: transitive
-    description:
-      name: strings
-      sha256: "052836499f03897d3860a603b330c1ea3c8a14177b21f34b15a1295f36024aae"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.1.2"
   sync_http:
     dependency: transitive
     description:
@@ -1249,6 +1297,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.1"
+  tuple:
+    dependency: transitive
+    description:
+      name: tuple
+      sha256: a97ce2013f240b2f3807bcbaf218765b6f301c3eff91092bcfa23a039e7dd151
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.2"
   typed_data:
     dependency: transitive
     description:
@@ -1257,14 +1313,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.2"
-  unicode:
-    dependency: transitive
-    description:
-      name: unicode
-      sha256: "0f69e46593d65245774d4f17125c6084d2c20b4e473a983f6e21b7d7762218f1"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.1"
   url_launcher:
     dependency: "direct main"
     description:
