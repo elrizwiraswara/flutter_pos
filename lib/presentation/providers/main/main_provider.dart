@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/domain/usecases/params/no_params.dart';
 
 import '../../../app/const/const.dart';
 import '../../../app/services/auth/auth_service.dart';
@@ -10,6 +9,7 @@ import '../../../domain/repositories/product_repository.dart';
 import '../../../domain/repositories/queued_action_repository.dart';
 import '../../../domain/repositories/transaction_repository.dart';
 import '../../../domain/repositories/user_repository.dart';
+import '../../../domain/usecases/params/no_params.dart';
 import '../../../domain/usecases/product_usecases.dart';
 import '../../../domain/usecases/ququed_action_usecases.dart';
 import '../../../domain/usecases/transaction_usecases.dart';

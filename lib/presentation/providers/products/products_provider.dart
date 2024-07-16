@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_pos/domain/usecases/params/base_params.dart';
 
 import '../../../app/services/auth/auth_service.dart';
 import '../../../domain/entities/product_entity.dart';
 import '../../../domain/repositories/product_repository.dart';
+import '../../../domain/usecases/params/base_params.dart';
 import '../../../domain/usecases/product_usecases.dart';
 
 class ProductsProvider extends ChangeNotifier {

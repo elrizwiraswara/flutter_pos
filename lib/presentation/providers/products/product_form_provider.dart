@@ -1,12 +1,12 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_pos/core/errors/errors.dart';
-import 'package:flutter_pos/core/usecase/usecase.dart';
 
 import '../../../app/services/auth/auth_service.dart';
 import '../../../app/services/firebase_storage/firebase_storage_service.dart';
 import '../../../app/utilities/console_log.dart';
+import '../../../core/errors/errors.dart';
+import '../../../core/usecase/usecase.dart';
 import '../../../domain/entities/product_entity.dart';
 import '../../../domain/repositories/product_repository.dart';
 import '../../../domain/usecases/product_usecases.dart';

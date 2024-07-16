@@ -1,9 +1,8 @@
 import 'dart:convert';
 
-import 'package:flutter_pos/core/errors/errors.dart';
-
 import '../../app/const/const.dart';
 import '../../app/services/connectivity/connectivity_service.dart';
+import '../../core/errors/errors.dart';
 import '../../core/usecase/usecase.dart';
 import '../../domain/entities/transaction_entity.dart';
 import '../../domain/repositories/transaction_repository.dart';

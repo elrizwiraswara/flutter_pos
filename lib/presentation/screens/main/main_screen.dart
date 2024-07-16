@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/app/const/const.dart';
-import 'package:flutter_pos/presentation/screens/error_handler_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../../app/const/const.dart';
 import '../../../service_locator.dart';
 import '../../providers/main/main_provider.dart';
+import '../error_handler_screen.dart';
 import '../root_screen.dart';
 
 class MainScreen extends StatefulWidget {
