@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/presentation/widgets/app_loading_more_indicator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -9,6 +8,7 @@ import '../../../service_locator.dart';
 import '../../providers/products/products_provider.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_empty_state.dart';
+import '../../widgets/app_loading_more_indicator.dart';
 import '../../widgets/app_progress_indicator.dart';
 import '../../widgets/app_text_field.dart';
 import 'components/products_card.dart';

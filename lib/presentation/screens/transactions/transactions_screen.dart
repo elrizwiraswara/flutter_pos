@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/presentation/widgets/app_empty_state.dart';
-import 'package:flutter_pos/presentation/widgets/app_loading_more_indicator.dart';
-import 'package:flutter_pos/presentation/widgets/app_progress_indicator.dart';
-import 'package:flutter_pos/presentation/widgets/app_text_field.dart';
 import 'package:provider/provider.dart';
 
 import '../../../app/themes/app_sizes.dart';
 import '../../../service_locator.dart';
 import '../../providers/transactions/transactions_provider.dart';
+import '../../widgets/app_empty_state.dart';
+import '../../widgets/app_loading_more_indicator.dart';
+import '../../widgets/app_progress_indicator.dart';
+import '../../widgets/app_text_field.dart';
 import 'components/transaction_card.dart';
 
 class TransactionsScreen extends StatefulWidget {

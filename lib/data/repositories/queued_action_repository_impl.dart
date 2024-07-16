@@ -1,16 +1,15 @@
 import 'dart:convert';
 
-import 'package:flutter_pos/core/errors/errors.dart';
-import 'package:flutter_pos/data/datasources/remote/product_remote_datasource_impl.dart';
-import 'package:flutter_pos/data/datasources/remote/transaction_remote_datasource_impl.dart';
-import 'package:flutter_pos/data/datasources/remote/user_remote_datasource_impl.dart';
-
 import '../../app/services/connectivity/connectivity_service.dart';
 import '../../app/utilities/console_log.dart';
+import '../../core/errors/errors.dart';
 import '../../core/usecase/usecase.dart';
 import '../../domain/entities/queued_action_entity.dart';
 import '../../domain/repositories/queued_action_repository.dart';
 import '../datasources/local/queued_action_local_datasource_impl.dart';
+import '../datasources/remote/product_remote_datasource_impl.dart';
+import '../datasources/remote/transaction_remote_datasource_impl.dart';
+import '../datasources/remote/user_remote_datasource_impl.dart';
 import '../models/product_model.dart';
 import '../models/queued_action_model.dart';
 import '../models/transaction_model.dart';

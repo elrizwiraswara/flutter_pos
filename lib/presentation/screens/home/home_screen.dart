@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/presentation/widgets/app_text_field.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -17,6 +16,7 @@ import '../../widgets/app_empty_state.dart';
 import '../../widgets/app_image.dart';
 import '../../widgets/app_loading_more_indicator.dart';
 import '../../widgets/app_progress_indicator.dart';
+import '../../widgets/app_text_field.dart';
 import '../products/components/products_card.dart';
 import 'components/cart_panel_body.dart';
 import 'components/cart_panel_footer.dart';

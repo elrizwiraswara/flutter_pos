@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_pos/presentation/widgets/app_progress_indicator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -16,6 +15,7 @@ import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
 import '../../widgets/app_icon_button.dart';
 import '../../widgets/app_image.dart';
+import '../../widgets/app_progress_indicator.dart';
 import '../../widgets/app_text_field.dart';
 
 class ProductFormScreen extends StatefulWidget {

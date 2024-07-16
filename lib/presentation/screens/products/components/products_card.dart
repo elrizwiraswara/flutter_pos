@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/app/themes/app_sizes.dart';
 
+import '../../../../app/themes/app_sizes.dart';
 import '../../../../app/utilities/currency_formatter.dart';
 import '../../../../domain/entities/product_entity.dart';
 import '../../../widgets/app_image.dart';

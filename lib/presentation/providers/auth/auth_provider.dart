@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_pos/core/errors/errors.dart';
-import 'package:flutter_pos/core/usecase/usecase.dart';
 
 import '../../../app/services/auth/auth_service.dart';
+import '../../../core/errors/errors.dart';
+import '../../../core/usecase/usecase.dart';
 import '../../../domain/entities/user_entity.dart';
 import '../../../domain/repositories/user_repository.dart';
 import '../../../domain/usecases/user_usecases.dart';

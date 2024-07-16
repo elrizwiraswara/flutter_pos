@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_pos/domain/usecases/params/base_params.dart';
 
 import '../../../app/services/auth/auth_service.dart';
 import '../../../domain/entities/transaction_entity.dart';
 import '../../../domain/repositories/transaction_repository.dart';
+import '../../../domain/usecases/params/base_params.dart';
 import '../../../domain/usecases/transaction_usecases.dart';
 
 class TransactionsProvider extends ChangeNotifier {

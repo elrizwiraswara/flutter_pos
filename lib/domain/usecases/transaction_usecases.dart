@@ -1,8 +1,7 @@
-import 'package:flutter_pos/domain/usecases/params/base_params.dart';
-
 import '../../core/usecase/usecase.dart';
 import '../entities/transaction_entity.dart';
 import '../repositories/transaction_repository.dart';
+import 'params/base_params.dart';
 
 class SyncAllUserTransactionsUsecase extends UseCase<Result, String> {
   SyncAllUserTransactionsUsecase(this._transactionRepository);

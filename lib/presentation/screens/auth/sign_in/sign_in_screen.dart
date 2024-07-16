@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/app/routes/app_routes.dart';
-import 'package:flutter_pos/presentation/widgets/app_dialog.dart';
 
 import '../../../../app/assets/app_assets.dart';
+import '../../../../app/routes/app_routes.dart';
 import '../../../../app/themes/app_sizes.dart';
 import '../../../../service_locator.dart';
 import '../../../providers/auth/auth_provider.dart';
 import '../../../widgets/app_button.dart';
+import '../../../widgets/app_dialog.dart';
 import '../../../widgets/app_image.dart';
 
 class SignInScreen extends StatefulWidget {
