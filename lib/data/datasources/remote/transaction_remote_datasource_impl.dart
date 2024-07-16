@@ -157,8 +157,9 @@ class TransactionRemoteDatasourceImpl extends TransactionDatasource {
     int? offset,
     String? contains,
   }) async {
-    // Because firestore doesnt suppport numeric offset
-    // Get last snapshot the pass it to startAfterDocument
+    // Because firestore doesn't suppport numeric offset
+    // Instead, use query cursors. Get last document snapshot then pass it to startAfterDocument
+    // https://firebase.google.com/docs/firestore/query-data/query-cursors
 
     DocumentSnapshot<Object?>? lastSnapshot;
 
