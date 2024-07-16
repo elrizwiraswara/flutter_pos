@@ -17,8 +17,9 @@ class CartPanelBody extends StatefulWidget {
 class _CartPanelBodyState extends State<CartPanelBody> {
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(vertical: 62),
+      physics: const NeverScrollableScrollPhysics(),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -33,36 +34,41 @@ class _CartPanelBodyState extends State<CartPanelBody> {
     return Consumer<HomeProvider>(
       builder: (context, provider, _) {
         if (provider.orderedProducts.isEmpty) {
-          return const Expanded(
-            child: AppEmptyState(
+          return SizedBox(
+            height: AppSizes.screenHeight(context) - 272,
+            child: const AppEmptyState(
               title: 'Empty',
               subtitle: 'No products added to cart',
             ),
           );
         }
 
-        return ListView.builder(
-          itemCount: provider.orderedProducts.length,
-          shrinkWrap: true,
-          padding: const EdgeInsets.all(AppSizes.padding),
-          itemBuilder: (context, i) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: AppSizes.padding),
-              child: OrderCard(
-                name: provider.orderedProducts[i].name,
-                imageUrl: provider.orderedProducts[i].imageUrl,
-                stock: provider.orderedProducts[i].stock,
-                price: provider.orderedProducts[i].price,
-                initialQuantity: provider.orderedProducts[i].quantity,
-                onChangedQuantity: (val) {
-                  provider.onChangedOrderedProductQuantity(i, val);
-                },
-                onTapRemove: () {
-                  provider.onRemoveOrderedProduct(provider.orderedProducts[i]);
-                },
-              ),
-            );
-          },
+        return SizedBox(
+          height: AppSizes.screenHeight(context) - 272,
+          child: Scrollbar(
+            child: ListView.builder(
+              itemCount: provider.orderedProducts.length,
+              padding: const EdgeInsets.all(AppSizes.padding),
+              itemBuilder: (context, i) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: AppSizes.padding),
+                  child: OrderCard(
+                    name: provider.orderedProducts[i].name,
+                    imageUrl: provider.orderedProducts[i].imageUrl,
+                    stock: provider.orderedProducts[i].stock,
+                    price: provider.orderedProducts[i].price,
+                    initialQuantity: provider.orderedProducts[i].quantity,
+                    onChangedQuantity: (val) {
+                      provider.onChangedOrderedProductQuantity(i, val);
+                    },
+                    onTapRemove: () {
+                      provider.onRemoveOrderedProduct(provider.orderedProducts[i]);
+                    },
+                  ),
+                );
+              },
+            ),
+          ),
         );
       },
     );
