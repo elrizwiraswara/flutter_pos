@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/presentation/screens/account/about_screen.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../presentation/screens/account/about_screen.dart';
 import '../../presentation/screens/account/account_screen.dart';
 import '../../presentation/screens/account/profile_form_screen.dart';
 import '../../presentation/screens/auth/sign_in/sign_in_screen.dart';
@@ -83,6 +83,15 @@ class AppRoutes {
     builder: (BuildContext context, GoRouterState state, Widget child) {
       return MainScreen(child: child);
     },
+    redirect: (context, state) async {
+      // if isAuthenticated = true, go to intended route screen
+      // else return to auth screen
+      if (!await AuthService().isAuthenticated()) {
+        return '/auth';
+      } else {
+        return null;
+      }
+    },
     routes: [
       _home,
       _products,
@@ -93,15 +102,6 @@ class AppRoutes {
 
   static final _home = GoRoute(
     path: '/home',
-    redirect: (context, state) async {
-      // if isAuthenticated = true, go to intended route screen
-      // else return to auth screen
-      if (!await AuthService().isAuthenticated()) {
-        return '/auth';
-      } else {
-        return '/home';
-      }
-    },
     pageBuilder: (context, state) {
       return const NoTransitionPage<void>(
         child: HomeScreen(),
