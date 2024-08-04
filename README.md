@@ -70,6 +70,8 @@ This application uses an offline-first approach, where data will be stored in th
     <br/>
     <img src="indexes.png" alt="Cloud Firestore Indexes" width=800px>
     <br/>
+    <br/>
+    
     - Update firebase storage rules to allow read write operation
     <br/>
 
