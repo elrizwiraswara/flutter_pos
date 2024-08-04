@@ -69,6 +69,19 @@ This application uses an offline-first approach, where data will be stored in th
     - Add cloud firestore indexes to enable query
     <br/>
     <img src="indexes.png" alt="Cloud Firestore Indexes" width=800px>
+    <br/>
+    - Update firebase storage rules to allow read write operation
+    <br/>
+
+    ```
+    service firebase.storage {
+      match /b/{bucket}/o {
+        match /{allPaths=**} {
+          allow read, write: if request.auth != null;
+        }
+      }
+    }
+    ```
 
 
 4. **Run the application:**
