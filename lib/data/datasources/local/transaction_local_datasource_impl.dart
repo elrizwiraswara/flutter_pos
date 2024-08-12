@@ -167,13 +167,43 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
 
   @override
   Future<List<TransactionModel>> getAllUserTransactions(String userId) async {
-    var rawTransactions = await _appDatabase.database.query(
-      AppDatabaseConfig.transactionTableName,
-      where: 'createdById = ?',
-      whereArgs: [userId],
-    );
+    return await _appDatabase.database.transaction((trx) async {
+      var rawTransactions = await trx.query(
+        AppDatabaseConfig.transactionTableName,
+        where: 'createdById = ?',
+        whereArgs: [userId],
+      );
 
-    return rawTransactions.map((e) => TransactionModel.fromJson(e)).toList();
+      var transactions = rawTransactions.map((e) => TransactionModel.fromJson(e)).toList();
+
+      for (var transaction in transactions) {
+        // Get transaction ordered products
+        var rawOrderedProducts = await trx.query(
+          AppDatabaseConfig.orderedProductTableName,
+          where: 'transactionId = ?',
+          whereArgs: [transaction.id],
+        );
+
+        var orderedProducts = (rawOrderedProducts as List).map((e) => OrderedProductModel.fromJson(e)).toList();
+
+        // Set ordered products to transaction
+        transaction.orderedProducts = orderedProducts;
+
+        // Get created by
+        var rawCreatedBy = await trx.query(
+          AppDatabaseConfig.userTableName,
+          where: 'id = ?',
+          whereArgs: [transaction.createdById],
+        );
+
+        // Set created by to transaction
+        if (rawCreatedBy.isNotEmpty) {
+          transaction.createdBy = UserModel.fromJson(rawCreatedBy.first);
+        }
+      }
+
+      return transactions;
+    });
   }
 
   @override
@@ -185,15 +215,46 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
     int? offset,
     String? contains,
   }) async {
-    var rawTransactions = await _appDatabase.database.query(
-      AppDatabaseConfig.transactionTableName,
-      where: 'createdById = ? AND id LIKE ?',
-      whereArgs: [userId, "%${contains ?? ''}%"],
-      orderBy: '$orderBy $sortBy',
-      limit: limit,
-      offset: offset,
-    );
+    return await _appDatabase.database.transaction((trx) async {
+      // Get transaction
+      var rawTransactions = await _appDatabase.database.query(
+        AppDatabaseConfig.transactionTableName,
+        where: 'createdById = ? AND id LIKE ?',
+        whereArgs: [userId, "%${contains ?? ''}%"],
+        orderBy: '$orderBy $sortBy',
+        limit: limit,
+        offset: offset,
+      );
 
-    return rawTransactions.map((e) => TransactionModel.fromJson(e)).toList();
+      var transactions = rawTransactions.map((e) => TransactionModel.fromJson(e)).toList();
+
+      for (var transaction in transactions) {
+        // Get transaction ordered products
+        var rawOrderedProducts = await trx.query(
+          AppDatabaseConfig.orderedProductTableName,
+          where: 'transactionId = ?',
+          whereArgs: [transaction.id],
+        );
+
+        var orderedProducts = (rawOrderedProducts as List).map((e) => OrderedProductModel.fromJson(e)).toList();
+
+        // Set ordered products to transaction
+        transaction.orderedProducts = orderedProducts;
+
+        // Get created by
+        var rawCreatedBy = await trx.query(
+          AppDatabaseConfig.userTableName,
+          where: 'id = ?',
+          whereArgs: [transaction.createdById],
+        );
+
+        // Set created by to transaction
+        if (rawCreatedBy.isNotEmpty) {
+          transaction.createdBy = UserModel.fromJson(rawCreatedBy.first);
+        }
+      }
+
+      return transactions;
+    });
   }
 }
