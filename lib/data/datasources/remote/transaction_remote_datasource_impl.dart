@@ -142,10 +142,36 @@ class TransactionRemoteDatasourceImpl extends TransactionDatasource {
 
   @override
   Future<List<TransactionModel>> getAllUserTransactions(String userId) async {
-    var rawTransactions =
-        await _firebaseFirestore.collection('Transaction').where('createdById', isEqualTo: userId).get();
+    return await _firebaseFirestore.runTransaction((trx) async {
+      var rawTransactions =
+          await _firebaseFirestore.collection('Transaction').where('createdById', isEqualTo: userId).get();
 
-    return rawTransactions.docs.map((e) => TransactionModel.fromJson(e.data())).toList();
+      var transactions = rawTransactions.docs.map((e) => TransactionModel.fromJson(e.data())).toList();
+
+      for (var transaction in transactions) {
+        // Get transaction ordered products
+        var rawOrderedProducts = await _firebaseFirestore
+            .collection('OrderedProduct')
+            .where('transactionId', isEqualTo: transaction.id)
+            .get();
+
+        var orderedProducts = rawOrderedProducts.docs.map((e) => OrderedProductModel.fromJson(e.data())).toList();
+
+        // Set ordered products to transaction
+        transaction.orderedProducts = orderedProducts;
+
+        // Get created by
+        var rawCreatedByDocRef = _firebaseFirestore.collection('User').doc(transaction.createdById);
+        var rawCreatedBy = await trx.get(rawCreatedByDocRef);
+
+        // Set created by to transaction
+        if (rawCreatedBy.data() != null) {
+          transaction.createdBy = UserModel.fromJson(rawCreatedBy.data()!);
+        }
+      }
+
+      return transactions;
+    });
   }
 
   @override
@@ -161,19 +187,6 @@ class TransactionRemoteDatasourceImpl extends TransactionDatasource {
     // Instead, use query cursors. Get last document snapshot then pass it to startAfterDocument
     // https://firebase.google.com/docs/firestore/query-data/query-cursors
 
-    DocumentSnapshot<Object?>? lastSnapshot;
-
-    if (offset != null) {
-      var temp = await _firebaseFirestore
-          .collection('Transaction')
-          .where('createdById', isEqualTo: userId)
-          .orderBy(orderBy, descending: sortBy == 'DESC')
-          .limit(offset)
-          .get();
-
-      lastSnapshot = temp.docs.last;
-    }
-
     var query = _firebaseFirestore
         .collection('Transaction')
         .where('createdById', isEqualTo: userId)
@@ -181,14 +194,48 @@ class TransactionRemoteDatasourceImpl extends TransactionDatasource {
         .orderBy(orderBy, descending: sortBy == 'DESC')
         .limit(limit);
 
-    if (lastSnapshot != null) {
-      query = query.startAfterDocument(lastSnapshot);
-    } else {
-      return [];
+    if (offset != null) {
+      DocumentSnapshot<Object?>? lastSnapshot;
+
+      var temp = await _firebaseFirestore
+          .collection('Transaction')
+          .where('createdById', isEqualTo: userId)
+          .orderBy(orderBy, descending: sortBy == 'DESC')
+          .limit(offset)
+          .get();
+
+      lastSnapshot = temp.docs.lastOrNull;
+
+      if (lastSnapshot != null) {
+        query = query.startAfterDocument(lastSnapshot);
+      } else {
+        return [];
+      }
     }
 
     var rawTransactions = await query.get();
 
-    return rawTransactions.docs.map((e) => TransactionModel.fromJson(e.data())).toList();
+    var transactions = rawTransactions.docs.map((e) => TransactionModel.fromJson(e.data())).toList();
+
+    for (var transaction in transactions) {
+      // Get transaction ordered products
+      var rawOrderedProducts =
+          await _firebaseFirestore.collection('OrderedProduct').where('transactionId', isEqualTo: transaction.id).get();
+
+      var orderedProducts = rawOrderedProducts.docs.map((e) => OrderedProductModel.fromJson(e.data())).toList();
+
+      // Set ordered products to transaction
+      transaction.orderedProducts = orderedProducts;
+
+      // Get created by
+      var rawCreatedBy = await _firebaseFirestore.collection('User').doc(transaction.createdById).get();
+
+      // Set created by to transaction
+      if (rawCreatedBy.data() != null) {
+        transaction.createdBy = UserModel.fromJson(rawCreatedBy.data()!);
+      }
+    }
+
+    return transactions;
   }
 }

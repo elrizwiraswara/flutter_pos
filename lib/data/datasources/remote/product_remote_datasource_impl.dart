@@ -54,19 +54,6 @@ class ProductRemoteDatasourceImpl extends ProductDatasource {
     // Instead, use query cursors. Get last document snapshot then pass it to startAfterDocument
     // https://firebase.google.com/docs/firestore/query-data/query-cursors
 
-    DocumentSnapshot<Object?>? lastSnapshot;
-
-    if (offset != null) {
-      var temp = await _firebaseFirestore
-          .collection('Product')
-          .where('createdById', isEqualTo: userId)
-          .orderBy(orderBy, descending: sortBy == 'DESC')
-          .limit(offset)
-          .get();
-
-      lastSnapshot = temp.docs.last;
-    }
-
     var query = _firebaseFirestore
         .collection('Product')
         .where('createdById', isEqualTo: userId)
@@ -74,10 +61,23 @@ class ProductRemoteDatasourceImpl extends ProductDatasource {
         .orderBy(orderBy, descending: sortBy == 'DESC')
         .limit(limit);
 
-    if (lastSnapshot != null) {
-      query = query.startAfterDocument(lastSnapshot);
-    } else {
-      return [];
+    if (offset != null) {
+      DocumentSnapshot<Object?>? lastSnapshot;
+
+      var temp = await _firebaseFirestore
+          .collection('Product')
+          .where('createdById', isEqualTo: userId)
+          .orderBy(orderBy, descending: sortBy == 'DESC')
+          .limit(offset)
+          .get();
+
+      lastSnapshot = temp.docs.lastOrNull;
+
+      if (lastSnapshot != null) {
+        query = query.startAfterDocument(lastSnapshot);
+      } else {
+        return [];
+      }
     }
 
     var rawProducts = await query.get();
