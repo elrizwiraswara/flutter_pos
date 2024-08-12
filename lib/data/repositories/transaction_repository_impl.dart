@@ -30,94 +30,13 @@ class TransactionRepositoryImpl extends TransactionRepository {
         var local = await transactionLocalDatasource.getAllUserTransactions(userId);
         var remote = await transactionRemoteDatasource.getAllUserTransactions(userId);
 
-        if (remote.isEmpty && local.isNotEmpty) {
-          for (var data in local) {
-            // Store local data to remote db
-            await transactionRemoteDatasource.createTransaction(data);
-          }
+        var res = await syncTransactions(local, remote);
 
-          // Return synced data count
-          return Result.success(local.length);
-        }
-
-        if (remote.isNotEmpty && local.isEmpty) {
-          for (var data in remote) {
-            // Store remote data to local db
-            await transactionLocalDatasource.createTransaction(data);
-          }
-
-          // Return synced data count
-          return Result.success(remote.length);
-        }
-
-        int syncedDataCount = 0;
-
-        if (remote.isNotEmpty && local.isNotEmpty) {
-          // Local first
-          for (var localData in local) {
-            var matchRemoteData = remote.where((remoteData) => remoteData.id == localData.id).firstOrNull;
-
-            if (matchRemoteData != null) {
-              // Compare local & remote data updatedAt difference
-              var updatedAtLocal = DateTime.tryParse(localData.updatedAt ?? DateTime.now().toIso8601String());
-              var updatedAtRemote = DateTime.tryParse(matchRemoteData.updatedAt ?? DateTime.now().toIso8601String());
-              var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
-              // Check is the difference is above the minimum interval sync tolerance
-              var isRemoteNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
-              var isLocalNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
-
-              if (isRemoteNewer) {
-                syncedDataCount += 1;
-                // Save remote data to local db
-                await transactionLocalDatasource.updateTransaction(matchRemoteData);
-              }
-
-              if (isLocalNewer) {
-                syncedDataCount += 1;
-                // Update remote with local data
-                await transactionRemoteDatasource.updateTransaction(localData);
-              }
-            } else {
-              syncedDataCount += 1;
-              // No matching remote data, create it
-              await transactionRemoteDatasource.createTransaction(localData);
-            }
-          }
-
-          // Remote first
-          for (var remoteData in remote) {
-            var matchLocalData = local.where((localData) => localData.id == remoteData.id).firstOrNull;
-
-            if (matchLocalData != null) {
-              // Compare local & remote data updatedAt difference
-              var updatedAtLocal = DateTime.tryParse(remoteData.updatedAt ?? DateTime.now().toIso8601String());
-              var updatedAtRemote = DateTime.tryParse(matchLocalData.updatedAt ?? DateTime.now().toIso8601String());
-              var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
-              // Check is the difference is above the minimum interval sync tolerance
-              var isRemoteNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
-              var isLocalNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
-
-              if (isRemoteNewer) {
-                syncedDataCount += 1;
-                // Save remote data to local db
-                await transactionLocalDatasource.updateTransaction(remoteData);
-              }
-
-              if (isLocalNewer) {
-                syncedDataCount += 1;
-                // Update remote with local data
-                await transactionRemoteDatasource.updateTransaction(matchLocalData);
-              }
-            } else {
-              syncedDataCount += 1;
-              // No matching local data, create it
-              await transactionLocalDatasource.createTransaction(remoteData);
-            }
-          }
-        }
+        // Sum all local and remote sync counts
+        int totalSyncedCount = res.$1 + res.$2;
 
         // Return synced data count
-        return Result.success(syncedDataCount);
+        return Result.success(totalSyncedCount);
       }
 
       return Result.success(0);
@@ -155,65 +74,18 @@ class TransactionRepositoryImpl extends TransactionRepository {
           contains: contains,
         );
 
-        if (remote.isEmpty && local.isNotEmpty) {
-          for (var data in local) {
-            // Store local data to remote db
-            await transactionRemoteDatasource.createTransaction(data);
-          }
+        var res = await syncTransactions(local, remote);
 
-          // Return local data
-          return Result.success(local.map((e) => e.toEntity()).toList());
-        }
+        int syncedToLocalCount = res.$1;
+        int syncedToRemoteCount = res.$2;
 
-        if (remote.isNotEmpty && local.isEmpty) {
-          for (var data in remote) {
-            // Store remote data to local db
-            await transactionLocalDatasource.createTransaction(data);
-          }
-
+        // If more data was synced to the local, return the remote data
+        if (syncedToLocalCount > syncedToRemoteCount) {
           // Return remote data
           return Result.success(remote.map((e) => e.toEntity()).toList());
-        }
-
-        if (remote.isNotEmpty && local.isNotEmpty) {
-          List<bool> isRemoteHasNewerData = [];
-
-          // Local first only
-          for (var localData in local) {
-            var matchRemoteData = remote.where((remoteData) => remoteData.id == localData.id).firstOrNull;
-
-            if (matchRemoteData != null) {
-              // Compare local & remote data updatedAt difference
-              var updatedAtLocal = DateTime.tryParse(localData.updatedAt ?? DateTime.now().toIso8601String());
-              var updatedAtRemote = DateTime.tryParse(matchRemoteData.updatedAt ?? DateTime.now().toIso8601String());
-              var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
-              // Check is the difference is above the minimum interval sync tolerance
-              var isRemoteNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
-              var isLocalNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
-
-              if (isRemoteNewer) {
-                isRemoteHasNewerData.add(true);
-                // Save remote data to local db
-                await transactionLocalDatasource.updateTransaction(matchRemoteData);
-              }
-
-              if (isLocalNewer) {
-                // Update remote with local data
-                await transactionRemoteDatasource.updateTransaction(localData);
-              }
-            } else {
-              // No matching remote product, create it
-              await transactionRemoteDatasource.createTransaction(localData);
-            }
-          }
-
-          if (isRemoteHasNewerData.contains(true)) {
-            // Return remote data
-            return Result.success(remote.map((e) => e.toEntity()).toList());
-          } else {
-            // Return local data
-            return Result.success(local.map((e) => e.toEntity()).toList());
-          }
+        } else {
+          // Return local data
+          return Result.success(local.map((e) => e.toEntity()).toList());
         }
       }
 
@@ -231,42 +103,21 @@ class TransactionRepositoryImpl extends TransactionRepository {
       if (ConnectivityService.isConnected) {
         var remote = await transactionRemoteDatasource.getTransaction(transactionId);
 
-        if (remote == null && local != null) {
-          // Store local data to remote db
-          await transactionRemoteDatasource.createTransaction(local);
+        List<TransactionModel> localToList = local != null ? [local] : [];
+        List<TransactionModel> remoteToList = remote != null ? [remote] : [];
+
+        var res = await syncTransactions(localToList, remoteToList);
+
+        int syncedToLocalCount = res.$1;
+        int syncedToRemoteCount = res.$2;
+
+        // If more data was synced to the local, return the remote data
+        if (syncedToLocalCount > syncedToRemoteCount) {
+          // Return remote data
+          return Result.success(remote?.toEntity());
+        } else {
           // Return local data
-          return Result.success(local.toEntity());
-        }
-
-        if (remote != null && local == null) {
-          // Store remote data to local db
-          await transactionLocalDatasource.createTransaction(remote);
-          // Return remote
-          return Result.success(remote.toEntity());
-        }
-
-        if (remote != null && local != null) {
-          // Compare local & remote data updatedAt difference
-          var updatedAtLocal = DateTime.tryParse(local.updatedAt ?? DateTime.now().toIso8601String());
-          var updatedAtRemote = DateTime.tryParse(remote.updatedAt ?? DateTime.now().toIso8601String());
-          var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
-          // Check is the difference is above the minimum interval sync tolerance
-          var isRemoteNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
-          var isLocalNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
-
-          if (isRemoteNewer) {
-            // Save remote data to local db
-            await transactionLocalDatasource.updateTransaction(remote);
-            // Return remote data
-            return Result.success(remote.toEntity());
-          }
-
-          if (isLocalNewer) {
-            // Store local data to remote db
-            await transactionRemoteDatasource.updateTransaction(local);
-            // Return local data
-            return Result.success(local.toEntity());
-          }
+          return Result.success(local?.toEntity());
         }
       }
 
@@ -356,5 +207,75 @@ class TransactionRepositoryImpl extends TransactionRepository {
     } catch (e) {
       return Result.error(APIError(message: e.toString()));
     }
+  }
+
+  // Perform a sync between local and remote data
+  Future<(int, int)> syncTransactions(List<TransactionModel> local, List<TransactionModel> remote) async {
+    int syncedToLocalCount = 0;
+    int syncedToRemoteCount = 0;
+
+    // Local
+    for (var localData in local) {
+      var matchRemoteData = remote.where((remoteData) => remoteData.id == localData.id).firstOrNull;
+
+      if (matchRemoteData != null) {
+        // Compare local & remote data updatedAt difference
+        var updatedAtLocal = DateTime.tryParse(localData.updatedAt ?? DateTime.now().toIso8601String());
+        var updatedAtRemote = DateTime.tryParse(matchRemoteData.updatedAt ?? DateTime.now().toIso8601String());
+        var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
+        // Check is the difference is above the minimum interval sync tolerance
+        var isRemoteNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
+        var isLocalNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
+
+        if (isRemoteNewer) {
+          syncedToLocalCount += 1;
+          // Save remote data to local db
+          await transactionLocalDatasource.updateTransaction(matchRemoteData);
+        }
+
+        if (isLocalNewer) {
+          syncedToRemoteCount += 1;
+          // Update remote with local data
+          await transactionRemoteDatasource.updateTransaction(localData);
+        }
+      } else {
+        syncedToRemoteCount += 1;
+        // No matching remote data, create it
+        await transactionRemoteDatasource.createTransaction(localData);
+      }
+    }
+
+    // Remote
+    for (var remoteData in remote) {
+      var matchLocalData = local.where((localData) => localData.id == remoteData.id).firstOrNull;
+
+      if (matchLocalData != null) {
+        // Compare local & remote data updatedAt difference
+        var updatedAtLocal = DateTime.tryParse(remoteData.updatedAt ?? DateTime.now().toIso8601String());
+        var updatedAtRemote = DateTime.tryParse(matchLocalData.updatedAt ?? DateTime.now().toIso8601String());
+        var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
+        // Check is the difference is above the minimum interval sync tolerance
+        var isRemoteNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
+        var isLocalNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
+
+        if (isRemoteNewer) {
+          syncedToLocalCount += 1;
+          // Save remote data to local db
+          await transactionLocalDatasource.updateTransaction(remoteData);
+        }
+
+        if (isLocalNewer) {
+          syncedToRemoteCount += 1;
+          // Update remote with local data
+          await transactionRemoteDatasource.updateTransaction(matchLocalData);
+        }
+      } else {
+        syncedToLocalCount += 1;
+        // No matching local data, create it
+        await transactionLocalDatasource.createTransaction(remoteData);
+      }
+    }
+
+    return (syncedToLocalCount, syncedToRemoteCount);
   }
 }

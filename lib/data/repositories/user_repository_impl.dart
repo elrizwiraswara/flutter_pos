@@ -31,43 +31,18 @@ class UserRepositoryImpl extends UserRepository {
       if (ConnectivityService.isConnected) {
         var remote = await userRemoteDatasource.getUser(userId);
 
-        if (remote == null && local != null) {
-          // Store local data to remote db
-          await userRemoteDatasource.createUser(local);
-          // Return local data
-          return Result.success(local.toEntity());
-        }
+        var res = await syncUser(local, remote);
 
-        if (remote != null && local == null) {
-          // Store remote data to local db
-          await userLocalDatasource.createUser(remote);
+        int syncedToLocalCount = res.$1;
+        int syncedToRemoteCount = res.$2;
+
+        // If more data was synced to the local, return the remote data
+        if (syncedToLocalCount > syncedToRemoteCount) {
           // Return remote data
-          return Result.success(remote.toEntity());
-        }
-
-        if (remote != null && local != null) {
-          // Compare local & remote data updatedAt difference
-          var updatedAtLocal = DateTime.tryParse(local.updatedAt ?? DateTime.now().toIso8601String());
-          var updatedAtRemote = DateTime.tryParse(remote.updatedAt ?? DateTime.now().toIso8601String());
-          var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
-          // Check is the difference is above the minimum interval sync tolerance
-          var isRemoteNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_LESS_CRITICAL_IN_MINUTES;
-          var isLocalNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_LESS_CRITICAL_IN_MINUTES;
-
-          // Compare local & remote data updatedAt difference
-          if (isRemoteNewer) {
-            // Save remote data to local db
-            await userLocalDatasource.updateUser(remote);
-            // Return remote data
-            return Result.success(remote.toEntity());
-          }
-
-          if (isLocalNewer) {
-            // Store local data to remote db
-            await userRemoteDatasource.updateUser(local);
-            // Return local data
-            return Result.success(local.toEntity());
-          }
+          return Result.success(remote?.toEntity());
+        } else {
+          // Return local data
+          return Result.success(local?.toEntity());
         }
       }
 
@@ -153,5 +128,48 @@ class UserRepositoryImpl extends UserRepository {
     } catch (e) {
       return Result.error(APIError(message: e.toString()));
     }
+  }
+
+  // Perform a sync between local and remote data
+  Future<(int, int)> syncUser(UserModel? local, UserModel? remote) async {
+    int syncedToLocalCount = 0;
+    int syncedToRemoteCount = 0;
+
+    if (remote == null && local != null) {
+      syncedToRemoteCount += 1;
+      // Store local data to remote db
+      await userRemoteDatasource.createUser(local);
+    }
+
+    if (remote != null && local == null) {
+      syncedToLocalCount += 1;
+      // Store remote data to local db
+      await userLocalDatasource.createUser(remote);
+    }
+
+    if (remote != null && local != null) {
+      // Compare local & remote data updatedAt difference
+      var updatedAtLocal = DateTime.tryParse(local.updatedAt ?? DateTime.now().toIso8601String());
+      var updatedAtRemote = DateTime.tryParse(remote.updatedAt ?? DateTime.now().toIso8601String());
+      var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
+      // Check is the difference is above the minimum interval sync tolerance
+      var isRemoteNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_LESS_CRITICAL_IN_MINUTES;
+      var isLocalNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_LESS_CRITICAL_IN_MINUTES;
+
+      // Compare local & remote data updatedAt difference
+      if (isRemoteNewer) {
+        syncedToLocalCount += 1;
+        // Save remote data to local db
+        await userLocalDatasource.updateUser(remote);
+      }
+
+      if (isLocalNewer) {
+        syncedToRemoteCount += 1;
+        // Store local data to remote db
+        await userRemoteDatasource.updateUser(local);
+      }
+    }
+
+    return (syncedToLocalCount, syncedToRemoteCount);
   }
 }
