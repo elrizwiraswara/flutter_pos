@@ -30,92 +30,13 @@ class ProductRepositoryImpl extends ProductRepository {
         var local = await productLocalDatasource.getAllUserProducts(userId);
         var remote = await productRemoteDatasource.getAllUserProducts(userId);
 
-        if (remote.isEmpty && local.isNotEmpty) {
-          for (var data in local) {
-            // Store local data to remote db
-            await productRemoteDatasource.createProduct(data);
-          }
+        var res = await syncProducts(local, remote);
 
-          // Return synced data count
-          return Result.success(local.length);
-        }
-
-        if (remote.isNotEmpty && local.isEmpty) {
-          for (var data in remote) {
-            // Store remote data to local db
-            await productLocalDatasource.createProduct(data);
-          }
-
-          // Return synced data count
-          return Result.success(remote.length);
-        }
-
-        int syncedDataCount = 0;
-
-        if (remote.isNotEmpty && local.isNotEmpty) {
-          // Local first
-          for (var localData in local) {
-            var matchRemoteData = remote.where((remoteData) => remoteData.id == localData.id).firstOrNull;
-
-            if (matchRemoteData != null) {
-              var updatedAtLocal = DateTime.tryParse(localData.updatedAt ?? DateTime.now().toIso8601String());
-              var updatedAtRemote = DateTime.tryParse(matchRemoteData.updatedAt ?? DateTime.now().toIso8601String());
-              var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
-              // Check is the difference is above the minimum interval sync tolerance
-              var isRemoteNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
-              var isLocalNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
-
-              if (isRemoteNewer) {
-                syncedDataCount += 1;
-                // Save remote data to local db
-                await productLocalDatasource.updateProduct(matchRemoteData);
-              }
-
-              if (isLocalNewer) {
-                syncedDataCount += 1;
-                // Update remote with local data
-                await productRemoteDatasource.updateProduct(localData);
-              }
-            } else {
-              syncedDataCount += 1;
-              // No matching remote product, create it
-              await productRemoteDatasource.createProduct(localData);
-            }
-          }
-
-          // Remote first
-          for (var remoteData in remote) {
-            var matchLocalData = local.where((localData) => localData.id == remoteData.id).firstOrNull;
-
-            if (matchLocalData != null) {
-              var updatedAtLocal = DateTime.tryParse(remoteData.updatedAt ?? DateTime.now().toIso8601String());
-              var updatedAtRemote = DateTime.tryParse(matchLocalData.updatedAt ?? DateTime.now().toIso8601String());
-              var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
-              // Check is the difference is above the minimum interval sync tolerance
-              var isRemoteNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
-              var isLocalNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
-
-              if (isRemoteNewer) {
-                syncedDataCount += 1;
-                // Save remote data to local db
-                await productLocalDatasource.updateProduct(remoteData);
-              }
-
-              if (isLocalNewer) {
-                syncedDataCount += 1;
-                // Update remote with local data
-                await productRemoteDatasource.updateProduct(matchLocalData);
-              }
-            } else {
-              syncedDataCount += 1;
-              // No matching remote product, create it
-              await productLocalDatasource.createProduct(remoteData);
-            }
-          }
-        }
+        // Sum all local and remote sync counts
+        int totalSyncedCount = res.$1 + res.$2;
 
         // Return synced data count
-        return Result.success(syncedDataCount);
+        return Result.success(totalSyncedCount);
       }
 
       return Result.success(0);
@@ -153,65 +74,18 @@ class ProductRepositoryImpl extends ProductRepository {
           contains: contains,
         );
 
-        if (remote.isEmpty && local.isNotEmpty) {
-          for (var data in local) {
-            // Store local data to remote db
-            await productRemoteDatasource.createProduct(data);
-          }
+        var res = await syncProducts(local, remote);
 
+        int syncedToLocalCount = res.$1;
+        int syncedToRemoteCount = res.$2;
+
+        // If more data was synced to the local, return the remote data
+        if (syncedToLocalCount > syncedToRemoteCount) {
+          // Return remote data
+          return Result.success(remote.map((e) => e.toEntity()).toList());
+        } else {
           // Return local data
           return Result.success(local.map((e) => e.toEntity()).toList());
-        }
-
-        if (remote.isNotEmpty && local.isEmpty) {
-          for (var data in remote) {
-            // Store remote data to local db
-            await productLocalDatasource.createProduct(data);
-          }
-
-          // Return local data
-          return Result.success(remote.map((e) => e.toEntity()).toList());
-        }
-
-        if (remote.isNotEmpty && local.isNotEmpty) {
-          List<bool> isRemoteHasNewerData = [];
-
-          // Local first only
-          for (var localData in local) {
-            var matchRemoteData = remote.where((remoteData) => remoteData.id == localData.id).firstOrNull;
-
-            if (matchRemoteData != null) {
-              // Compare local & remote data updatedAt difference
-              var updatedAtLocal = DateTime.tryParse(localData.updatedAt ?? DateTime.now().toIso8601String());
-              var updatedAtRemote = DateTime.tryParse(matchRemoteData.updatedAt ?? DateTime.now().toIso8601String());
-              var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
-              // Check is the difference is above the minimum interval sync tolerance
-              var isRemoteNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
-              var isLocalNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
-
-              if (isRemoteNewer) {
-                isRemoteHasNewerData.add(true);
-                // Save remote data to local db
-                await productLocalDatasource.updateProduct(matchRemoteData);
-              }
-
-              if (isLocalNewer) {
-                // Update remote with local data
-                await productRemoteDatasource.updateProduct(localData);
-              }
-            } else {
-              // No matching remote product, create it
-              await productRemoteDatasource.createProduct(localData);
-            }
-          }
-
-          if (isRemoteHasNewerData.contains(true)) {
-            // Return remote data
-            return Result.success(remote.map((e) => e.toEntity()).toList());
-          } else {
-            // Return local data
-            return Result.success(local.map((e) => e.toEntity()).toList());
-          }
         }
       }
 
@@ -229,42 +103,21 @@ class ProductRepositoryImpl extends ProductRepository {
       if (ConnectivityService.isConnected) {
         var remote = await productRemoteDatasource.getProduct(productId);
 
-        if (remote == null && local != null) {
-          // Store local data to remote db
-          await productRemoteDatasource.createProduct(local);
-          // Return local data
-          return Result.success(local.toEntity());
-        }
+        List<ProductModel> localToList = local != null ? [local] : [];
+        List<ProductModel> remoteToList = remote != null ? [remote] : [];
 
-        if (remote != null && local == null) {
-          // Store remote data to local db
-          await productLocalDatasource.createProduct(remote);
+        var res = await syncProducts(localToList, remoteToList);
+
+        int syncedToLocalCount = res.$1;
+        int syncedToRemoteCount = res.$2;
+
+        // If more data was synced to the local, return the remote data
+        if (syncedToLocalCount > syncedToRemoteCount) {
           // Return remote data
-          return Result.success(remote.toEntity());
-        }
-
-        if (remote != null && local != null) {
-          var updatedAtLocal = DateTime.tryParse(local.updatedAt ?? DateTime.now().toIso8601String());
-          var updatedAtRemote = DateTime.tryParse(remote.updatedAt ?? DateTime.now().toIso8601String());
-          var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
-          // Check is the difference is above the minimum interval sync tolerance
-          var isRemoteNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
-          var isLocalNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
-
-          // Compare local & remote data updatedAt difference
-          if (isRemoteNewer) {
-            // Save remote data to local db
-            await productLocalDatasource.updateProduct(remote);
-            // Return remote data
-            return Result.success(remote.toEntity());
-          }
-
-          if (isLocalNewer) {
-            // Store local data to remote db
-            await productRemoteDatasource.updateProduct(local);
-            // Return local data
-            return Result.success(local.toEntity());
-          }
+          return Result.success(remote?.toEntity());
+        } else {
+          // Return local data
+          return Result.success(local?.toEntity());
         }
       }
 
@@ -352,5 +205,74 @@ class ProductRepositoryImpl extends ProductRepository {
     } catch (e) {
       return Result.error(APIError(message: e.toString()));
     }
+  }
+
+  // Perform a sync between local and remote data
+  Future<(int, int)> syncProducts(List<ProductModel> local, List<ProductModel> remote) async {
+    int syncedToLocalCount = 0;
+    int syncedToRemoteCount = 0;
+
+    // Local
+    // Local first
+    for (var localData in local) {
+      var matchRemoteData = remote.where((remoteData) => remoteData.id == localData.id).firstOrNull;
+
+      if (matchRemoteData != null) {
+        var updatedAtLocal = DateTime.tryParse(localData.updatedAt ?? DateTime.now().toIso8601String());
+        var updatedAtRemote = DateTime.tryParse(matchRemoteData.updatedAt ?? DateTime.now().toIso8601String());
+        var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
+        // Check is the difference is above the minimum interval sync tolerance
+        var isRemoteNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
+        var isLocalNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
+
+        if (isRemoteNewer) {
+          syncedToLocalCount += 1;
+          // Save remote data to local db
+          await productLocalDatasource.updateProduct(matchRemoteData);
+        }
+
+        if (isLocalNewer) {
+          syncedToRemoteCount += 1;
+          // Update remote with local data
+          await productRemoteDatasource.updateProduct(localData);
+        }
+      } else {
+        syncedToRemoteCount += 1;
+        // No matching remote product, create it
+        await productRemoteDatasource.createProduct(localData);
+      }
+    }
+
+    // Remote first
+    for (var remoteData in remote) {
+      var matchLocalData = local.where((localData) => localData.id == remoteData.id).firstOrNull;
+
+      if (matchLocalData != null) {
+        var updatedAtLocal = DateTime.tryParse(remoteData.updatedAt ?? DateTime.now().toIso8601String());
+        var updatedAtRemote = DateTime.tryParse(matchLocalData.updatedAt ?? DateTime.now().toIso8601String());
+        var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
+        // Check is the difference is above the minimum interval sync tolerance
+        var isRemoteNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
+        var isLocalNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
+
+        if (isRemoteNewer) {
+          syncedToLocalCount += 1;
+          // Save remote data to local db
+          await productLocalDatasource.updateProduct(remoteData);
+        }
+
+        if (isLocalNewer) {
+          syncedToRemoteCount += 1;
+          // Update remote with local data
+          await productRemoteDatasource.updateProduct(matchLocalData);
+        }
+      } else {
+        syncedToLocalCount += 1;
+        // No matching remote product, create it
+        await productLocalDatasource.createProduct(remoteData);
+      }
+    }
+
+    return (syncedToLocalCount, syncedToRemoteCount);
   }
 }
