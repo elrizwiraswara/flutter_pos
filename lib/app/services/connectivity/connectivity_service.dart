@@ -23,7 +23,8 @@ class ConnectivityService {
 
   static String host = 'google.com';
 
-  static bool isConnected = true;
+  static bool _isConnected = true;
+  static bool get isConnected => _isConnected;
 
   static StreamSubscription<List<ConnectivityResult>>? _subscription;
 
@@ -41,14 +42,14 @@ class ConnectivityService {
       if (results.every((e) => internetConnectivityList.contains(e))) {
         await _checkInternetConnection();
       } else {
-        isConnected = false;
+        _isConnected = false;
       }
 
       if (onHasInternet != null) {
-        onHasInternet(isConnected);
+        onHasInternet(_isConnected);
       }
 
-      cl('[NetworkCheckerService].isConnected = $isConnected ');
+      cl('[ConnectivityService].isConnected = $_isConnected ');
     });
   }
 
@@ -56,14 +57,27 @@ class ConnectivityService {
     var response = await client.get(Uri.http(host));
 
     if (response.statusCode == 200) {
-      isConnected = true;
+      _isConnected = true;
     } else {
-      isConnected = false;
+      _isConnected = false;
     }
   }
 
   static void cancelSubs() {
     _subscription?.cancel();
     _subscription = null;
+  }
+
+  // Only for testing
+  // Bypass connection status using this func
+  static void setTestIsConnected(bool value) {
+    // Ensure this func only can be run in debug mode and completely removed in release mode
+    assert(
+      () {
+        _isConnected = value;
+        return true;
+      }(),
+      "[ConnectivityService].setTestIsConnected should only be used in unit tests.",
+    );
   }
 }

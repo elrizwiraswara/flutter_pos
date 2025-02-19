@@ -23,7 +23,7 @@ void main() {
       var testDatabase = await openDatabase(inMemoryDatabasePath, version: 1);
 
       // Initialize the AppDatabase with the test database
-      await appDatabase.init(testDatabase: testDatabase);
+      await appDatabase.initTestDatabase(testDatabase: testDatabase);
 
       // Initialize the datasource with the AppDatabase
       datasource = TransactionLocalDatasourceImpl(appDatabase);
