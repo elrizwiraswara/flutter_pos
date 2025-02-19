@@ -31,9 +31,7 @@ void main() {
     );
   }
 
-  testWidgets('SignInScreen UI should render correctly', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('SignInScreen UI should render correctly', (WidgetTester tester) async {
     await tester.pumpWidget(makeTestableWidget(const SignInScreen()));
 
     expect(find.text('Welcome!'), findsOneWidget);
@@ -41,12 +39,8 @@ void main() {
     expect(find.text('Sign In With Google'), findsOneWidget);
   });
 
-  testWidgets('Clicking Sign In button should call signIn method', (
-    WidgetTester tester,
-  ) async {
-    when(mockAuthProvider.signIn()).thenAnswer(
-      (_) async => Result.success('user_id'),
-    );
+  testWidgets('Clicking Sign In button should call signIn method', (WidgetTester tester) async {
+    when(mockAuthProvider.signIn()).thenAnswer((_) async => Result.success('user_id'));
 
     await tester.pumpWidget(makeTestableWidget(const SignInScreen()));
 
@@ -56,12 +50,9 @@ void main() {
     verify(mockAuthProvider.signIn()).called(1);
   });
 
-  testWidgets('Should show error dialog if signIn fails', (
-    WidgetTester tester,
-  ) async {
-    when(mockAuthProvider.signIn()).thenAnswer(
-      (_) async => Result.error(const UnknownError(message: 'Sign-in failed')),
-    );
+  testWidgets('Should show error dialog if signIn fails', (WidgetTester tester) async {
+    when(mockAuthProvider.signIn())
+        .thenAnswer((_) async => Result.error(const UnknownError(message: 'Sign-in failed')));
 
     await tester.pumpWidget(makeTestableWidget(const SignInScreen()));
 

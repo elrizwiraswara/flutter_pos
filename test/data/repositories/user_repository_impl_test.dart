@@ -43,8 +43,7 @@ void main() {
     test('should return local user when there is no connectivity', () async {
       ConnectivityService.setTestIsConnected(false);
 
-      when(mockUserLocalDatasource.getUser(userId))
-          .thenAnswer((_) async => userModel);
+      when(mockUserLocalDatasource.getUser(userId)).thenAnswer((_) async => userModel);
 
       final result = await userRepository.getUser(userId);
 
@@ -55,10 +54,8 @@ void main() {
     test('should return remote user when connectivity is available', () async {
       ConnectivityService.setTestIsConnected(true);
 
-      when(mockUserLocalDatasource.getUser(userId))
-          .thenAnswer((_) async => userModel);
-      when(mockUserRemoteDatasource.getUser(userId))
-          .thenAnswer((_) async => userModel);
+      when(mockUserLocalDatasource.getUser(userId)).thenAnswer((_) async => userModel);
+      when(mockUserRemoteDatasource.getUser(userId)).thenAnswer((_) async => userModel);
 
       final result = await userRepository.getUser(userId);
 
@@ -67,8 +64,7 @@ void main() {
     });
 
     test('should return an error when an exception occurs', () async {
-      when(userRepository.getUser(userId))
-          .thenThrow(Exception('Database error'));
+      when(userRepository.getUser(userId)).thenThrow(Exception('Database error'));
 
       final result = await userRepository.getUser(userId);
 
@@ -83,10 +79,8 @@ void main() {
     test('should create user locally and remotely when connected', () async {
       ConnectivityService.setTestIsConnected(true);
 
-      when(mockUserLocalDatasource.createUser(any))
-          .thenAnswer((_) async => '123');
-      when(mockUserRemoteDatasource.createUser(any))
-          .thenAnswer((_) async => '123');
+      when(mockUserLocalDatasource.createUser(any)).thenAnswer((_) async => '123');
+      when(mockUserRemoteDatasource.createUser(any)).thenAnswer((_) async => '123');
 
       final result = await userRepository.createUser(userEntity);
 
@@ -97,10 +91,8 @@ void main() {
     test('should queue action when no connectivity', () async {
       ConnectivityService.setTestIsConnected(false);
 
-      when(mockUserLocalDatasource.createUser(any))
-          .thenAnswer((_) async => '123');
-      when(mockQueuedActionLocalDatasource.createQueuedAction(any))
-          .thenAnswer((_) async => 1);
+      when(mockUserLocalDatasource.createUser(any)).thenAnswer((_) async => '123');
+      when(mockQueuedActionLocalDatasource.createQueuedAction(any)).thenAnswer((_) async => 1);
 
       final result = await userRepository.createUser(userEntity);
 
@@ -110,8 +102,7 @@ void main() {
     });
 
     test('should return an error when an exception occurs', () async {
-      when(mockUserLocalDatasource.createUser(any))
-          .thenThrow(Exception('Database error'));
+      when(mockUserLocalDatasource.createUser(any)).thenThrow(Exception('Database error'));
 
       final result = await userRepository.createUser(userEntity);
 
