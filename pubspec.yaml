@@ -47,7 +47,7 @@ dependencies:
   logger: ^2.0.2+1
   cupertino_icons: ^1.0.6
   google_fonts: ^6.2.1
-  material_color_utilities: ^0.8.0
+  material_color_utilities: ^0.11.1
   flutter_secure_storage: ^9.0.0
   google_sign_in: ^6.2.1
   firebase_auth: ^5.1.1
@@ -75,6 +75,7 @@ dev_dependencies:
   build_runner: ^2.4.6
   sqflite_common_ffi: ^2.3.3
   fake_cloud_firestore: ^3.0.1
+  firebase_storage_mocks: ^0.7.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
