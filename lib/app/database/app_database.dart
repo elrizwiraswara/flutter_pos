@@ -41,8 +41,10 @@ class AppDatabase {
         database = testDatabase;
         return true;
       }(),
-      "[AppDatabase].init should only be used in unit tests.",
+      "[AppDatabase].initTestDatabase should only be used in unit tests.",
     );
+
+    if (!kDebugMode) return;
 
     // Create tables
     await Future.wait([
