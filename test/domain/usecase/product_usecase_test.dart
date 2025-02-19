@@ -48,8 +48,7 @@ void main() {
     ),
   ];
 
-  test('should return a list of ProductEntity when call is successful',
-      () async {
+  test('should return a list of ProductEntity when call is successful', () async {
     when(mockProductRepository.getUserProducts(
       any,
       orderBy: anyNamed('orderBy'),
