@@ -17,21 +17,32 @@ class AppDatabase {
 
   late Database database;
 
-  Future<void> init({Database? testDatabase}) async {
+  Future<void> init() async {
     if (kDebugMode) {
       // Only for development purpose
       // await dropDatabase();
     }
 
-    if (testDatabase != null) {
-      // For unit testing
-      database = testDatabase;
-    } else {
-      database = await openDatabase(
-        join(await getDatabasesPath(), AppDatabaseConfig.dbPath),
-        version: AppDatabaseConfig.version,
-      );
-    }
+    // Create tables
+    await Future.wait([
+      database.execute(AppDatabaseConfig.createUserTable),
+      database.execute(AppDatabaseConfig.createProductTable),
+      database.execute(AppDatabaseConfig.createTransactionTable),
+      database.execute(AppDatabaseConfig.createOrderedProductTable),
+      database.execute(AppDatabaseConfig.createQueuedActionTable),
+    ]);
+  }
+
+  // Only for testing
+  Future<void> initTestDatabase({required Database testDatabase}) async {
+    // Ensure this func only can be run in debug mode and completely removed in release mode
+    assert(
+      () {
+        database = testDatabase;
+        return true;
+      }(),
+      "[AppDatabase].init should only be used in unit tests.",
+    );
 
     // Create tables
     await Future.wait([
