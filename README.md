@@ -91,6 +91,13 @@ This application uses an offline-first approach, where data will be stored in th
     flutter run
     ```
 
+### Test
+
+To test the application, run the following command:
+```sh
+flutter test
+```
+
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request for any bugs, feature requests, or improvements.
