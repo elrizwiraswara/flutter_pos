@@ -85,8 +85,10 @@ This application uses an offline-first approach, where data will be stored in th
     }
     ```
 
+4. Also, add all your firebase api keys, secrets and mesaurement IDs into the ```.env``` file to ensure yor API key is not exposed, usually they are inside the firebase_options.dart file
 
-4. **Run the application:**
+
+5. **Run the application:**
     ```sh
     flutter run
     ```

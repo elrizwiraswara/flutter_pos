@@ -63,6 +63,7 @@ dependencies:
   http: ^1.2.1
   package_info_plus: ^8.0.0
   url_launcher: ^6.3.0
+  flutter_dotenv: ^5.2.1
 
 
 dev_dependencies:

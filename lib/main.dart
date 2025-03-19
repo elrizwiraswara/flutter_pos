@@ -12,10 +12,12 @@ import 'firebase_options.dart';
 import 'presentation/providers/theme/theme_provider.dart';
 import 'presentation/screens/error_handler_screen.dart';
 import 'service_locator.dart';
+import 'packages:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   // Initialize binding
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileNmae:'.env');
 
   // Initialize multiple futures
   await Future.wait([
