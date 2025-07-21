@@ -87,7 +87,7 @@ class AppTheme {
           color: colorScheme.onSurface,
         ),
       ),
-      tabBarTheme: TabBarTheme(
+      tabBarTheme: TabBarThemeData(
         labelColor: colorScheme.onSurface,
         unselectedLabelColor: colorScheme.onSurface,
         indicator: BoxDecoration(
@@ -121,7 +121,6 @@ class AppTheme {
         color: colorScheme.surfaceDim,
         thickness: 0.5,
       ),
-      dialogBackgroundColor: colorScheme.surfaceContainerLowest,
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         backgroundColor: colorScheme.primary,
@@ -132,6 +131,7 @@ class AppTheme {
         showCloseIcon: true,
         elevation: 1,
       ),
+      dialogTheme: DialogThemeData(backgroundColor: colorScheme.surfaceContainerLowest),
     );
   }
 }
