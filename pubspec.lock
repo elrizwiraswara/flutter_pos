@@ -33,6 +33,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.13.2"
+  app_image:
+    dependency: "direct main"
+    description:
+      name: app_image
+      sha256: "1cd4ca171e60d70437528db5fc25bb23a4d0669f560d023eee5829219ff96e24"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.12"
   args:
     dependency: transitive
     description:

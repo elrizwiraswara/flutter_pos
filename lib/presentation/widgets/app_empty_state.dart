@@ -35,17 +35,17 @@ class AppEmptyState extends StatelessWidget {
               title ?? 'Nothing to show',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.outline,
-                  ),
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.outline,
+              ),
             ),
             const SizedBox(height: AppSizes.padding / 2),
             Text(
               subtitle ?? '',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.outline,
-                  ),
+                color: Theme.of(context).colorScheme.outline,
+              ),
             ),
             const SizedBox(height: AppSizes.padding),
             if (buttonText != null && onTapButton != null)
@@ -56,7 +56,7 @@ class AppEmptyState extends StatelessWidget {
                 borderColor: Theme.of(context).colorScheme.surfaceContainerLowest,
                 textColor: Theme.of(context).colorScheme.primary,
                 alignment: null,
-              )
+              ),
           ],
         ),
       ),

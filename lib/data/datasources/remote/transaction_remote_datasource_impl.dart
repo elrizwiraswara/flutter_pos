@@ -119,8 +119,10 @@ class TransactionRemoteDatasourceImpl extends TransactionDatasource {
       var transaction = TransactionModel.fromJson(rawTransactions.data()!);
 
       // Get transaction ordered products
-      var rawOrderedProducts =
-          await _firebaseFirestore.collection('OrderedProduct').where('transactionId', isEqualTo: transaction.id).get();
+      var rawOrderedProducts = await _firebaseFirestore
+          .collection('OrderedProduct')
+          .where('transactionId', isEqualTo: transaction.id)
+          .get();
 
       var orderedProducts = rawOrderedProducts.docs.map((e) => OrderedProductModel.fromJson(e.data())).toList();
 
@@ -143,8 +145,10 @@ class TransactionRemoteDatasourceImpl extends TransactionDatasource {
   @override
   Future<List<TransactionModel>> getAllUserTransactions(String userId) async {
     return await _firebaseFirestore.runTransaction((trx) async {
-      var rawTransactions =
-          await _firebaseFirestore.collection('Transaction').where('createdById', isEqualTo: userId).get();
+      var rawTransactions = await _firebaseFirestore
+          .collection('Transaction')
+          .where('createdById', isEqualTo: userId)
+          .get();
 
       var transactions = rawTransactions.docs.map((e) => TransactionModel.fromJson(e.data())).toList();
 
@@ -219,8 +223,10 @@ class TransactionRemoteDatasourceImpl extends TransactionDatasource {
 
     for (var transaction in transactions) {
       // Get transaction ordered products
-      var rawOrderedProducts =
-          await _firebaseFirestore.collection('OrderedProduct').where('transactionId', isEqualTo: transaction.id).get();
+      var rawOrderedProducts = await _firebaseFirestore
+          .collection('OrderedProduct')
+          .where('transactionId', isEqualTo: transaction.id)
+          .get();
 
       var orderedProducts = rawOrderedProducts.docs.map((e) => OrderedProductModel.fromJson(e.data())).toList();
 

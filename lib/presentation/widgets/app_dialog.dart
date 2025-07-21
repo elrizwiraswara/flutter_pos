@@ -87,12 +87,12 @@ class AppDialog {
                   Padding(
                     padding: const EdgeInsets.only(top: AppSizes.padding),
                     child: Text(
-                      error.toString().length > 35 ? error.toString().substring(0, 35) : error.toString(),
+                      error.toString().length > 200 ? error.toString().substring(0, 200) : error.toString(),
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.outlineVariant,
-                          ),
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.outlineVariant,
+                      ),
                     ),
                   ),
               ],
@@ -277,7 +277,7 @@ class AppDialogWidget extends StatelessWidget {
                           },
                         ),
                       )
-                    : const SizedBox.shrink()
+                    : const SizedBox.shrink(),
               ],
             ),
           );

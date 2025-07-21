@@ -53,15 +53,15 @@ class ProductEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        createdById,
-        name,
-        imageUrl,
-        stock,
-        sold,
-        price,
-        description,
-        createdAt,
-        updatedAt,
-      ];
+    id,
+    createdById,
+    name,
+    imageUrl,
+    stock,
+    sold,
+    price,
+    description,
+    createdAt,
+    updatedAt,
+  ];
 }

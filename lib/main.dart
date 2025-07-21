@@ -39,7 +39,7 @@ void main() async {
   setupServiceLocator();
 
   // Set/lock screen orientation
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  SystemChrome.setPreferredOrientations([]);
 
   // Set Default SystemUIOverlayStyle
   SystemChrome.setSystemUIOverlayStyle(

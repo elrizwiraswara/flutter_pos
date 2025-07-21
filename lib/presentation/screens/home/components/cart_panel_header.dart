@@ -55,7 +55,7 @@ class _CartPanelHeaderState extends State<CartPanelHeader> {
         width: 40,
         height: 4,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.54),
+          color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.54),
           borderRadius: BorderRadius.circular(100),
         ),
       ),
@@ -71,14 +71,14 @@ class _CartPanelHeaderState extends State<CartPanelHeader> {
             Text(
               '${provider.orderedProducts.length} Products',
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                fontWeight: FontWeight.bold,
+              ),
             ),
             AppButton(
               height: 26,
               borderRadius: BorderRadius.circular(4),
               padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding / 2),
-              buttonColor: Theme.of(context).colorScheme.errorContainer.withOpacity(0.32),
+              buttonColor: Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.32),
               enabled: provider.orderedProducts.isNotEmpty,
               onTap: () {
                 AppDialog.show(
@@ -103,10 +103,10 @@ class _CartPanelHeaderState extends State<CartPanelHeader> {
                   Text(
                     'Remove All',
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.error,
-                        ),
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.error,
+                    ),
                   ),
                 ],
               ),

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -14,7 +15,6 @@ import '../../providers/account/account_provider.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
 import '../../widgets/app_icon_button.dart';
-import '../../widgets/app_image.dart';
 import '../../widgets/app_progress_indicator.dart';
 import '../../widgets/app_text_field.dart';
 
@@ -127,10 +127,9 @@ class _ProfileFormScreenState extends State<ProfileFormScreen> {
                     imgProvider: provider.imageFile != null ? ImgProvider.fileImage : ImgProvider.networkImage,
                     width: 100,
                     height: 100,
-                    borderRadius: AppSizes.radius,
+                    borderRadius: BorderRadius.circular(AppSizes.radius),
                     backgroundColor: Theme.of(context).colorScheme.surface,
-                    borderWidth: 1,
-                    borderColor: Theme.of(context).colorScheme.primaryContainer,
+                    border: Border.all(width: 1, color: Theme.of(context).colorScheme.primaryContainer),
                     errorWidget: Icon(
                       Icons.image,
                       color: Theme.of(context).colorScheme.surfaceDim,

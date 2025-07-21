@@ -17,10 +17,7 @@ class UserRemoteDatasourceImpl extends UserDatasource {
 
   @override
   Future<void> updateUser(UserModel user) async {
-    await _firebaseFirestore.collection('User').doc(user.id).set(
-          user.toJson(),
-          SetOptions(merge: true),
-        );
+    await _firebaseFirestore.collection('User').doc(user.id).set(user.toJson(), SetOptions(merge: true));
   }
 
   @override

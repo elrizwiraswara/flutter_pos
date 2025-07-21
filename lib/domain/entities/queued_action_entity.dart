@@ -37,11 +37,11 @@ class QueuedActionEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        repository,
-        method,
-        param,
-        isCritical,
-        createdAt,
-      ];
+    id,
+    repository,
+    method,
+    param,
+    isCritical,
+    createdAt,
+  ];
 }
