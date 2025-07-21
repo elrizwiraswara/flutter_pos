@@ -18,10 +18,21 @@ class AppDatabase {
   late Database database;
 
   Future<void> init() async {
+    // Get the path to the database
+    String path = join(await getDatabasesPath(), AppDatabaseConfig.dbPath);
+
     if (kDebugMode) {
       // Only for development purpose
-      // await dropDatabase();
+      // await dropDatabase(path);
     }
+
+    // Create database if not exists
+    File databaseFile = File(path);
+
+    if (!await databaseFile.exists()) await databaseFile.create();
+
+    // Open database
+    database = await openDatabase(path);
 
     // Create tables
     await Future.wait([
@@ -56,19 +67,14 @@ class AppDatabase {
     ]);
   }
 
-  Future<void> dropDatabase() async {
-    // Get the path to the database
-    String path = join(await getDatabasesPath(), AppDatabaseConfig.dbPath);
-
+  Future<void> dropDatabase(String path) async {
     // Check if the database file exists
     File databaseFile = File(path);
-    if (await databaseFile.exists()) {
-      // Close the database if it is open
-      Database db = await openDatabase(path);
-      await db.close();
 
+    if (await databaseFile.exists()) {
       // Delete the database file
       await databaseFile.delete();
+
       cl('[AppDatabase].dropDatabase = Database deleted successfully.');
     } else {
       cl('[AppDatabase].dropDatabase = Database does not exist.');
@@ -86,7 +92,8 @@ class AppDatabaseConfig {
   static const String orderedProductTableName = 'OrderedProduct';
   static const String queuedActionTableName = 'QueuedAction';
 
-  static String createUserTable = '''
+  static String createUserTable =
+      '''
 CREATE TABLE IF NOT EXISTS '$userTableName' (
     'id' TEXT NOT NULL,
     'email' TEXT,
@@ -101,7 +108,8 @@ CREATE TABLE IF NOT EXISTS '$userTableName' (
 );
 ''';
 
-  static String createProductTable = '''
+  static String createProductTable =
+      '''
 CREATE TABLE IF NOT EXISTS '$productTableName' (
     'id' INTEGER NOT NULL,
     'createdById' TEXT,
@@ -118,7 +126,8 @@ CREATE TABLE IF NOT EXISTS '$productTableName' (
 );
 ''';
 
-  static String createTransactionTable = '''
+  static String createTransactionTable =
+      '''
 CREATE TABLE IF NOT EXISTS '$transactionTableName' (
     'id' INTEGER NOT NULL,
     'paymentMethod' TEXT,
@@ -136,7 +145,8 @@ CREATE TABLE IF NOT EXISTS '$transactionTableName' (
 );
 ''';
 
-  static String createOrderedProductTable = '''
+  static String createOrderedProductTable =
+      '''
 CREATE TABLE IF NOT EXISTS '$orderedProductTableName' (
     'id' INTEGER NOT NULL,
     'transactionId' INTEGER,
@@ -154,7 +164,8 @@ CREATE TABLE IF NOT EXISTS '$orderedProductTableName' (
 );
 ''';
 
-  static String createQueuedActionTable = '''
+  static String createQueuedActionTable =
+      '''
 CREATE TABLE IF NOT EXISTS '$queuedActionTableName' (
     'id' INTEGER NOT NULL,
     'repository' TEXT,
