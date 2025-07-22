@@ -1,3 +1,4 @@
+import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -9,7 +10,6 @@ import '../../providers/main/main_provider.dart';
 import '../../providers/theme/theme_provider.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
-import '../../widgets/app_image.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -44,15 +44,15 @@ class AccountScreen extends StatelessWidget {
                 image: provider.user?.imageUrl ?? '',
                 width: 120,
                 height: 120,
-                borderRadius: 100,
+                borderRadius: BorderRadius.circular(100),
                 backgroundColor: Theme.of(context).colorScheme.surface,
               ),
               const SizedBox(height: AppSizes.padding),
               Text(
                 provider.user?.name ?? '(No Name)',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: AppSizes.padding / 4),
               Text(
@@ -85,15 +85,15 @@ class AccountScreen extends StatelessWidget {
                 Text(
                   'Profile',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
             const Icon(
               Icons.arrow_forward_ios_rounded,
               size: 18,
-            )
+            ),
           ],
         ),
         onTap: () {
@@ -122,40 +122,42 @@ class AccountScreen extends StatelessWidget {
                 Text(
                   'Theme',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
             const Icon(
               Icons.arrow_forward_ios_rounded,
               size: 18,
-            )
+            ),
           ],
         ),
         onTap: () {
           AppDialog.show(
             title: 'Theme',
             leftButtonText: 'Close',
-            child: Consumer<ThemeProvider>(builder: (context, provider, _) {
-              return Row(
-                children: [
-                  Switch(
-                    value: !provider.isLight(),
-                    onChanged: (val) {
-                      provider.changeBrightness(!val);
-                    },
-                  ),
-                  const SizedBox(width: AppSizes.padding),
-                  Text(
-                    'Dark Mode',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                ],
-              );
-            }),
+            child: Consumer<ThemeProvider>(
+              builder: (context, provider, _) {
+                return Row(
+                  children: [
+                    Switch(
+                      value: !provider.isLight(),
+                      onChanged: (val) {
+                        provider.changeBrightness(!val);
+                      },
+                    ),
+                    const SizedBox(width: AppSizes.padding),
+                    Text(
+                      'Dark Mode',
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
           );
         },
       ),
@@ -181,15 +183,15 @@ class AccountScreen extends StatelessWidget {
                 Text(
                   'About',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
             const Icon(
               Icons.arrow_forward_ios_rounded,
               size: 18,
-            )
+            ),
           ],
         ),
         onTap: () {
@@ -218,15 +220,15 @@ class AccountScreen extends StatelessWidget {
                 Text(
                   'Sign Out',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
             const Icon(
               Icons.arrow_forward_ios_rounded,
               size: 18,
-            )
+            ),
           ],
         ),
         onTap: () {

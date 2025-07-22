@@ -6,12 +6,13 @@ class FirebaseStorageService {
   final FirebaseStorage firebaseStorage;
 
   FirebaseStorageService({FirebaseStorage? firebaseStorage})
-      : firebaseStorage = firebaseStorage ?? FirebaseStorage.instance;
+    : firebaseStorage = firebaseStorage ?? FirebaseStorage.instance;
 
   Future<String> uploadUserPhoto(String imgPath) async {
-    final ref = firebaseStorage.ref().child('user_photos').child(
-          'UserImage_${DateTime.now().millisecondsSinceEpoch}.jpg',
-        );
+    final ref = firebaseStorage
+        .ref()
+        .child('user_photos')
+        .child('UserImage_${DateTime.now().millisecondsSinceEpoch}.jpg');
 
     final metadata = SettableMetadata(contentType: 'image/jpeg');
 
@@ -21,9 +22,10 @@ class FirebaseStorageService {
   }
 
   Future<String> uploadProductImage(String imgPath) async {
-    final ref = firebaseStorage.ref().child('products').child(
-          'ProductImage_${DateTime.now().millisecondsSinceEpoch}.jpg',
-        );
+    final ref = firebaseStorage
+        .ref()
+        .child('products')
+        .child('ProductImage_${DateTime.now().millisecondsSinceEpoch}.jpg');
 
     final metadata = SettableMetadata(contentType: 'image/jpeg');
 

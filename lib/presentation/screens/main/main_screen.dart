@@ -33,44 +33,46 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<MainProvider>(builder: (context, provider, _) {
-      // Display RootScreen when data is being load
-      if (!provider.isLoaded) {
-        return const RootScreen();
-      }
+    return Consumer<MainProvider>(
+      builder: (context, provider, _) {
+        // Display RootScreen when data is being load
+        if (!provider.isLoaded) {
+          return const RootScreen();
+        }
 
-      // User data might still null for the first time app open or login without internet connection
-      // So, display error screen with a first time internet error message
-      if (provider.isLoaded && provider.user == null && !provider.isHasInternet) {
-        return const ErrorScreen(errorMessage: FIRST_TIME_INTERNET_ERROR_MESSAGE);
-      }
+        // User data might still null for the first time app open or login without internet connection
+        // So, display error screen with a first time internet error message
+        if (provider.isLoaded && provider.user == null && !provider.isHasInternet) {
+          return const ErrorScreen(errorMessage: FIRST_TIME_INTERNET_ERROR_MESSAGE);
+        }
 
-      return Scaffold(
-        body: widget.child,
-        bottomNavigationBar: BottomNavigationBar(
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.maps_home_work_outlined),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard_customize_outlined),
-              label: 'Products',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.receipt_long_rounded),
-              label: 'Transactions',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle_outlined),
-              label: 'Account',
-            ),
-          ],
-          currentIndex: _calculateSelectedIndex(context),
-          onTap: (int idx) => _onItemTapped(idx, context),
-        ),
-      );
-    });
+        return Scaffold(
+          body: widget.child,
+          bottomNavigationBar: BottomNavigationBar(
+            items: const <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(Icons.maps_home_work_outlined),
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.dashboard_customize_outlined),
+                label: 'Products',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.receipt_long_rounded),
+                label: 'Transactions',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.account_circle_outlined),
+                label: 'Account',
+              ),
+            ],
+            currentIndex: _calculateSelectedIndex(context),
+            onTap: (int idx) => _onItemTapped(idx, context),
+          ),
+        );
+      },
+    );
   }
 
   int _calculateSelectedIndex(BuildContext context) {

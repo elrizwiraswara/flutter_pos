@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_pos/app/services/auth/auth_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -7,13 +8,24 @@ import 'package:mockito/mockito.dart';
 
 import 'auth_service_test.mocks.dart';
 
-@GenerateMocks([FirebaseAuth, GoogleSignIn, GoogleSignInAccount, GoogleSignInAuthentication, User, UserCredential])
+@GenerateMocks([
+  FirebaseAuth,
+  GoogleSignIn,
+  GoogleSignInAccount,
+  GoogleSignInAuthentication,
+  GoogleSignInClientAuthorization,
+  GoogleSignInAuthorizationClient,
+  User,
+  UserCredential,
+])
 void main() {
   late AuthService authService;
   late MockFirebaseAuth mockFirebaseAuth;
   late MockGoogleSignIn mockGoogleSignIn;
   late MockGoogleSignInAccount mockGoogleSignInAccount;
   late MockGoogleSignInAuthentication mockGoogleSignInAuthentication;
+  late MockGoogleSignInClientAuthorization mockGoogleSignInAuthorization;
+  late MockGoogleSignInAuthorizationClient mockGoogleSignInAuthorizationClient;
   late MockUser mockUser;
   late MockUserCredential mockUserCredential;
 
@@ -22,6 +34,8 @@ void main() {
     mockGoogleSignIn = MockGoogleSignIn();
     mockGoogleSignInAccount = MockGoogleSignInAccount();
     mockGoogleSignInAuthentication = MockGoogleSignInAuthentication();
+    mockGoogleSignInAuthorization = MockGoogleSignInClientAuthorization();
+    mockGoogleSignInAuthorizationClient = MockGoogleSignInAuthorizationClient();
     mockUser = MockUser();
     mockUserCredential = MockUserCredential();
 
@@ -29,6 +43,8 @@ void main() {
       firebaseAuth: mockFirebaseAuth,
       googleSignIn: mockGoogleSignIn,
     );
+
+    dotenv.testLoad(fileInput: 'client-id');
   });
 
   group('AuthService', () {
@@ -57,10 +73,26 @@ void main() {
     });
 
     test('signIn should return success when Google sign-in is successful', () async {
-      when(mockGoogleSignIn.signIn()).thenAnswer((_) async => mockGoogleSignInAccount);
-      when(mockGoogleSignInAccount.authentication).thenAnswer((_) async => mockGoogleSignInAuthentication);
-      when(mockGoogleSignInAuthentication.accessToken).thenReturn('fake_access_token');
-      when(mockGoogleSignInAuthentication.idToken).thenReturn('fake_id_token');
+      when(
+        mockGoogleSignIn.initialize(
+          clientId: anyNamed('clientId'),
+          serverClientId: anyNamed('serverClientId'),
+        ),
+      ).thenAnswer((_) async => Future.value());
+
+      when(mockGoogleSignIn.authenticate()).thenAnswer((_) async => mockGoogleSignInAccount);
+
+      when(mockGoogleSignInAccount.authentication).thenReturn(mockGoogleSignInAuthentication);
+
+      when(mockGoogleSignInAccount.authorizationClient).thenReturn(mockGoogleSignInAuthorizationClient);
+
+      when(
+        mockGoogleSignInAuthorizationClient.authorizationForScopes(any),
+      ).thenAnswer((_) async => mockGoogleSignInAuthorization);
+
+      when(mockGoogleSignInAuthentication.idToken).thenReturn('id-token');
+      when(mockGoogleSignInAuthorization.accessToken).thenReturn('access-token');
+
       when(mockFirebaseAuth.signInWithCredential(any)).thenAnswer((_) async => mockUserCredential);
 
       final result = await authService.signIn();
@@ -70,7 +102,7 @@ void main() {
     });
 
     test('signIn should return error when an exception occurs', () async {
-      when(mockGoogleSignIn.signIn()).thenThrow(Exception('Sign in failed'));
+      when(mockGoogleSignIn.authenticate()).thenThrow(Exception('Sign in failed'));
 
       final result = await authService.signIn();
 
@@ -83,7 +115,7 @@ void main() {
         return;
       });
       when(mockGoogleSignIn.signOut()).thenAnswer((_) async {
-        return null;
+        return;
       });
 
       final result = await authService.signOut();

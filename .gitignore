@@ -32,11 +32,11 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
-.firebase
 
 # Secrets and env
 android/app/google-services.json
 lib/firebase_options.dart
+.firebase.json
 .env
 
 # Symbolication related

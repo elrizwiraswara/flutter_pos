@@ -17,10 +17,7 @@ class ProductRemoteDatasourceImpl extends ProductDatasource {
 
   @override
   Future<void> updateProduct(ProductModel product) async {
-    await _firebaseFirestore.collection('Product').doc("${product.id}").set(
-          product.toJson(),
-          SetOptions(merge: true),
-        );
+    await _firebaseFirestore.collection('Product').doc("${product.id}").set(product.toJson(), SetOptions(merge: true));
   }
 
   @override

@@ -67,10 +67,8 @@ class TransactionDetailScreen extends StatelessWidget {
         Text(
           'Transaction Created',
           textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-        )
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+        ),
       ],
     );
   }
@@ -95,7 +93,7 @@ class TransactionDetailScreen extends StatelessWidget {
               Text(
                 '${transaction.id ?? '-'}',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
-              )
+              ),
             ],
           ),
           const SizedBox(height: AppSizes.padding),
@@ -109,7 +107,7 @@ class TransactionDetailScreen extends StatelessWidget {
               Text(
                 transaction.paymentMethod.toTitleCase(),
                 style: Theme.of(context).textTheme.bodyMedium,
-              )
+              ),
             ],
           ),
           const SizedBox(height: AppSizes.padding),
@@ -123,7 +121,7 @@ class TransactionDetailScreen extends StatelessWidget {
               Text(
                 transaction.createdBy?.name ?? '-',
                 style: Theme.of(context).textTheme.bodyMedium,
-              )
+              ),
             ],
           ),
           const SizedBox(height: AppSizes.padding),
@@ -137,7 +135,7 @@ class TransactionDetailScreen extends StatelessWidget {
               Text(
                 DateFormatter.normalWithClock(transaction.createdAt ?? ''),
                 style: Theme.of(context).textTheme.bodyMedium,
-              )
+              ),
             ],
           ),
           const SizedBox(height: AppSizes.padding),
@@ -151,7 +149,7 @@ class TransactionDetailScreen extends StatelessWidget {
               Text(
                 transaction.customerName ?? '-',
                 style: Theme.of(context).textTheme.bodyMedium,
-              )
+              ),
             ],
           ),
           const SizedBox(height: AppSizes.padding),
@@ -165,7 +163,7 @@ class TransactionDetailScreen extends StatelessWidget {
               Text(
                 transaction.description ?? '-',
                 style: Theme.of(context).textTheme.bodyMedium,
-              )
+              ),
             ],
           ),
         ],
@@ -193,7 +191,7 @@ class TransactionDetailScreen extends StatelessWidget {
               Text(
                 '${transaction.orderedProducts?.length ?? '0'}',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
-              )
+              ),
             ],
           ),
           const Divider(height: AppSizes.padding * 2),
@@ -214,7 +212,7 @@ class TransactionDetailScreen extends StatelessWidget {
               Text(
                 CurrencyFormatter.format(transaction.totalAmount),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
-              )
+              ),
             ],
           ),
           const SizedBox(height: AppSizes.padding),
@@ -228,7 +226,7 @@ class TransactionDetailScreen extends StatelessWidget {
               Text(
                 CurrencyFormatter.format(transaction.receivedAmount),
                 style: Theme.of(context).textTheme.bodyMedium,
-              )
+              ),
             ],
           ),
           const SizedBox(height: AppSizes.padding),
@@ -242,7 +240,7 @@ class TransactionDetailScreen extends StatelessWidget {
               Text(
                 CurrencyFormatter.format(transaction.receivedAmount - transaction.totalAmount),
                 style: Theme.of(context).textTheme.bodyMedium,
-              )
+              ),
             ],
           ),
         ],
@@ -271,7 +269,7 @@ class TransactionDetailScreen extends StatelessWidget {
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           ],
-        )
+        ),
       ],
     );
   }

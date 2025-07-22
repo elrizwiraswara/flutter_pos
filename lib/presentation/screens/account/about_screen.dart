@@ -1,10 +1,10 @@
+import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../../app/assets/app_assets.dart';
 import '../../../app/themes/app_sizes.dart';
 import '../../../app/utilities/external_launcher.dart';
-import '../../widgets/app_image.dart';
 
 class AboutScreen extends StatefulWidget {
   const AboutScreen({super.key});
@@ -61,17 +61,17 @@ class _AboutScreenState extends State<AboutScreen> {
                 packageName,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.outline,
+                ),
               ),
               Text(
                 'version $version',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.outline,
+                ),
               ),
               const SizedBox(height: AppSizes.padding),
               Text(
@@ -91,13 +91,17 @@ class _AboutScreenState extends State<AboutScreen> {
                   Text(
                     "Developed with ❤️ by",
                     textAlign: TextAlign.justify,
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(width: 4),
                   Text(
                     "Elriz Wiraswara",
                     textAlign: TextAlign.justify,
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -112,16 +116,16 @@ class _AboutScreenState extends State<AboutScreen> {
                         "GitHub",
                         textAlign: TextAlign.justify,
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: Theme.of(context).colorScheme.primary,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(width: 4),
                       Icon(
                         Icons.open_in_new,
                         size: 12,
                         color: Theme.of(context).colorScheme.primary,
-                      )
+                      ),
                     ],
                   ),
                   onTap: () {
@@ -140,16 +144,16 @@ class _AboutScreenState extends State<AboutScreen> {
                         "Website",
                         textAlign: TextAlign.justify,
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: Theme.of(context).colorScheme.primary,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(width: 4),
                       Icon(
                         Icons.open_in_new,
                         size: 12,
                         color: Theme.of(context).colorScheme.primary,
-                      )
+                      ),
                     ],
                   ),
                   onTap: () {

@@ -2,10 +2,6 @@ import 'package:intl/intl.dart';
 
 import '../locale/app_locale.dart';
 
-// App Currency Formatter
-// v.2.0.0
-// by Elriz Wiraswara
-
 // Currency Formatter
 // dependent on [AppLocale]
 class CurrencyFormatter {

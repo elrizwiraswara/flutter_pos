@@ -5,10 +5,6 @@ import 'package:http/http.dart' as http;
 
 import '../../utilities/console_log.dart';
 
-// Network Checker Service
-// v.4.0.0
-// by Elriz Wiraswara
-
 class ConnectivityService {
   /// Make [ConnectivityService] to be singleton
   static final ConnectivityService _instance = ConnectivityService._();

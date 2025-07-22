@@ -1,3 +1,4 @@
+import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../app/assets/app_assets.dart';
@@ -7,7 +8,6 @@ import '../../../../service_locator.dart';
 import '../../../providers/auth/auth_provider.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_dialog.dart';
-import '../../../widgets/app_image.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});

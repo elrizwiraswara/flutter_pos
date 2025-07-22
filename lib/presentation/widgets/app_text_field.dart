@@ -87,9 +87,9 @@ class _AppTextFieldState extends State<AppTextField> {
               child: Text(
                 widget.labelText!,
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      fontSize: widget.fontSize,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  fontSize: widget.fontSize,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           TextField(
@@ -98,10 +98,10 @@ class _AppTextFieldState extends State<AppTextField> {
             onEditingComplete: widget.onEditingComplete,
             enabled: widget.enabled,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontSize: widget.fontSize,
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+              fontSize: widget.fontSize,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
             cursorColor: Theme.of(context).colorScheme.primary,
             cursorWidth: 1.5,
             autofocus: widget.autofocus,
@@ -122,9 +122,9 @@ class _AppTextFieldState extends State<AppTextField> {
               suffixIcon: suffix(context),
               hintText: widget.hintText,
               hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontSize: widget.fontSize,
-                    color: Theme.of(context).colorScheme.outlineVariant,
-                  ),
+                fontSize: widget.fontSize,
+                color: Theme.of(context).colorScheme.outlineVariant,
+              ),
               contentPadding: widget.contentPadding,
               focusedBorder: widget.showBorder
                   ? OutlineInputBorder(
@@ -186,9 +186,9 @@ class _AppTextFieldState extends State<AppTextField> {
           AppLocale.defaultCurrencyCode,
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.primary,
-              ),
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.primary,
+          ),
         ),
       );
     }

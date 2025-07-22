@@ -2,10 +2,6 @@ import 'dart:io';
 
 import 'package:url_launcher/url_launcher.dart';
 
-// App External Launcher
-// v.1.0.1
-// by Elriz Wiraswara
-
 // External launcher
 class ExternalLauncher {
   ExternalLauncher._();

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -14,7 +15,6 @@ import '../../providers/products/product_form_provider.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
 import '../../widgets/app_icon_button.dart';
-import '../../widgets/app_image.dart';
 import '../../widgets/app_progress_indicator.dart';
 import '../../widgets/app_text_field.dart';
 
@@ -91,28 +91,29 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         titleSpacing: 0,
       ),
       body: Selector<ProductFormProvider, bool>(
-          selector: (context, provider) => provider.isLoaded,
-          builder: (context, isLoaded, _) {
-            if (!isLoaded) {
-              return const AppProgressIndicator();
-            }
+        selector: (context, provider) => provider.isLoaded,
+        builder: (context, isLoaded, _) {
+          if (!isLoaded) {
+            return const AppProgressIndicator();
+          }
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(AppSizes.padding),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  image(),
-                  name(),
-                  price(),
-                  stock(),
-                  description(),
-                  createOrUpdateButton(),
-                  deleteButton(),
-                ],
-              ),
-            );
-          }),
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(AppSizes.padding),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                image(),
+                name(),
+                price(),
+                stock(),
+                description(),
+                createOrUpdateButton(),
+                deleteButton(),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -124,7 +125,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           children: [
             Text(
               'Product Image',
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(
+                context,
+              ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: AppSizes.padding / 2),
             Stack(
@@ -136,10 +139,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                     imgProvider: provider.imageFile != null ? ImgProvider.fileImage : ImgProvider.networkImage,
                     width: 100,
                     height: 100,
-                    borderRadius: AppSizes.radius,
+                    borderRadius: BorderRadius.circular(AppSizes.radius),
                     backgroundColor: Theme.of(context).colorScheme.surface,
-                    borderWidth: 1,
-                    borderColor: Theme.of(context).colorScheme.primaryContainer,
+                    border: Border.all(width: 1, color: Theme.of(context).colorScheme.primaryContainer),
                     errorWidget: Icon(
                       Icons.image,
                       color: Theme.of(context).colorScheme.surfaceDim,
