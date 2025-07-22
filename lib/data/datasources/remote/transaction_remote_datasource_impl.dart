@@ -102,7 +102,43 @@ class TransactionRemoteDatasourceImpl extends TransactionDatasource {
 
   @override
   Future<void> deleteTransaction(int id) async {
-    await _firebaseFirestore.collection('Transaction').doc('$id').delete();
+    return await _firebaseFirestore.runTransaction((trx) async {
+      try {
+        // Get ordered products to revert stock
+        var orderedProductsQuery = await _firebaseFirestore
+            .collection('OrderedProduct')
+            .where('transactionId', isEqualTo: id)
+            .get();
+
+        // Revert stock for each ordered product
+        for (var doc in orderedProductsQuery.docs) {
+          var orderedProduct = OrderedProductModel.fromJson(doc.data());
+          var productDocRef = _firebaseFirestore.collection('Product').doc('${orderedProduct.productId}');
+          var productDoc = await trx.get(productDocRef);
+
+          if (productDoc.exists && productDoc.data() != null) {
+            var product = ProductModel.fromJson(productDoc.data() as Map<String, dynamic>);
+
+            int revertedStock = product.stock + orderedProduct.quantity;
+            int revertedSold = product.sold - orderedProduct.quantity;
+
+            trx.update(productDocRef, {
+              'stock': revertedStock,
+              'sold': revertedSold,
+            });
+          }
+
+          // Delete ordered product
+          trx.delete(doc.reference);
+        }
+
+        // Delete transaction
+        var transactionDocRef = _firebaseFirestore.collection('Transaction').doc('$id');
+        trx.delete(transactionDocRef);
+      } catch (e) {
+        rethrow;
+      }
+    });
   }
 
   @override

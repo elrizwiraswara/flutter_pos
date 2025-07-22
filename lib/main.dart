@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -18,19 +19,20 @@ void main() async {
   // Initialize binding
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize multiple futures
-  await Future.wait([
-    // Initialize Firebase (google-service.json required)
-    Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    ),
+  // Initialize Firebase (use `flutterfire configure` to generate the options)
+  await Firebase.initializeApp(
+    name: DefaultFirebaseOptions.currentPlatform.projectId,
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
-    // Initialize app local db
-    AppDatabase().init(),
+  // Initialize app local db
+  await AppDatabase().init();
 
-    // Initialize flutter_dotenv
-    dotenv.load(),
-  ]);
+  // Ensure persistence is cleared
+  await FirebaseFirestore.instance.clearPersistence();
+
+  // Initialize flutter_dotenv
+  await dotenv.load();
 
   // Initialize date formatting
   initializeDateFormatting();
