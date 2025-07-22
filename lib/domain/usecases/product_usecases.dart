@@ -19,13 +19,13 @@ class GetUserProductsUsecase extends UseCase<Result, BaseParams> {
 
   @override
   Future<Result<List<ProductEntity>>> call(BaseParams params) async => _productRepository.getUserProducts(
-        params.param,
-        orderBy: params.orderBy,
-        sortBy: params.sortBy,
-        limit: params.limit,
-        offset: params.offset,
-        contains: params.contains,
-      );
+    params.param,
+    orderBy: params.orderBy,
+    sortBy: params.sortBy,
+    limit: params.limit,
+    offset: params.offset,
+    contains: params.contains,
+  );
 }
 
 class GetProductUsecase extends UseCase<Result, int> {

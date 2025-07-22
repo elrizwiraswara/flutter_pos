@@ -1,9 +1,9 @@
+import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../app/themes/app_sizes.dart';
 import '../../../../app/utilities/currency_formatter.dart';
 import '../../../../domain/entities/product_entity.dart';
-import '../../../widgets/app_image.dart';
 
 class ProductsCard extends StatelessWidget {
   final ProductEntity product;
@@ -21,7 +21,7 @@ class ProductsCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(4),
       child: InkWell(
         onTap: onTap,
-        splashColor: Colors.black.withOpacity(0.06),
+        splashColor: Colors.black.withValues(alpha: 0.06),
         splashFactory: InkRipple.splashFactory,
         highlightColor: Colors.black12,
         borderRadius: BorderRadius.circular(4),
@@ -46,10 +46,9 @@ class ProductsCard extends StatelessWidget {
                       aspectRatio: 1,
                       child: AppImage(
                         image: product.imageUrl,
-                        borderRadius: 4,
-                        borderWidth: 0.5,
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(width: 0.5, color: Theme.of(context).colorScheme.surfaceContainerHighest),
                         backgroundColor: Theme.of(context).colorScheme.surfaceContainerLowest,
-                        borderColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                         errorWidget: Icon(
                           Icons.image,
                           color: Theme.of(context).colorScheme.surfaceDim,
@@ -90,9 +89,9 @@ class ProductsCard extends StatelessWidget {
                                         'Out of stock',
                                         overflow: TextOverflow.ellipsis,
                                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                              color: Theme.of(context).colorScheme.outline,
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                                          color: Theme.of(context).colorScheme.outline,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   ],

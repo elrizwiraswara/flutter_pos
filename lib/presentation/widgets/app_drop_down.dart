@@ -37,9 +37,9 @@ class AppDropDown<T> extends StatelessWidget {
               child: Text(
                 labelText!,
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      fontSize: fontSize,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  fontSize: fontSize,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           DropdownButtonFormField<T>(
@@ -47,10 +47,10 @@ class AppDropDown<T> extends StatelessWidget {
             onChanged: onChanged,
             items: dropdownItems,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontSize: fontSize,
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+              fontSize: fontSize,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
             icon: Icon(
               Icons.keyboard_arrow_down_rounded,
               color: Theme.of(context).colorScheme.outline,
@@ -65,9 +65,9 @@ class AppDropDown<T> extends StatelessWidget {
               fillColor: enabled ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.surfaceDim,
               hintText: hintText,
               hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontSize: fontSize,
-                    color: Theme.of(context).colorScheme.outlineVariant,
-                  ),
+                fontSize: fontSize,
+                color: Theme.of(context).colorScheme.outlineVariant,
+              ),
               contentPadding: contentPadding,
               focusedBorder: OutlineInputBorder(
                 borderRadius: const BorderRadius.all(

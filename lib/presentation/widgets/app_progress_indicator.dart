@@ -38,7 +38,7 @@ class AppProgressIndicator extends StatelessWidget {
                   message,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: fontSize),
                 ),
-              )
+              ),
           ],
         ),
       ),

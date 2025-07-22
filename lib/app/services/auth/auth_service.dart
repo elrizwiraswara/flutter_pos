@@ -1,19 +1,28 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../../core/auth/auth_base.dart';
 import '../../../core/errors/errors.dart';
 import '../../../core/usecase/usecase.dart';
+import '../../../firebase_options.dart';
 
 class AuthService implements AuthBase {
   AuthService({
     FirebaseAuth? firebaseAuth,
     GoogleSignIn? googleSignIn,
-  })  : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-        _googleSignIn = googleSignIn ?? GoogleSignIn();
+  }) : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
+       _googleSignIn = googleSignIn ?? GoogleSignIn.instance;
 
   final FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
+
+  final List<String> authScopes = [
+    'https://www.googleapis.com/auth/userinfo.profile',
+    'https://www.googleapis.com/auth/userinfo.email',
+  ];
 
   @override
   Future<bool> isAuthenticated() async {
@@ -27,19 +36,28 @@ class AuthService implements AuthBase {
 
   @override
   Future<Result<UserCredential>> signIn() async {
+    await _googleSignIn.initialize(
+      clientId: Platform.isIOS ? DefaultFirebaseOptions.ios.iosClientId : null,
+      serverClientId: dotenv.env['GOOGLE_SERVER_CLIENT_ID'],
+    );
+
     try {
-      final googleUser = await _googleSignIn.signIn();
+      final googleSignInAccount = await _googleSignIn.authenticate();
 
-      final googleAuth = await googleUser?.authentication;
+      final googleSignInAuthentication = googleSignInAccount.authentication;
 
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth?.accessToken,
-        idToken: googleAuth?.idToken,
+      final googleSignInAuthorization = await googleSignInAccount.authorizationClient.authorizationForScopes(
+        authScopes,
       );
 
-      var result = await _firebaseAuth.signInWithCredential(credential);
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleSignInAuthorization?.accessToken,
+        idToken: googleSignInAuthentication.idToken,
+      );
 
-      return Result.success(result);
+      final userCredential = await _firebaseAuth.signInWithCredential(credential);
+
+      return Result.success(userCredential);
     } catch (e) {
       return Result.error(ServiceError(message: e.toString()));
     }

@@ -1,3 +1,4 @@
+import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../app/routes/app_routes.dart';
@@ -5,7 +6,6 @@ import '../../../../app/themes/app_sizes.dart';
 import '../../../../app/utilities/currency_formatter.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_dialog.dart';
-import '../../../widgets/app_image.dart';
 
 class OrderCard extends StatefulWidget {
   final String name;
@@ -115,10 +115,9 @@ class _OrderCardState extends State<OrderCard> {
                     width: 70,
                     height: 70,
                     image: widget.imageUrl,
-                    borderRadius: 4,
-                    borderWidth: 0.5,
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(width: 0.5, color: Theme.of(context).colorScheme.surfaceContainerHighest),
                     backgroundColor: Theme.of(context).colorScheme.surfaceContainerLowest,
-                    borderColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                     errorWidget: Icon(
                       Icons.image,
                       color: Theme.of(context).colorScheme.surfaceDim,
@@ -133,7 +132,7 @@ class _OrderCardState extends State<OrderCard> {
                       fontSize: 10,
                       borderRadius: BorderRadius.circular(4),
                       padding: const EdgeInsets.all(AppSizes.padding / 4),
-                      buttonColor: Theme.of(context).colorScheme.errorContainer.withOpacity(0.32),
+                      buttonColor: Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.32),
                       textColor: Theme.of(context).colorScheme.error,
                       onTap: () {
                         AppDialog.show(
@@ -147,9 +146,9 @@ class _OrderCardState extends State<OrderCard> {
                           },
                         );
                       },
-                    )
+                    ),
                 ],
-              )
+              ),
             ],
           ),
         ),
@@ -184,9 +183,9 @@ class _OrderCardState extends State<OrderCard> {
             child: Text(
               '-',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.primary,
+              ),
             ),
             onTap: () {
               if (quantity > 1) {
@@ -208,9 +207,9 @@ class _OrderCardState extends State<OrderCard> {
               child: Text(
                 '+',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
               onTap: () {
                 if (quantity < widget.stock) {

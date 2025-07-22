@@ -1,3 +1,4 @@
+import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -13,7 +14,6 @@ import '../../providers/products/products_provider.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
 import '../../widgets/app_empty_state.dart';
-import '../../widgets/app_image.dart';
 import '../../widgets/app_loading_more_indicator.dart';
 import '../../widgets/app_progress_indicator.dart';
 import '../../widgets/app_text_field.dart';
@@ -76,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
         color: Theme.of(context).colorScheme.surfaceContainerLowest,
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.shadow.withOpacity(0.04),
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.04),
             offset: const Offset(0, -4),
             blurRadius: 12,
           ),
@@ -102,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             AppImage(
               image: provider.user?.imageUrl ?? '',
-              borderRadius: 100,
+              borderRadius: BorderRadius.circular(100),
               width: 30,
               height: 30,
               backgroundColor: Theme.of(context).colorScheme.surface,
@@ -118,19 +118,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 Text(
                   provider.user?.name ?? '',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        height: 0,
-                      ),
+                    fontWeight: FontWeight.bold,
+                    height: 0,
+                  ),
                 ),
                 Text(
                   provider.user?.email ?? '',
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        fontSize: 10,
-                        color: Theme.of(context).colorScheme.outline,
-                      ),
+                    fontSize: 10,
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
                 ),
               ],
-            )
+            ),
           ],
         );
       },
@@ -148,15 +148,15 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding / 2),
             buttonColor: provider.isHasQueuedActions && !provider.isSyncronizing
                 ? Theme.of(context).colorScheme.surfaceContainer
-                : Theme.of(context).colorScheme.shadow.withOpacity(0.06),
+                : Theme.of(context).colorScheme.shadow.withValues(alpha: 0.06),
             child: Row(
               children: [
                 Icon(
                   provider.isSyncronizing
                       ? Icons.sync
                       : provider.isHasQueuedActions
-                          ? Icons.cloud_done_sharp
-                          : Icons.sync_problem_sharp,
+                      ? Icons.cloud_done_sharp
+                      : Icons.sync_problem_sharp,
                   size: 12,
                   color: provider.isHasQueuedActions && !provider.isSyncronizing
                       ? Theme.of(context).colorScheme.primary
@@ -167,15 +167,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   provider.isSyncronizing
                       ? 'Syncronizing'
                       : provider.isHasQueuedActions
-                          ? 'Synced'
-                          : 'Pending',
+                      ? 'Synced'
+                      : 'Pending',
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: provider.isHasQueuedActions && !provider.isSyncronizing
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).colorScheme.outline,
-                      ),
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: provider.isHasQueuedActions && !provider.isSyncronizing
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.outline,
+                  ),
                 ),
               ],
             ),
@@ -200,7 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding / 2),
             buttonColor: isHasInternet
                 ? Theme.of(context).colorScheme.surfaceContainer
-                : Theme.of(context).colorScheme.shadow.withOpacity(0.06),
+                : Theme.of(context).colorScheme.shadow.withValues(alpha: 0.06),
             child: Icon(
               isHasInternet ? Icons.wifi_rounded : Icons.wifi_off_rounded,
               size: 12,

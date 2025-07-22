@@ -1,9 +1,5 @@
 import 'package:intl/intl.dart';
 
-// App Date Formatter
-// v.2.0.2
-// by Elriz Wiraswara
-
 // For develompment purpose
 String dateNow = DateTime.now().toIso8601String();
 

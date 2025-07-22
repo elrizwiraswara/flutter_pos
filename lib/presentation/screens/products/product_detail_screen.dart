@@ -1,3 +1,4 @@
+import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -8,7 +9,6 @@ import '../../../service_locator.dart';
 import '../../providers/products/product_detail_provider.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_empty_state.dart';
-import '../../widgets/app_image.dart';
 import '../../widgets/app_progress_indicator.dart';
 import '../error_handler_screen.dart';
 
@@ -65,7 +65,7 @@ class ProductDetailScreen extends StatelessWidget {
                       description(context, snapshot.data!.description),
                     ],
                   ),
-                )
+                ),
               ],
             ),
           );
@@ -93,10 +93,10 @@ class ProductDetailScreen extends StatelessWidget {
             Text(
               'Edit Product',
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.primary,
+              ),
             ),
           ],
         ),
@@ -119,8 +119,7 @@ class ProductDetailScreen extends StatelessWidget {
       child: AppImage(
         image: imageUrl ?? '',
         backgroundColor: Theme.of(context).colorScheme.surface,
-        borderWidth: 0.5,
-        borderColor: Theme.of(context).colorScheme.primaryContainer,
+        border: Border.all(width: 0.5, color: Theme.of(context).colorScheme.primaryContainer),
         enableFullScreenView: true,
         errorWidget: Icon(
           Icons.image,
@@ -142,22 +141,24 @@ class ProductDetailScreen extends StatelessWidget {
       children: [
         Text(
           productName ?? '(No name)',
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: AppSizes.padding / 2),
         Text(
           "Added at ${DateFormatter.stripDateWithClock(createdAt ?? '')}",
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                fontSize: 10,
-                color: Theme.of(context).colorScheme.outline,
-              ),
+            fontSize: 10,
+            color: Theme.of(context).colorScheme.outline,
+          ),
         ),
         Text(
           "Last updated at ${DateFormatter.stripDateWithClock(updatedAt ?? '')}",
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                fontSize: 10,
-                color: Theme.of(context).colorScheme.outline,
-              ),
+            fontSize: 10,
+            color: Theme.of(context).colorScheme.outline,
+          ),
         ),
       ],
     );

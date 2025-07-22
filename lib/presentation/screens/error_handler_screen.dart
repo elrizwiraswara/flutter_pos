@@ -73,9 +73,9 @@ class ErrorScreen extends StatelessWidget {
                 Text(
                   'Oops!',
                   style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.error,
-                      ),
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
                 ),
                 const SizedBox(height: AppSizes.padding),
                 Text(
@@ -90,10 +90,10 @@ class ErrorScreen extends StatelessWidget {
                     errorDetails?.summary.toString() ?? '(No error summary)',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w100,
-                          color: Theme.of(context).colorScheme.outline,
-                        ),
+                      fontSize: 10,
+                      fontWeight: FontWeight.w100,
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
                   ),
                 const SizedBox(height: AppSizes.padding * 2),
                 AppButton(
@@ -106,7 +106,7 @@ class ErrorScreen extends StatelessWidget {
                     // Go back to default initial route
                     GoRouter.of(context).go('/home');
                   },
-                )
+                ),
               ],
             ),
           ),

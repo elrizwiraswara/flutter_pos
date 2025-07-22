@@ -79,6 +79,7 @@ class HomeProvider extends ChangeNotifier {
       orderedProducts[currentIndex] = orderedProducts[currentIndex].copyWith(quantity: qty);
     } else {
       var order = OrderedProductEntity(
+        id: DateTime.now().millisecondsSinceEpoch,
         productId: product.id!,
         quantity: qty,
         stock: product.stock,

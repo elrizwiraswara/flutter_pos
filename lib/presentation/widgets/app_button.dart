@@ -80,12 +80,12 @@ class AppButton extends StatelessWidget {
           text ?? '',
           overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                fontSize: fontSize,
-                color: enabled
-                    ? textColor ?? Theme.of(context).colorScheme.onPrimary
-                    : Theme.of(context).colorScheme.outline,
-              ),
+            fontWeight: FontWeight.bold,
+            fontSize: fontSize,
+            color: enabled
+                ? textColor ?? Theme.of(context).colorScheme.onPrimary
+                : Theme.of(context).colorScheme.outline,
+          ),
         );
   }
 }
