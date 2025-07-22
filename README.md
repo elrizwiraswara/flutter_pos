@@ -16,7 +16,7 @@ This application uses an offline-first approach, where data will be stored in th
 </p>
 
 ## Demo APK
-[Download Demo APK](flutter_pos.apk)
+[Download Demo APK](https://github.com/elrizwiraswara/flutter_pos/releases)
 
 ## Features
 
