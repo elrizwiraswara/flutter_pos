@@ -1,11 +1,12 @@
+import '../../../core/common/result.dart';
 import '../../models/queued_action_model.dart';
 
 abstract class QueuedActionDatasource {
-  Future<int> createQueuedAction(QueuedActionModel queue);
+  Future<Result<int>> createQueuedAction(QueuedActionModel queue);
 
-  Future<QueuedActionModel?> getQueuedAction(int id);
+  Future<Result<QueuedActionModel?>> getQueuedAction(int id);
 
-  Future<List<QueuedActionModel>> getAllUserQueuedAction();
+  Future<Result<List<QueuedActionModel>>> getAllUserQueuedAction();
 
-  Future<void> deleteQueuedAction(int id);
+  Future<Result<void>> deleteQueuedAction(int id);
 }

@@ -43,7 +43,7 @@ class AppDropDown<T> extends StatelessWidget {
               ),
             ),
           DropdownButtonFormField<T>(
-            value: selectedValue,
+            initialValue: selectedValue,
             onChanged: onChanged,
             items: dropdownItems,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(

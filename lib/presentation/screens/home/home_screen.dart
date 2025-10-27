@@ -1,10 +1,11 @@
 import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_pos/presentation/widgets/app_snack_bar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-import '../../../app/const/const.dart';
+import '../../../app/const/app_const.dart';
 import '../../../app/themes/app_sizes.dart';
 import '../../../domain/entities/product_entity.dart';
 import '../../../service_locator.dart';
@@ -180,7 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             onTap: () {
-              provider.checkAndSyncAllData(context);
+              provider.checkAndSyncAllData();
             },
           ),
         );
@@ -207,9 +208,7 @@ class _HomeScreenState extends State<HomeScreen> {
               color: isHasInternet ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.outline,
             ),
             onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(isHasInternet ? ONLINE_MESSAGE : OFFLINE_MESSAGE)),
-              );
+              AppSnackBar.show(message: isHasInternet ? AppConst.onlineMessage : AppConst.offlineMessage);
             },
           ),
         );
@@ -349,10 +348,10 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           rightButtonText: 'Add To Cart',
           leftButtonText: 'Cancel',
-          onTapLeftButton: () {
+          onTapLeftButton: (context) {
             context.pop();
           },
-          onTapRightButton: () {
+          onTapRightButton: (context) {
             homeProvider.onAddOrderedProduct(product, currentQty == 0 ? 1 : currentQty);
             context.pop();
           },

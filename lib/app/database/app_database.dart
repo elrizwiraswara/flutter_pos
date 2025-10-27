@@ -5,15 +5,15 @@ import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../utilities/console_log.dart';
+import '../utilities/console_logger.dart';
+import 'app_database_config.dart';
 
 class AppDatabase {
-  /// Make [AppDatabase] to be singleton
-  static final AppDatabase _instance = AppDatabase._();
+  AppDatabase._internal();
 
-  factory AppDatabase() => _instance;
+  static final AppDatabase _instance = AppDatabase._internal();
 
-  AppDatabase._();
+  static AppDatabase get instance => _instance;
 
   late Database database;
 
@@ -44,18 +44,9 @@ class AppDatabase {
     ]);
   }
 
-  // Only for testing
+  @visibleForTesting
   Future<void> initTestDatabase({required Database testDatabase}) async {
-    // Ensure this func only can be run in debug mode and completely removed in release mode
-    assert(
-      () {
-        database = testDatabase;
-        return true;
-      }(),
-      "[AppDatabase].initTestDatabase should only be used in unit tests.",
-    );
-
-    if (!kDebugMode) return;
+    database = testDatabase;
 
     // Create tables
     await Future.wait([
@@ -80,99 +71,4 @@ class AppDatabase {
       cl('[AppDatabase].dropDatabase = Database does not exist.');
     }
   }
-}
-
-class AppDatabaseConfig {
-  static const String dbPath = 'app_database.db';
-  static const int version = 1;
-
-  static const String userTableName = 'User';
-  static const String productTableName = 'Product';
-  static const String transactionTableName = 'Transaction';
-  static const String orderedProductTableName = 'OrderedProduct';
-  static const String queuedActionTableName = 'QueuedAction';
-
-  static String createUserTable =
-      '''
-CREATE TABLE IF NOT EXISTS '$userTableName' (
-    'id' TEXT NOT NULL,
-    'email' TEXT,
-    'phone' TEXT,
-    'name' TEXT,
-    'gender' TEXT,
-    'birthdate' TEXT,
-    'imageUrl' TEXT,
-    'createdAt' DATETIME DEFAULT CURRENT_TIMESTAMP,
-    'updatedAt' DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY ('id')
-);
-''';
-
-  static String createProductTable =
-      '''
-CREATE TABLE IF NOT EXISTS '$productTableName' (
-    'id' INTEGER NOT NULL,
-    'createdById' TEXT,
-    'name' TEXT,
-    'imageUrl' TEXT,
-    'stock' INTEGER,
-    'sold' INTEGER,
-    'price' INTEGER,
-    'description' TEXT,
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY ('id'),
-    FOREIGN KEY ('createdById') REFERENCES 'User' ('id')
-);
-''';
-
-  static String createTransactionTable =
-      '''
-CREATE TABLE IF NOT EXISTS '$transactionTableName' (
-    'id' INTEGER NOT NULL,
-    'paymentMethod' TEXT,
-    'customerName' TEXT,
-    'description' TEXT,
-    'createdById' TEXT,
-    'receivedAmount' INTEGER,
-    'returnAmount' INTEGER,
-    'totalAmount' INTEGER,
-    'totalOrderedProduct' INTEGER,
-    'createdAt' DATETIME DEFAULT CURRENT_TIMESTAMP,
-    'updatedAt' DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY ('id'),
-    FOREIGN KEY ('createdById') REFERENCES 'User' ('id')
-);
-''';
-
-  static String createOrderedProductTable =
-      '''
-CREATE TABLE IF NOT EXISTS '$orderedProductTableName' (
-    'id' INTEGER NOT NULL,
-    'transactionId' INTEGER,
-    'productId' INTEGER,
-    'quantity' INTEGER,
-    'stock' INTEGER,
-    'name' TEXT,
-    'imageUrl' TEXT,
-    'price' INTEGER,
-    'createdAt' DATETIME DEFAULT CURRENT_TIMESTAMP,
-    'updatedAt' DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY ('id'),
-    FOREIGN KEY ('transactionId') REFERENCES 'Transaction' ('id'),
-    FOREIGN KEY ('productId') REFERENCES 'Product' ('id')
-);
-''';
-
-  static String createQueuedActionTable =
-      '''
-CREATE TABLE IF NOT EXISTS '$queuedActionTableName' (
-    'id' INTEGER NOT NULL,
-    'repository' TEXT,
-    'method' TEXT,
-    'param' TEXT,
-    'isCritical' INTEGER,
-    'createdAt' DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-''';
 }

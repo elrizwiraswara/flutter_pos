@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+
 import '../../domain/entities/user_entity.dart';
 
 class UserModel {
@@ -8,6 +10,7 @@ class UserModel {
   String? gender;
   String? birthdate;
   String? imageUrl;
+  AuthProvider? authProvider;
   String? createdAt;
   String? updatedAt;
 
@@ -19,6 +22,7 @@ class UserModel {
     this.gender,
     this.birthdate,
     this.imageUrl,
+    this.authProvider,
     this.createdAt,
     this.updatedAt,
   });
@@ -32,6 +36,7 @@ class UserModel {
       gender: json['gender'],
       birthdate: json['birthdate'],
       imageUrl: json['imageUrl'],
+      authProvider: json['authProvider'],
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
     );
@@ -46,6 +51,7 @@ class UserModel {
       'gender': gender,
       'birthdate': birthdate,
       'imageUrl': imageUrl,
+      'authProvider': authProvider,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
@@ -60,6 +66,7 @@ class UserModel {
       gender: entity.gender,
       birthdate: entity.birthdate,
       imageUrl: entity.imageUrl,
+      authProvider: entity.authProvider,
       createdAt: entity.createdAt ?? DateTime.now().toIso8601String(),
       updatedAt: entity.updatedAt ?? DateTime.now().toIso8601String(),
     );
@@ -74,8 +81,28 @@ class UserModel {
       gender: gender,
       birthdate: birthdate,
       imageUrl: imageUrl,
+      authProvider: authProvider,
       createdAt: createdAt,
       updatedAt: updatedAt,
+    );
+  }
+
+  /// Convert Firebase User to UserModel
+  factory UserModel.fromFirebaseUser(
+    firebase_auth.User firebaseUser, {
+    AuthProvider authProvider = AuthProvider.google,
+  }) {
+    return UserModel(
+      id: firebaseUser.uid,
+      email: firebaseUser.email,
+      phone: firebaseUser.phoneNumber,
+      name: firebaseUser.displayName,
+      gender: null,
+      birthdate: null,
+      imageUrl: firebaseUser.photoURL,
+      authProvider: authProvider,
+      createdAt: null,
+      updatedAt: null,
     );
   }
 }

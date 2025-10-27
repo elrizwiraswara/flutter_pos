@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_pos/app/routes/app_routes.dart';
+import 'package:flutter_pos/presentation/widgets/app_snack_bar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../app/themes/app_sizes.dart';
-import '../../../../app/utilities/console_log.dart';
 import '../../../../app/utilities/currency_formatter.dart';
 import '../../../../service_locator.dart';
 import '../../../providers/home/home_provider.dart';
@@ -190,21 +191,15 @@ class _CartPanelFooterState extends State<CartPanelFooter> {
   }
 
   void onPay() async {
-    final router = GoRouter.of(context);
-    final messenger = ScaffoldMessenger.of(context);
-
-    AppDialog.showDialogProgress();
-
-    var res = await _homeProvider.createTransaction();
-
-    AppDialog.closeDialog();
+    var res = await AppDialog.showDialogProgress(() {
+      return _homeProvider.createTransaction();
+    });
 
     if (res.isSuccess) {
-      router.go('/transactions/transaction-detail/${res.data}');
-      messenger.showSnackBar(const SnackBar(content: Text('Transaction created')));
+      AppRoutes.instance.router.go('/transactions/transaction-detail/${res.data}');
+      AppSnackBar.show(message: 'Transaction created');
     } else {
-      cl('[createTransaction].error ${res.error}');
-      AppDialog.showErrorDialog(error: res.error?.message);
+      AppDialog.showErrorDialog(error: res.error?.toString());
     }
   }
 }

@@ -3,7 +3,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
@@ -26,13 +25,10 @@ void main() async {
   );
 
   // Initialize app local db
-  await AppDatabase().init();
+  await AppDatabase.instance.init();
 
   // Ensure persistence is cleared
   await FirebaseFirestore.instance.clearPersistence();
-
-  // Initialize flutter_dotenv
-  await dotenv.load();
 
   // Initialize date formatting
   initializeDateFormatting();
@@ -68,7 +64,7 @@ class MyApp extends StatelessWidget {
             title: 'Flutter POS',
             theme: theme,
             debugShowCheckedModeBanner: kDebugMode,
-            routerConfig: AppRoutes.router,
+            routerConfig: AppRoutes.instance.router,
             locale: AppLocale.defaultLocale,
             supportedLocales: AppLocale.supportedLocales,
             localizationsDelegates: AppLocale.localizationsDelegates,

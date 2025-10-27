@@ -1,9 +1,8 @@
 import 'dart:convert';
 
-import '../../app/const/const.dart';
-import '../../app/services/connectivity/connectivity_service.dart';
-import '../../core/errors/errors.dart';
-import '../../core/usecase/usecase.dart';
+import '../../app/const/app_const.dart';
+import '../../app/services/connectivity/ping_service.dart';
+import '../../core/common/result.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/user_repository.dart';
 import '../datasources/local/queued_action_local_datasource_impl.dart';
@@ -13,25 +12,29 @@ import '../models/queued_action_model.dart';
 import '../models/user_model.dart';
 
 class UserRepositoryImpl extends UserRepository {
+  final PingService pingService;
   final UserLocalDatasourceImpl userLocalDatasource;
   final UserRemoteDatasourceImpl userRemoteDatasource;
   final QueuedActionLocalDatasourceImpl queuedActionLocalDatasource;
 
   UserRepositoryImpl({
+    required this.pingService,
     required this.userLocalDatasource,
     required this.userRemoteDatasource,
     required this.queuedActionLocalDatasource,
   });
 
   @override
-  Future<Result<UserEntity>> getUser(String userId) async {
+  Future<Result<UserEntity?>> getUser(String userId) async {
     try {
       var local = await userLocalDatasource.getUser(userId);
+      if (local.isFailure) return Result.failure(error: local.error!);
 
-      if (ConnectivityService.isConnected) {
+      if (pingService.isConnected) {
         var remote = await userRemoteDatasource.getUser(userId);
+        if (remote.isFailure) return Result.failure(error: remote.error!);
 
-        var res = await syncUser(local, remote);
+        var res = await _syncUser(local.data, remote.data);
 
         int syncedToLocalCount = res.$1;
         int syncedToRemoteCount = res.$2;
@@ -39,54 +42,60 @@ class UserRepositoryImpl extends UserRepository {
         // If more data was synced to the local, return the remote data
         if (syncedToLocalCount > syncedToRemoteCount) {
           // Return remote data
-          return Result.success(remote?.toEntity());
+          return Result.success(data: remote.data?.toEntity());
         } else {
           // Return local data
-          return Result.success(local?.toEntity());
+          return Result.success(data: local.data?.toEntity());
         }
       }
 
-      return Result.success(local?.toEntity());
+      return Result.success(data: local.data?.toEntity());
     } catch (e) {
-      return Result.error(APIError(message: e.toString()));
+      return Result.failure(error: e);
     }
   }
 
   @override
   Future<Result<String>> createUser(UserEntity user) async {
     try {
-      var id = await userLocalDatasource.createUser(UserModel.fromEntity(user));
+      var local = await userLocalDatasource.createUser(UserModel.fromEntity(user));
+      if (local.isFailure) return Result.failure(error: local.error!);
 
-      if (ConnectivityService.isConnected) {
-        await userRemoteDatasource.createUser(UserModel.fromEntity(user)..id = id);
+      if (pingService.isConnected) {
+        final remote = await userRemoteDatasource.createUser(UserModel.fromEntity(user)..id = local.data!);
+        if (remote.isFailure) return Result.failure(error: remote.error!);
       } else {
-        await queuedActionLocalDatasource.createQueuedAction(
+        final res = await queuedActionLocalDatasource.createQueuedAction(
           QueuedActionModel(
             id: DateTime.now().millisecondsSinceEpoch,
             repository: 'UserRepositoryImpl',
             method: 'createUser',
-            param: jsonEncode((UserModel.fromEntity(user)..id = id).toJson()),
+            param: jsonEncode((UserModel.fromEntity(user)..id = local.data!).toJson()),
             isCritical: false,
             createdAt: DateTime.now().toIso8601String(),
           ),
         );
+
+        if (res.isFailure) return Result.failure(error: res.error!);
       }
 
-      return Result.success(id);
+      return Result.success(data: local.data!);
     } catch (e) {
-      return Result.error(APIError(message: e.toString()));
+      return Result.failure(error: e);
     }
   }
 
   @override
   Future<Result<void>> deleteUser(String userId) async {
     try {
-      await userLocalDatasource.deleteUser(userId);
+      final local = await userLocalDatasource.deleteUser(userId);
+      if (local.isFailure) return Result.failure(error: local.error!);
 
-      if (ConnectivityService.isConnected) {
-        await userRemoteDatasource.deleteUser(userId);
+      if (pingService.isConnected) {
+        final remote = await userRemoteDatasource.deleteUser(userId);
+        if (remote.isFailure) return Result.failure(error: remote.error!);
       } else {
-        await queuedActionLocalDatasource.createQueuedAction(
+        final res = await queuedActionLocalDatasource.createQueuedAction(
           QueuedActionModel(
             id: DateTime.now().millisecondsSinceEpoch,
             repository: 'UserRepositoryImpl',
@@ -96,23 +105,27 @@ class UserRepositoryImpl extends UserRepository {
             createdAt: DateTime.now().toIso8601String(),
           ),
         );
+
+        if (res.isFailure) return Result.failure(error: res.error!);
       }
 
-      return Result.success(null);
+      return Result.success(data: null);
     } catch (e) {
-      return Result.error(APIError(message: e.toString()));
+      return Result.failure(error: e);
     }
   }
 
   @override
   Future<Result<void>> updateUser(UserEntity user) async {
     try {
-      await userLocalDatasource.updateUser(UserModel.fromEntity(user));
+      final local = await userLocalDatasource.updateUser(UserModel.fromEntity(user));
+      if (local.isFailure) return Result.failure(error: local.error!);
 
-      if (ConnectivityService.isConnected) {
-        await userRemoteDatasource.updateUser(UserModel.fromEntity(user));
+      if (pingService.isConnected) {
+        final remote = await userRemoteDatasource.updateUser(UserModel.fromEntity(user));
+        if (remote.isFailure) return Result.failure(error: remote.error!);
       } else {
-        await queuedActionLocalDatasource.createQueuedAction(
+        final res = await queuedActionLocalDatasource.createQueuedAction(
           QueuedActionModel(
             id: DateTime.now().millisecondsSinceEpoch,
             repository: 'UserRepositoryImpl',
@@ -122,52 +135,56 @@ class UserRepositoryImpl extends UserRepository {
             createdAt: DateTime.now().toIso8601String(),
           ),
         );
+
+        if (res.isFailure) return Result.failure(error: res.error!);
       }
 
-      return Result.success(null);
+      return Result.success(data: null);
     } catch (e) {
-      return Result.error(APIError(message: e.toString()));
+      return Result.failure(error: e);
     }
   }
 
   // Perform a sync between local and remote data
-  Future<(int, int)> syncUser(UserModel? local, UserModel? remote) async {
+  Future<(int, int)> _syncUser(UserModel? local, UserModel? remote) async {
     int syncedToLocalCount = 0;
     int syncedToRemoteCount = 0;
 
     if (remote == null && local != null) {
-      syncedToRemoteCount += 1;
       // Store local data to remote db
-      await userRemoteDatasource.createUser(local);
-    }
-
-    if (remote != null && local == null) {
-      syncedToLocalCount += 1;
+      final res = await userRemoteDatasource.createUser(local);
+      if (res.isSuccess) syncedToRemoteCount += 1;
+    } else if (remote != null && local == null) {
       // Store remote data to local db
-      await userLocalDatasource.createUser(remote);
-    }
+      final res = await userLocalDatasource.createUser(remote);
+      if (res.isSuccess) syncedToLocalCount += 1;
+    } else if (remote != null && local != null) {
+      // Both exist, compare timestamps
+      final updatedAtLocal = DateTime.tryParse(local.updatedAt ?? '');
+      final updatedAtRemote = DateTime.tryParse(remote.updatedAt ?? '');
 
-    if (remote != null && local != null) {
-      // Compare local & remote data updatedAt difference
-      var updatedAtLocal = DateTime.tryParse(local.updatedAt ?? DateTime.now().toIso8601String());
-      var updatedAtRemote = DateTime.tryParse(remote.updatedAt ?? DateTime.now().toIso8601String());
-      var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
-      // Check is the difference is above the minimum interval sync tolerance
-      var isRemoteNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_LESS_CRITICAL_IN_MINUTES;
-      var isLocalNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_LESS_CRITICAL_IN_MINUTES;
+      // Skip if either timestamp is invalid
+      if (updatedAtLocal == null || updatedAtRemote == null) {
+        return (syncedToLocalCount, syncedToRemoteCount);
+      }
 
-      // Compare local & remote data updatedAt difference
+      final differenceInMinutes = updatedAtRemote.difference(updatedAtLocal).inMinutes;
+      final isDiffSignificant = differenceInMinutes.abs() > AppConst.minSyncIntervalToleranceForLessCriticalInMinutes;
+
+      // Check which is newer based on the difference
+      final isRemoteNewer = isDiffSignificant && differenceInMinutes > 0;
+      final isLocalNewer = isDiffSignificant && differenceInMinutes < 0;
+
       if (isRemoteNewer) {
-        syncedToLocalCount += 1;
         // Save remote data to local db
-        await userLocalDatasource.updateUser(remote);
-      }
-
-      if (isLocalNewer) {
-        syncedToRemoteCount += 1;
+        final res = await userLocalDatasource.updateUser(remote);
+        if (res.isSuccess) syncedToLocalCount += 1;
+      } else if (isLocalNewer) {
         // Store local data to remote db
-        await userRemoteDatasource.updateUser(local);
+        final res = await userRemoteDatasource.updateUser(local);
+        if (res.isSuccess) syncedToRemoteCount += 1;
       }
+      // If not significant difference, do nothing (already in sync)
     }
 
     return (syncedToLocalCount, syncedToRemoteCount);
