@@ -10,7 +10,6 @@ import '../../providers/products/product_detail_provider.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_empty_state.dart';
 import '../../widgets/app_progress_indicator.dart';
-import '../error_handler_screen.dart';
 
 class ProductDetailScreen extends StatelessWidget {
   final int id;
@@ -36,7 +35,7 @@ class ProductDetailScreen extends StatelessWidget {
           }
 
           if (snapshot.hasError) {
-            return ErrorScreen(errorMessage: snapshot.error.toString());
+            throw snapshot.error.toString();
           }
 
           if (snapshot.data == null) {

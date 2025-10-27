@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import '../../../app/const/const.dart';
+import '../../../app/const/app_const.dart';
+import '../../../app/routes/app_routes.dart';
 import '../../../service_locator.dart';
+import '../../providers/auth/auth_provider.dart';
 import '../../providers/main/main_provider.dart';
-import '../error_handler_screen.dart';
 import '../root_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -21,12 +21,14 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  final _authProvider = sl<AuthProvider>();
   final _mainProvider = sl<MainProvider>()..resetStates();
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _mainProvider.initMainProvider(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _authProvider.checkIsAuthenticated();
+      await _mainProvider.initMainProvider();
     });
     super.initState();
   }
@@ -41,9 +43,9 @@ class _MainScreenState extends State<MainScreen> {
         }
 
         // User data might still null for the first time app open or login without internet connection
-        // So, display error screen with a first time internet error message
+        // So, throw error with a first time internet error message then the [ErrorScreen] will be shown
         if (provider.isLoaded && provider.user == null && !provider.isHasInternet) {
-          return const ErrorScreen(errorMessage: FIRST_TIME_INTERNET_ERROR_MESSAGE);
+          throw AppConst.firstTimeInternetErrorMessage;
         }
 
         return Scaffold(
@@ -67,16 +69,16 @@ class _MainScreenState extends State<MainScreen> {
                 label: 'Account',
               ),
             ],
-            currentIndex: _calculateSelectedIndex(context),
-            onTap: (int idx) => _onItemTapped(idx, context),
+            currentIndex: _calculateSelectedIndex(),
+            onTap: (int idx) => _onItemTapped(idx),
           ),
         );
       },
     );
   }
 
-  int _calculateSelectedIndex(BuildContext context) {
-    final String location = GoRouterState.of(context).uri.path;
+  int _calculateSelectedIndex() {
+    final String location = AppRoutes.instance.router.state.uri.path;
 
     if (location.startsWith('/home')) {
       return 0;
@@ -97,16 +99,16 @@ class _MainScreenState extends State<MainScreen> {
     return 0;
   }
 
-  void _onItemTapped(int index, BuildContext context) {
+  void _onItemTapped(int index) {
     switch (index) {
       case 0:
-        GoRouter.of(context).go('/home');
+        AppRoutes.instance.router.go('/home');
       case 1:
-        GoRouter.of(context).go('/products');
+        AppRoutes.instance.router.go('/products');
       case 2:
-        GoRouter.of(context).go('/transactions');
+        AppRoutes.instance.router.go('/transactions');
       case 3:
-        GoRouter.of(context).go('/account');
+        AppRoutes.instance.router.go('/account');
     }
   }
 }

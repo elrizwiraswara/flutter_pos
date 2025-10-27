@@ -1,11 +1,13 @@
 import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_pos/presentation/widgets/app_snack_bar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../app/routes/app_routes.dart';
-import '../../../app/services/auth/auth_service.dart';
 import '../../../app/themes/app_sizes.dart';
+import '../../../service_locator.dart';
+import '../../providers/auth/auth_provider.dart';
 import '../../providers/main/main_provider.dart';
 import '../../providers/theme/theme_provider.dart';
 import '../../widgets/app_button.dart';
@@ -237,10 +239,16 @@ class AccountScreen extends StatelessWidget {
             text: 'Are you sure want to sign out?',
             leftButtonText: 'Cancel',
             rightButtonText: 'Sign Out',
-            onTapRightButton: () async {
+            onTapRightButton: (context) async {
               context.pop();
-              await AuthService().signOut();
-              AppRoutes.router.refresh();
+
+              final res = await sl<AuthProvider>().signOut();
+
+              if (res.isSuccess) {
+                AppRoutes.instance.router.refresh();
+              } else {
+                AppSnackBar.show(message: res.error.toString(), isErrorMessage: true);
+              }
             },
           );
         },

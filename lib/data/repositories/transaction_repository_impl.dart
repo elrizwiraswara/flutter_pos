@@ -1,9 +1,8 @@
 import 'dart:convert';
 
-import '../../app/const/const.dart';
-import '../../app/services/connectivity/connectivity_service.dart';
-import '../../core/errors/errors.dart';
-import '../../core/usecase/usecase.dart';
+import '../../app/const/app_const.dart';
+import '../../app/services/connectivity/ping_service.dart';
+import '../../core/common/result.dart';
 import '../../domain/entities/transaction_entity.dart';
 import '../../domain/repositories/transaction_repository.dart';
 import '../datasources/local/queued_action_local_datasource_impl.dart';
@@ -13,11 +12,13 @@ import '../models/queued_action_model.dart';
 import '../models/transaction_model.dart';
 
 class TransactionRepositoryImpl extends TransactionRepository {
+  final PingService pingService;
   final TransactionLocalDatasourceImpl transactionLocalDatasource;
   final TransactionRemoteDatasourceImpl transactionRemoteDatasource;
   final QueuedActionLocalDatasourceImpl queuedActionLocalDatasource;
 
   TransactionRepositoryImpl({
+    required this.pingService,
     required this.transactionLocalDatasource,
     required this.transactionRemoteDatasource,
     required this.queuedActionLocalDatasource,
@@ -26,22 +27,25 @@ class TransactionRepositoryImpl extends TransactionRepository {
   @override
   Future<Result<int>> syncAllUserTransactions(String userId) async {
     try {
-      if (ConnectivityService.isConnected) {
+      if (pingService.isConnected) {
         var local = await transactionLocalDatasource.getAllUserTransactions(userId);
-        var remote = await transactionRemoteDatasource.getAllUserTransactions(userId);
+        if (local.isFailure) return Result.failure(error: local.error!);
 
-        var res = await syncTransactions(local, remote);
+        var remote = await transactionRemoteDatasource.getAllUserTransactions(userId);
+        if (remote.isFailure) return Result.failure(error: remote.error!);
+
+        var res = await syncTransactions(local.data!, remote.data!);
 
         // Sum all local and remote sync counts
         int totalSyncedCount = res.$1 + res.$2;
 
         // Return synced data count
-        return Result.success(totalSyncedCount);
+        return Result.success(data: totalSyncedCount);
       }
 
-      return Result.success(0);
+      return Result.success(data: 0);
     } catch (e) {
-      return Result.error(APIError(message: e.toString()));
+      return Result.failure(error: e);
     }
   }
 
@@ -64,7 +68,9 @@ class TransactionRepositoryImpl extends TransactionRepository {
         contains: contains,
       );
 
-      if (ConnectivityService.isConnected) {
+      if (local.isFailure) return Result.failure(error: local.error!);
+
+      if (pingService.isConnected) {
         var remote = await transactionRemoteDatasource.getUserTransactions(
           userId,
           orderBy: orderBy,
@@ -74,7 +80,9 @@ class TransactionRepositoryImpl extends TransactionRepository {
           contains: contains,
         );
 
-        var res = await syncTransactions(local, remote);
+        if (remote.isFailure) return Result.failure(error: remote.error!);
+
+        var res = await syncTransactions(local.data!, remote.data!);
 
         int syncedToLocalCount = res.$1;
         int syncedToRemoteCount = res.$2;
@@ -82,29 +90,31 @@ class TransactionRepositoryImpl extends TransactionRepository {
         // If more data was synced to the local, return the remote data
         if (syncedToLocalCount > syncedToRemoteCount) {
           // Return remote data
-          return Result.success(remote.map((e) => e.toEntity()).toList());
+          return Result.success(data: remote.data!.map((e) => e.toEntity()).toList());
         } else {
           // Return local data
-          return Result.success(local.map((e) => e.toEntity()).toList());
+          return Result.success(data: local.data!.map((e) => e.toEntity()).toList());
         }
       }
 
-      return Result.success(local.map((e) => e.toEntity()).toList());
+      return Result.success(data: local.data!.map((e) => e.toEntity()).toList());
     } catch (e) {
-      return Result.error(APIError(message: e.toString()));
+      return Result.failure(error: e);
     }
   }
 
   @override
-  Future<Result<TransactionEntity>> getTransaction(int transactionId) async {
+  Future<Result<TransactionEntity?>> getTransaction(int transactionId) async {
     try {
       var local = await transactionLocalDatasource.getTransaction(transactionId);
+      if (local.isFailure) return Result.failure(error: local.error!);
 
-      if (ConnectivityService.isConnected) {
+      if (pingService.isConnected) {
         var remote = await transactionRemoteDatasource.getTransaction(transactionId);
+        if (remote.isFailure) return Result.failure(error: remote.error!);
 
-        List<TransactionModel> localToList = local != null ? [local] : [];
-        List<TransactionModel> remoteToList = remote != null ? [remote] : [];
+        List<TransactionModel> localToList = [if (local.data != null) local.data!];
+        List<TransactionModel> remoteToList = [if (remote.data != null) remote.data!];
 
         var res = await syncTransactions(localToList, remoteToList);
 
@@ -114,16 +124,16 @@ class TransactionRepositoryImpl extends TransactionRepository {
         // If more data was synced to the local, return the remote data
         if (syncedToLocalCount > syncedToRemoteCount) {
           // Return remote data
-          return Result.success(remote?.toEntity());
+          return Result.success(data: remote.data?.toEntity());
         } else {
           // Return local data
-          return Result.success(local?.toEntity());
+          return Result.success(data: local.data?.toEntity());
         }
       }
 
-      return Result.success(local?.toEntity());
+      return Result.success(data: local.data?.toEntity());
     } catch (e) {
-      return Result.error(APIError(message: e.toString()));
+      return Result.failure(error: e);
     }
   }
 
@@ -132,12 +142,14 @@ class TransactionRepositoryImpl extends TransactionRepository {
     try {
       var data = TransactionModel.fromEntity(transaction);
 
-      var id = await transactionLocalDatasource.createTransaction(data);
+      var local = await transactionLocalDatasource.createTransaction(data);
+      if (local.isFailure) return Result.failure(error: local.error!);
 
-      if (ConnectivityService.isConnected) {
-        await transactionRemoteDatasource.createTransaction(data);
+      if (pingService.isConnected) {
+        final remote = await transactionRemoteDatasource.createTransaction(data);
+        if (remote.isFailure) return Result.failure(error: remote.error!);
       } else {
-        await queuedActionLocalDatasource.createQueuedAction(
+        final res = await queuedActionLocalDatasource.createQueuedAction(
           QueuedActionModel(
             id: DateTime.now().millisecondsSinceEpoch,
             repository: 'TransactionRepositoryImpl',
@@ -147,23 +159,27 @@ class TransactionRepositoryImpl extends TransactionRepository {
             createdAt: DateTime.now().toIso8601String(),
           ),
         );
+
+        if (res.isFailure) return Result.failure(error: res.error!);
       }
 
-      return Result.success(id);
+      return Result.success(data: local.data!);
     } catch (e) {
-      return Result.error(APIError(message: e.toString()));
+      return Result.failure(error: e);
     }
   }
 
   @override
   Future<Result<void>> deleteTransaction(int transactionId) async {
     try {
-      await transactionLocalDatasource.deleteTransaction(transactionId);
+      final local = await transactionLocalDatasource.deleteTransaction(transactionId);
+      if (local.isFailure) return Result.failure(error: local.error!);
 
-      if (ConnectivityService.isConnected) {
-        await transactionRemoteDatasource.deleteTransaction(transactionId);
+      if (pingService.isConnected) {
+        final remote = await transactionRemoteDatasource.deleteTransaction(transactionId);
+        if (remote.isFailure) return Result.failure(error: remote.error!);
       } else {
-        await queuedActionLocalDatasource.createQueuedAction(
+        final res = await queuedActionLocalDatasource.createQueuedAction(
           QueuedActionModel(
             id: DateTime.now().millisecondsSinceEpoch,
             repository: 'TransactionRepositoryImpl',
@@ -173,11 +189,13 @@ class TransactionRepositoryImpl extends TransactionRepository {
             createdAt: DateTime.now().toIso8601String(),
           ),
         );
+
+        if (res.isFailure) return Result.failure(error: res.error!);
       }
 
-      return Result.success(null);
+      return Result.success(data: null);
     } catch (e) {
-      return Result.error(APIError(message: e.toString()));
+      return Result.failure(error: e);
     }
   }
 
@@ -186,12 +204,14 @@ class TransactionRepositoryImpl extends TransactionRepository {
     try {
       var data = TransactionModel.fromEntity(transaction);
 
-      await transactionLocalDatasource.updateTransaction(data);
+      final local = await transactionLocalDatasource.updateTransaction(data);
+      if (local.isFailure) return Result.failure(error: local.error!);
 
-      if (ConnectivityService.isConnected) {
-        await transactionRemoteDatasource.updateTransaction(data);
+      if (pingService.isConnected) {
+        final remote = await transactionRemoteDatasource.updateTransaction(data);
+        if (remote.isFailure) return Result.failure(error: remote.error!);
       } else {
-        await queuedActionLocalDatasource.createQueuedAction(
+        final res = await queuedActionLocalDatasource.createQueuedAction(
           QueuedActionModel(
             id: DateTime.now().millisecondsSinceEpoch,
             repository: 'TransactionRepositoryImpl',
@@ -201,11 +221,13 @@ class TransactionRepositoryImpl extends TransactionRepository {
             createdAt: DateTime.now().toIso8601String(),
           ),
         );
+
+        if (res.isFailure) return Result.failure(error: res.error!);
       }
 
-      return Result.success(null);
+      return Result.success(data: null);
     } catch (e) {
-      return Result.error(APIError(message: e.toString()));
+      return Result.failure(error: e);
     }
   }
 
@@ -214,66 +236,56 @@ class TransactionRepositoryImpl extends TransactionRepository {
     int syncedToLocalCount = 0;
     int syncedToRemoteCount = 0;
 
-    // Local
-    for (var localData in local) {
-      var matchRemoteData = remote.where((remoteData) => remoteData.id == localData.id).firstOrNull;
+    // Track processed IDs to avoid duplicate syncing
+    final processedIds = <int>{};
+
+    // Process local transactions first
+    for (final localData in local) {
+      final matchRemoteData = remote.where((remoteData) => remoteData.id == localData.id).firstOrNull;
 
       if (matchRemoteData != null) {
-        // Compare local & remote data updatedAt difference
-        var updatedAtLocal = DateTime.tryParse(localData.updatedAt ?? DateTime.now().toIso8601String());
-        var updatedAtRemote = DateTime.tryParse(matchRemoteData.updatedAt ?? DateTime.now().toIso8601String());
-        var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
-        // Check is the difference is above the minimum interval sync tolerance
-        var isRemoteNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
-        var isLocalNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
+        // Mark as processed
+        processedIds.add(localData.id);
+
+        final updatedAtLocal = DateTime.tryParse(localData.updatedAt ?? '');
+        final updatedAtRemote = DateTime.tryParse(matchRemoteData.updatedAt ?? '');
+
+        // Skip if either timestamp is invalid
+        if (updatedAtLocal == null || updatedAtRemote == null) continue;
+
+        final differenceInMinutes = updatedAtRemote.difference(updatedAtLocal).inMinutes;
+        final isDiffSignificant = differenceInMinutes.abs() > AppConst.minSyncIntervalToleranceForCriticalInMinutes;
+
+        // Check which is newer based on the difference
+        final isRemoteNewer = isDiffSignificant && differenceInMinutes > 0;
+        final isLocalNewer = isDiffSignificant && differenceInMinutes < 0;
 
         if (isRemoteNewer) {
-          syncedToLocalCount += 1;
           // Save remote data to local db
-          await transactionLocalDatasource.updateTransaction(matchRemoteData);
-        }
-
-        if (isLocalNewer) {
-          syncedToRemoteCount += 1;
+          final res = await transactionLocalDatasource.updateTransaction(matchRemoteData);
+          if (res.isSuccess) syncedToLocalCount += 1;
+        } else if (isLocalNewer) {
           // Update remote with local data
-          await transactionRemoteDatasource.updateTransaction(localData);
+          final res = await transactionRemoteDatasource.updateTransaction(localData);
+          if (res.isSuccess) syncedToRemoteCount += 1;
         }
+        // If not significant difference, do nothing (already in sync)
       } else {
-        syncedToRemoteCount += 1;
-        // No matching remote data, create it
-        await transactionRemoteDatasource.createTransaction(localData);
+        // No matching remote transaction, create it
+        processedIds.add(localData.id);
+        final res = await transactionRemoteDatasource.createTransaction(localData);
+        if (res.isSuccess) syncedToRemoteCount += 1;
       }
     }
 
-    // Remote
-    for (var remoteData in remote) {
-      var matchLocalData = local.where((localData) => localData.id == remoteData.id).firstOrNull;
+    // Process remaining remote transactions that weren't in local
+    for (final remoteData in remote) {
+      // Skip if already processed in the first loop
+      if (processedIds.contains(remoteData.id)) continue;
 
-      if (matchLocalData != null) {
-        // Compare local & remote data updatedAt difference
-        var updatedAtLocal = DateTime.tryParse(remoteData.updatedAt ?? DateTime.now().toIso8601String());
-        var updatedAtRemote = DateTime.tryParse(matchLocalData.updatedAt ?? DateTime.now().toIso8601String());
-        var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
-        // Check is the difference is above the minimum interval sync tolerance
-        var isRemoteNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
-        var isLocalNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
-
-        if (isRemoteNewer) {
-          syncedToLocalCount += 1;
-          // Save remote data to local db
-          await transactionLocalDatasource.updateTransaction(remoteData);
-        }
-
-        if (isLocalNewer) {
-          syncedToRemoteCount += 1;
-          // Update remote with local data
-          await transactionRemoteDatasource.updateTransaction(matchLocalData);
-        }
-      } else {
-        syncedToLocalCount += 1;
-        // No matching local data, create it
-        await transactionLocalDatasource.createTransaction(remoteData);
-      }
+      // No matching local transaction, create it locally
+      final res = await transactionLocalDatasource.createTransaction(remoteData);
+      if (res.isSuccess) syncedToLocalCount += 1;
     }
 
     return (syncedToLocalCount, syncedToRemoteCount);

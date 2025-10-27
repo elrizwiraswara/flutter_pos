@@ -3,12 +3,12 @@ import 'dart:io';
 import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_pos/app/routes/app_routes.dart';
+import 'package:flutter_pos/presentation/widgets/app_snack_bar.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
-import '../../../app/services/auth/auth_service.dart';
 import '../../../app/themes/app_sizes.dart';
 import '../../../service_locator.dart';
 import '../../providers/account/account_provider.dart';
@@ -35,7 +35,7 @@ class _ProfileFormScreenState extends State<ProfileFormScreen> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await accountProvider.initProfileForm(AuthService().getAuthData()!.uid);
+      await accountProvider.initProfileForm();
 
       nameController.text = accountProvider.name ?? '';
       emailController.text = accountProvider.email ?? '';
@@ -210,20 +210,15 @@ class _ProfileFormScreenState extends State<ProfileFormScreen> {
   }
 
   void updatedUser() async {
-    final router = GoRouter.of(context);
-    final messenger = ScaffoldMessenger.of(context);
-
-    AppDialog.showDialogProgress();
-
-    var res = await accountProvider.updatedUser(AuthService().getAuthData()!.uid);
-
-    AppDialog.closeDialog();
+    var res = await AppDialog.showDialogProgress(() {
+      return accountProvider.updatedUser();
+    });
 
     if (res.isSuccess) {
-      router.pop();
-      messenger.showSnackBar(const SnackBar(content: Text('Profile updated')));
+      AppRoutes.instance.router.pop();
+      AppSnackBar.show(message: 'Profile updated');
     } else {
-      AppDialog.showErrorDialog(error: res.error?.message);
+      AppDialog.showErrorDialog(error: res.error.toString());
     }
   }
 }

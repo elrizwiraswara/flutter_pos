@@ -1,28 +1,35 @@
 import 'package:flutter/foundation.dart';
 
-import '../../../app/services/auth/auth_service.dart';
 import '../../../domain/entities/transaction_entity.dart';
 import '../../../domain/repositories/transaction_repository.dart';
 import '../../../domain/usecases/params/base_params.dart';
 import '../../../domain/usecases/transaction_usecases.dart';
+import '../auth/auth_provider.dart';
 
 class TransactionsProvider extends ChangeNotifier {
+  final AuthProvider authProvider;
   final TransactionRepository transactionRepository;
 
-  TransactionsProvider({required this.transactionRepository});
+  TransactionsProvider({
+    required this.authProvider,
+    required this.transactionRepository,
+  });
 
   List<TransactionEntity>? allTransactions;
 
   bool isLoadingMore = false;
 
   Future<void> getAllTransactions({int? offset, String? contains}) async {
+    var userId = authProvider.user?.id;
+    if (userId == null) throw 'Unathenticated!';
+
     if (offset != null) {
       isLoadingMore = true;
       notifyListeners();
     }
 
     var params = BaseParams(
-      param: AuthService().getAuthData()!.uid,
+      param: userId,
       offset: offset,
       contains: contains,
     );
@@ -39,7 +46,7 @@ class TransactionsProvider extends ChangeNotifier {
       isLoadingMore = false;
       notifyListeners();
     } else {
-      throw res.error?.message ?? 'Failed to load data';
+      throw res.error ?? 'Failed to load data';
     }
   }
 }

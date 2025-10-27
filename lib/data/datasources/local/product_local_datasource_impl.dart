@@ -1,6 +1,8 @@
 import 'package:sqflite/sqflite.dart';
 
 import '../../../app/database/app_database.dart';
+import '../../../app/database/app_database_config.dart';
+import '../../../core/common/result.dart';
 import '../../models/product_model.dart';
 import '../interfaces/product_datasource.dart';
 
@@ -10,63 +12,89 @@ class ProductLocalDatasourceImpl extends ProductDatasource {
   ProductLocalDatasourceImpl(this._appDatabase);
 
   @override
-  Future<int> createProduct(ProductModel product) async {
-    await _appDatabase.database.insert(
-      AppDatabaseConfig.productTableName,
-      product.toJson(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+  Future<Result<int>> createProduct(ProductModel product) async {
+    try {
+      await _appDatabase.database.insert(
+        AppDatabaseConfig.productTableName,
+        product.toJson(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
 
-    // The id has been generated in models
-    return product.id;
+      // The id has been generated in models
+      return Result.success(data: product.id);
+    } catch (e) {
+      return Result.failure(error: e);
+    }
   }
 
   @override
-  Future<void> updateProduct(ProductModel product) async {
-    await _appDatabase.database.update(
-      AppDatabaseConfig.productTableName,
-      product.toJson(),
-      where: 'id = ?',
-      whereArgs: [product.id],
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+  Future<Result<void>> updateProduct(ProductModel product) async {
+    try {
+      await _appDatabase.database.update(
+        AppDatabaseConfig.productTableName,
+        product.toJson(),
+        where: 'id = ?',
+        whereArgs: [product.id],
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+
+      return Result.success(data: null);
+    } catch (e) {
+      return Result.failure(error: e);
+    }
   }
 
   @override
-  Future<void> deleteProduct(int id) async {
-    await _appDatabase.database.delete(
-      AppDatabaseConfig.productTableName,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+  Future<Result<void>> deleteProduct(int id) async {
+    try {
+      await _appDatabase.database.delete(
+        AppDatabaseConfig.productTableName,
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+
+      return Result.success(data: null);
+    } catch (e) {
+      return Result.failure(error: e);
+    }
   }
 
   @override
-  Future<ProductModel?> getProduct(int id) async {
-    var res = await _appDatabase.database.query(
-      AppDatabaseConfig.productTableName,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+  Future<Result<ProductModel?>> getProduct(int id) async {
+    try {
+      var res = await _appDatabase.database.query(
+        AppDatabaseConfig.productTableName,
+        where: 'id = ?',
+        whereArgs: [id],
+      );
 
-    if (res.isEmpty) return null;
+      if (res.isEmpty) return Result.success(data: null);
 
-    return ProductModel.fromJson(res.first);
+      return Result.success(data: ProductModel.fromJson(res.first));
+    } catch (e) {
+      return Result.failure(error: e);
+    }
   }
 
   @override
-  Future<List<ProductModel>> getAllUserProducts(String userId) async {
-    var res = await _appDatabase.database.query(
-      AppDatabaseConfig.productTableName,
-      where: 'createdById = ?',
-      whereArgs: [userId],
-    );
+  Future<Result<List<ProductModel>>> getAllUserProducts(String userId) async {
+    try {
+      var res = await _appDatabase.database.query(
+        AppDatabaseConfig.productTableName,
+        where: 'createdById = ?',
+        whereArgs: [userId],
+      );
 
-    return res.map((e) => ProductModel.fromJson(e)).toList();
+      return Result.success(
+        data: res.map((e) => ProductModel.fromJson(e)).toList(),
+      );
+    } catch (e) {
+      return Result.failure(error: e);
+    }
   }
 
   @override
-  Future<List<ProductModel>> getUserProducts(
+  Future<Result<List<ProductModel>>> getUserProducts(
     String userId, {
     String orderBy = 'createdAt',
     String sortBy = 'DESC',
@@ -74,15 +102,21 @@ class ProductLocalDatasourceImpl extends ProductDatasource {
     int? offset,
     String? contains,
   }) async {
-    var res = await _appDatabase.database.query(
-      AppDatabaseConfig.productTableName,
-      where: 'createdById = ? AND name LIKE ?',
-      whereArgs: [userId, "%${contains ?? ''}%"],
-      orderBy: '$orderBy $sortBy',
-      limit: limit,
-      offset: offset,
-    );
+    try {
+      var res = await _appDatabase.database.query(
+        AppDatabaseConfig.productTableName,
+        where: 'createdById = ? AND name LIKE ?',
+        whereArgs: [userId, "%${contains ?? ''}%"],
+        orderBy: '$orderBy $sortBy',
+        limit: limit,
+        offset: offset,
+      );
 
-    return res.map((e) => ProductModel.fromJson(e)).toList();
+      return Result.success(
+        data: res.map((e) => ProductModel.fromJson(e)).toList(),
+      );
+    } catch (e) {
+      return Result.failure(error: e);
+    }
   }
 }

@@ -85,10 +85,18 @@ This application uses an offline-first approach, where data will be stored in th
     }
     ```
 
+5. **Set up your `config.json` file**
+    <br/> `GOOGLE_SERVER_CLIENT_ID` is `Web client ID` that you can get from your Firebase Google sign-in method provider 
 
-4. **Run the application:**
+    ```
+    {
+      "GOOGLE_SERVER_CLIENT_ID": "xxxxxxxxxxxxx.apps.googleusercontent.com"
+    }
+    ```
+
+5. **Run the application:**
     ```sh
-    flutter run
+    flutter run --dart-define-from-file config.json
     ```
 
 ### Test

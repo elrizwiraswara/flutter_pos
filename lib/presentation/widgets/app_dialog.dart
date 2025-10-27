@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_pos/app/utilities/console_logger.dart';
 
 import '../../app/routes/app_routes.dart';
 import '../../app/themes/app_sizes.dart';
@@ -14,8 +15,8 @@ class AppDialog {
     EdgeInsets? padding,
     String? leftButtonText,
     String? rightButtonText,
-    Function()? onTapLeftButton,
-    Function()? onTapRightButton,
+    Function(BuildContext)? onTapLeftButton,
+    Function(BuildContext)? onTapRightButton,
     bool? dismissible,
     bool? showButtons,
     bool? enableRightButton,
@@ -28,8 +29,11 @@ class AppDialog {
     Color? rightButtonBorderColor,
     double? elevation,
   }) async {
+    final context = AppRoutes.instance.router.configuration.navigatorKey.currentContext;
+    if (context == null) throw Exception('No context available for dialog');
+
     return await showDialog(
-      context: AppRoutes.router.configuration.navigatorKey.currentContext!,
+      context: context,
       barrierDismissible: dismissible ?? true,
       builder: (context) {
         return PopScope(
@@ -64,10 +68,15 @@ class AppDialog {
     String? message,
     String? error,
     String buttonText = 'Close',
-    Function()? onTapButton,
+    Function(BuildContext)? onTapButton,
   }) async {
+    final context = AppRoutes.instance.router.configuration.navigatorKey.currentContext;
+    if (context == null) throw Exception('No context available for dialog');
+
+    cl(error, type: LogType.error);
+
     return await showDialog(
-      context: AppRoutes.router.configuration.navigatorKey.currentContext!,
+      context: context,
       barrierDismissible: false,
       builder: (context) {
         return PopScope(
@@ -103,24 +112,51 @@ class AppDialog {
     );
   }
 
-  static Future<void> showDialogProgress({
+  static Future<T> showDialogProgress<T>(
+    Future<T> Function() process, {
     bool dismissible = false,
   }) async {
+    final context = AppRoutes.instance.router.configuration.navigatorKey.currentContext;
+    if (context == null) throw Exception('No context available for dialog');
+
+    // Show the progress dialog
     showDialog(
-      context: AppRoutes.router.configuration.navigatorKey.currentContext!,
-      builder: (context) {
-        return AppDialogWidget(
-          dismissible: kDebugMode ? true : dismissible,
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          child: const AppProgressIndicator(),
+      context: context,
+      barrierDismissible: kDebugMode ? true : dismissible,
+      builder: (dialogContext) {
+        return PopScope(
+          canPop: kDebugMode ? true : dismissible,
+          child: AppDialogWidget(
+            dismissible: kDebugMode ? true : dismissible,
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            child: const AppProgressIndicator(),
+          ),
         );
       },
     );
+
+    try {
+      // Execute the process
+      final result = await process();
+
+      // Close the dialog
+      _closeDialog();
+
+      return result;
+    } catch (e) {
+      // Close the dialog on error
+      _closeDialog();
+
+      // Rethrow the error so caller can handle it
+      rethrow;
+    }
   }
 
-  static void closeDialog() {
-    AppRoutes.router.configuration.navigatorKey.currentState?.pop();
+  static void _closeDialog() {
+    if (AppRoutes.instance.router.configuration.navigatorKey.currentState?.canPop() ?? false) {
+      AppRoutes.instance.router.configuration.navigatorKey.currentState?.pop();
+    }
   }
 }
 
@@ -143,8 +179,8 @@ class AppDialogWidget extends StatelessWidget {
   final Color? rightButtonColor;
   final Color? rightButtonTextColor;
   final Color? rightButtonBorderColor;
-  final Function()? onTapLeftButton;
-  final Function()? onTapRightButton;
+  final Function(BuildContext)? onTapLeftButton;
+  final Function(BuildContext)? onTapRightButton;
 
   const AppDialogWidget({
     super.key,
@@ -246,7 +282,7 @@ class AppDialogWidget extends StatelessWidget {
                           onTap: () async {
                             if (enableLeftButton) {
                               if (onTapLeftButton != null) {
-                                onTapLeftButton!();
+                                onTapLeftButton!(context);
                               } else {
                                 Navigator.of(context).pop();
                               }
@@ -269,7 +305,7 @@ class AppDialogWidget extends StatelessWidget {
                           onTap: () async {
                             if (enableRightButton) {
                               if (onTapRightButton != null) {
-                                onTapRightButton!();
+                                onTapRightButton!(context);
                               } else {
                                 Navigator.of(context).pop();
                               }

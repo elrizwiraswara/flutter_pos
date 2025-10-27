@@ -5,35 +5,30 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
-  group('ProductLocalDatasourceImpl', () {
-    // Create an instance of the AppDatabase
-    AppDatabase appDatabase = AppDatabase();
+  late AppDatabase appDatabase;
+  late ProductLocalDatasourceImpl datasource;
+  late Database testDatabase;
 
-    // Declare a late variable for the datasource
-    late ProductLocalDatasourceImpl datasource;
+  setUpAll(() async {
+    // Initialize FFI (Foreign Function Interface) for SQFlite
+    sqfliteFfiInit();
+    // Change the default factory for unit testing calls to use FFI
+    databaseFactory = databaseFactoryFfi;
 
-    setUp(() async {
-      // Initialize FFI (Foreign Function Interface) for SQFlite
-      sqfliteFfiInit();
-      // Change the default factory for unit testing calls to use FFI
-      databaseFactory = databaseFactoryFfi;
+    // Open an in-memory database for testing
+    testDatabase = await openDatabase(inMemoryDatabasePath, version: 1);
 
-      // Open an in-memory database for testing
-      var testDatabase = await openDatabase(inMemoryDatabasePath, version: 1);
+    appDatabase = AppDatabase.instance;
+    await appDatabase.initTestDatabase(testDatabase: testDatabase);
 
-      // Initialize the AppDatabase with the test database
-      await appDatabase.initTestDatabase(testDatabase: testDatabase);
+    datasource = ProductLocalDatasourceImpl(appDatabase);
+  });
 
-      // Initialize the datasource with the AppDatabase
-      datasource = ProductLocalDatasourceImpl(appDatabase);
-    });
+  const userId = "user123";
 
-    // Create a sample userId
-    const userId = "user123";
-
-    // Create a sample product
-    final product = ProductModel(
-      id: 1,
+  ProductModel createSampleProduct({int id = 1}) {
+    return ProductModel(
+      id: id,
       name: 'Sample Product',
       createdById: userId,
       imageUrl: '',
@@ -41,46 +36,130 @@ void main() {
       sold: 10,
       stock: 50,
     );
+  }
 
-    // Test: createProduct inserts the product into the database
-    test('createProduct inserts product into the database', () async {
-      // Call the createProduct method
-      final res = await datasource.createProduct(product);
+  group('ProductLocalDatasourceImpl', () {
+    group('createProduct', () {
+      test('should insert product into the database and return product id', () async {
+        final product = createSampleProduct();
+        final result = await datasource.createProduct(product);
 
-      // Verify that the ID returned matches the product's ID
-      expect(res, equals(product.id));
+        expect(result.data, equals(product.id));
+      });
+
+      test('should create multiple products successfully', () async {
+        final product1 = createSampleProduct(id: 1);
+        final product2 = createSampleProduct(id: 2);
+
+        final result1 = await datasource.createProduct(product1);
+        final result2 = await datasource.createProduct(product2);
+
+        expect(result1.data, equals(1));
+        expect(result2.data, equals(2));
+      });
     });
 
-    // Test: updateProduct updates the product in the database
-    test('updateProduct updates product in the database', () async {
-      final updateProduct = datasource.updateProduct(product);
+    group('updateProduct', () {
+      test('should update existing product in the database', () async {
+        final product = createSampleProduct();
+        await datasource.createProduct(product);
 
-      // Expect that the update completes successfully
-      expectLater(updateProduct, completes);
+        final updatedProduct = product
+          ..name = 'Updated Product'
+          ..price = 100;
+
+        await expectLater(
+          datasource.updateProduct(updatedProduct),
+          completes,
+        );
+
+        final retrieved = await datasource.getProduct(product.id);
+        expect(retrieved.data?.name, equals('Updated Product'));
+        expect(retrieved.data?.price, equals(100));
+      });
+
+      test('should complete even if product does not exist', () async {
+        final product = createSampleProduct();
+
+        await expectLater(
+          datasource.updateProduct(product),
+          completes,
+        );
+      });
     });
 
-    // Test: getProduct retrieves the product from the database
-    test('getProduct retrieves product from the database', () async {
-      final res = await datasource.getProduct(product.id);
+    group('getProduct', () {
+      test('should retrieve existing product from the database', () async {
+        final product = createSampleProduct();
+        await datasource.createProduct(product);
 
-      // Verify that the retrieved product's ID matches the expected ID
-      expect(res?.id, equals(product.id));
+        final result = await datasource.getProduct(product.id);
+
+        expect(result, isNotNull);
+        expect(result.data?.id, equals(product.id));
+        expect(result.data?.name, equals(product.name));
+        expect(result.data?.price, equals(product.price));
+      });
+
+      test('should return null when product does not exist', () async {
+        final result = await datasource.getProduct(999);
+
+        expect(result.data, isNull);
+      });
     });
 
-    // Test: getAllUserProducts retrieves all products for a given user
-    test('getAllUserProducts retrieves all user products from the database', () async {
-      final res = await datasource.getAllUserProducts(userId);
+    group('getAllUserProducts', () {
+      test('should retrieve all products for a given user', () async {
+        final product1 = createSampleProduct(id: 1);
+        final product2 = createSampleProduct(id: 2);
 
-      // Expect that the result is not empty
-      expect(res, isNotEmpty);
+        await datasource.createProduct(product1);
+        await datasource.createProduct(product2);
+
+        final result = await datasource.getAllUserProducts(userId);
+
+        expect(result.data, isNotEmpty);
+        expect(result.data?.length, equals(2));
+        expect(result.data?.any((p) => p.id == 1), isTrue);
+        expect(result.data?.any((p) => p.id == 2), isTrue);
+      });
+
+      test('should return empty list when user has no products', () async {
+        final result = await datasource.getAllUserProducts('nonexistent_user');
+
+        expect(result.data, isEmpty);
+      });
+
+      test('should not return products from other users', () async {
+        final product = createSampleProduct();
+        await datasource.createProduct(product);
+
+        final result = await datasource.getAllUserProducts('different_user');
+
+        expect(result.data, isEmpty);
+      });
     });
 
-    // Test: deleteProduct deletes the product from the database
-    test('deleteProduct deletes product from the database', () async {
-      final deleteProduct = datasource.deleteProduct(product.id);
+    group('deleteProduct', () {
+      test('should delete existing product from the database', () async {
+        final product = createSampleProduct();
+        await datasource.createProduct(product);
 
-      // Expect that the deletion completes successfully
-      expectLater(deleteProduct, completes);
+        await expectLater(
+          datasource.deleteProduct(product.id),
+          completes,
+        );
+
+        final retrieved = await datasource.getProduct(product.id);
+        expect(retrieved.data, isNull);
+      });
+
+      test('should complete even if product does not exist', () async {
+        await expectLater(
+          datasource.deleteProduct(999),
+          completes,
+        );
+      });
     });
   });
 }

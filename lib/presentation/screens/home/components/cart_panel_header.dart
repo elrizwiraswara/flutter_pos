@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../app/routes/app_routes.dart';
 import '../../../../app/themes/app_sizes.dart';
 import '../../../providers/home/home_provider.dart';
 import '../../../widgets/app_button.dart';
@@ -86,9 +86,9 @@ class _CartPanelHeaderState extends State<CartPanelHeader> {
                   text: 'Are you sure want to remove all product?',
                   rightButtonText: 'Remove',
                   leftButtonText: 'Cancel',
-                  onTapRightButton: () {
+                  onTapRightButton: (context) {
                     provider.onRemoveAllOrderedProduct();
-                    AppRoutes.router.pop();
+                    context.pop();
                   },
                 );
               },

@@ -9,15 +9,8 @@ import '../../../providers/auth/auth_provider.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_dialog.dart';
 
-class SignInScreen extends StatefulWidget {
+class SignInScreen extends StatelessWidget {
   const SignInScreen({super.key});
-
-  @override
-  State<SignInScreen> createState() => _SignInScreenState();
-}
-
-class _SignInScreenState extends State<SignInScreen> {
-  final _authProvider = sl<AuthProvider>();
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +19,7 @@ class _SignInScreenState extends State<SignInScreen> {
         padding: const EdgeInsets.all(AppSizes.padding),
         child: Column(
           children: [
-            welcomeMessage(),
+            welcomeMessage(context),
             signInButton(),
           ],
         ),
@@ -34,7 +27,7 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-  Widget welcomeMessage() {
+  Widget welcomeMessage(BuildContext context) {
     return Expanded(
       child: Container(
         constraints: const BoxConstraints(maxWidth: 270),
@@ -66,16 +59,12 @@ class _SignInScreenState extends State<SignInScreen> {
     return AppButton(
       text: 'Sign In With Google',
       onTap: () async {
-        AppDialog.showDialogProgress();
-
-        var res = await _authProvider.signIn();
-
-        AppDialog.closeDialog();
+        var res = await sl<AuthProvider>().signIn();
 
         if (res.isSuccess) {
-          AppRoutes.router.refresh();
+          AppRoutes.instance.router.refresh();
         } else {
-          AppDialog.showErrorDialog(error: res.error?.message);
+          AppDialog.showErrorDialog(error: res.error?.toString());
         }
       },
     );

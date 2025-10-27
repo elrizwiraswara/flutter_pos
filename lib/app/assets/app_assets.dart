@@ -1,6 +1,5 @@
 class AppAssets {
-  // This class is not meant to be instatiated or extended; this constructor
-  // prevents instantiation and extension.
+  // Prevents instantiation and extension
   AppAssets._();
 
   static const String emptyPlaceholder = 'assets/images/empty_placeholder.png';

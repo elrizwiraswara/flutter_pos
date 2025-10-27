@@ -4,13 +4,15 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i5;
-import 'dart:ui' as _i6;
+import 'dart:ui' as _i8;
 
-import 'package:flutter_pos/core/usecase/usecase.dart' as _i3;
+import 'package:flutter_pos/core/common/result.dart' as _i6;
+import 'package:flutter_pos/domain/repositories/auth_repository.dart' as _i3;
 import 'package:flutter_pos/domain/repositories/user_repository.dart' as _i2;
 import 'package:flutter_pos/presentation/providers/auth/auth_provider.dart'
     as _i4;
 import 'package:mockito/mockito.dart' as _i1;
+import 'package:mockito/src/dummies.dart' as _i7;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -25,6 +27,7 @@ import 'package:mockito/mockito.dart' as _i1;
 // ignore_for_file: unnecessary_parenthesis
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
+// ignore_for_file: invalid_use_of_internal_member
 
 class _FakeUserRepository_0 extends _i1.SmartFake
     implements _i2.UserRepository {
@@ -32,8 +35,9 @@ class _FakeUserRepository_0 extends _i1.SmartFake
     : super(parent, parentInvocation);
 }
 
-class _FakeResult_1<T> extends _i1.SmartFake implements _i3.Result<T> {
-  _FakeResult_1(Object parent, Invocation parentInvocation)
+class _FakeAuthRepository_1 extends _i1.SmartFake
+    implements _i3.AuthRepository {
+  _FakeAuthRepository_1(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
@@ -57,38 +61,72 @@ class MockAuthProvider extends _i1.Mock implements _i4.AuthProvider {
           as _i2.UserRepository);
 
   @override
+  _i3.AuthRepository get authRepository =>
+      (super.noSuchMethod(
+            Invocation.getter(#authRepository),
+            returnValue: _FakeAuthRepository_1(
+              this,
+              Invocation.getter(#authRepository),
+            ),
+          )
+          as _i3.AuthRepository);
+
+  @override
+  bool get isAuthenticated =>
+      (super.noSuchMethod(
+            Invocation.getter(#isAuthenticated),
+            returnValue: false,
+          )
+          as bool);
+
+  @override
   bool get hasListeners =>
       (super.noSuchMethod(Invocation.getter(#hasListeners), returnValue: false)
           as bool);
 
   @override
-  _i5.Future<_i3.Result<String>> signIn() =>
+  _i5.Future<void> checkIsAuthenticated() =>
+      (super.noSuchMethod(
+            Invocation.method(#checkIsAuthenticated, []),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
+          )
+          as _i5.Future<void>);
+
+  @override
+  _i5.Future<_i6.Result<String>> signIn() =>
       (super.noSuchMethod(
             Invocation.method(#signIn, []),
-            returnValue: _i5.Future<_i3.Result<String>>.value(
-              _FakeResult_1<String>(this, Invocation.method(#signIn, [])),
+            returnValue: _i5.Future<_i6.Result<String>>.value(
+              _i7.dummyValue<_i6.Result<String>>(
+                this,
+                Invocation.method(#signIn, []),
+              ),
             ),
           )
-          as _i5.Future<_i3.Result<String>>);
+          as _i5.Future<_i6.Result<String>>);
 
   @override
-  _i5.Future<_i3.Result<String>> saveUser() =>
+  _i5.Future<_i6.Result<void>> signOut() =>
       (super.noSuchMethod(
-            Invocation.method(#saveUser, []),
-            returnValue: _i5.Future<_i3.Result<String>>.value(
-              _FakeResult_1<String>(this, Invocation.method(#saveUser, [])),
+            Invocation.method(#signOut, []),
+            returnValue: _i5.Future<_i6.Result<void>>.value(
+              _i7.dummyValue<_i6.Result<void>>(
+                this,
+                Invocation.method(#signOut, []),
+              ),
             ),
           )
-          as _i5.Future<_i3.Result<String>>);
+          as _i5.Future<_i6.Result<void>>);
 
   @override
-  void addListener(_i6.VoidCallback? listener) => super.noSuchMethod(
+  void addListener(_i8.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#addListener, [listener]),
     returnValueForMissingStub: null,
   );
 
   @override
-  void removeListener(_i6.VoidCallback? listener) => super.noSuchMethod(
+  void removeListener(_i8.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#removeListener, [listener]),
     returnValueForMissingStub: null,
   );

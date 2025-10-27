@@ -3,13 +3,14 @@ import 'dart:io';
 import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_pos/app/routes/app_routes.dart';
+import 'package:flutter_pos/presentation/widgets/app_snack_bar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../../../app/themes/app_sizes.dart';
-import '../../../app/utilities/console_log.dart';
 import '../../../service_locator.dart';
 import '../../providers/products/product_form_provider.dart';
 import '../../widgets/app_button.dart';
@@ -223,7 +224,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   Widget createOrUpdateButton() {
     return Consumer<ProductFormProvider>(
       builder: (context, provider, _) {
-        cl(provider.isFormValid());
         return Padding(
           padding: const EdgeInsets.only(top: AppSizes.padding * 1.5),
           child: AppButton(
@@ -262,8 +262,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
             rightButtonText: 'Delete',
             rightButtonColor: Theme.of(context).colorScheme.errorContainer,
             rightButtonTextColor: Theme.of(context).colorScheme.error,
-            onTapRightButton: () async {
-              AppDialog.closeDialog();
+            onTapRightButton: (context) async {
+              context.pop();
               deleteProduct();
             },
           );
@@ -273,56 +273,41 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   }
 
   void createProduct() async {
-    final router = GoRouter.of(context);
-    final messenger = ScaffoldMessenger.of(context);
-
-    AppDialog.showDialogProgress();
-
-    var res = await productFormProvider.createProduct();
-
-    AppDialog.closeDialog();
+    var res = await AppDialog.showDialogProgress(() {
+      return productFormProvider.createProduct();
+    });
 
     if (res.isSuccess) {
-      router.go('/products');
-      messenger.showSnackBar(const SnackBar(content: Text('Product created')));
+      AppRoutes.instance.router.go('/products');
+      AppSnackBar.show(message: 'Product created');
     } else {
-      AppDialog.showErrorDialog(error: res.error?.message);
+      AppDialog.showErrorDialog(error: res.error?.toString());
     }
   }
 
   void updatedProduct() async {
-    final router = GoRouter.of(context);
-    final messenger = ScaffoldMessenger.of(context);
-
-    AppDialog.showDialogProgress();
-
-    var res = await productFormProvider.updatedProduct(widget.id!);
-
-    AppDialog.closeDialog();
+    var res = await AppDialog.showDialogProgress(() {
+      return productFormProvider.updatedProduct(widget.id!);
+    });
 
     if (res.isSuccess) {
-      router.pop();
-      messenger.showSnackBar(const SnackBar(content: Text('Product updated')));
+      AppRoutes.instance.router.pop();
+      AppSnackBar.show(message: 'Product updated');
     } else {
-      AppDialog.showErrorDialog(error: res.error?.message);
+      AppDialog.showErrorDialog(error: res.error?.toString());
     }
   }
 
   void deleteProduct() async {
-    final router = GoRouter.of(context);
-    final messenger = ScaffoldMessenger.of(context);
-
-    AppDialog.showDialogProgress();
-
-    var res = await productFormProvider.deleteProduct(widget.id!);
-
-    AppDialog.closeDialog();
+    var res = await AppDialog.showDialogProgress(() {
+      return productFormProvider.deleteProduct(widget.id!);
+    });
 
     if (res.isSuccess) {
-      router.go('/products');
-      messenger.showSnackBar(const SnackBar(content: Text('Product deleted')));
+      AppRoutes.instance.router.go('/products');
+      AppSnackBar.show(message: 'Product deleted');
     } else {
-      AppDialog.showErrorDialog(error: res.error?.message);
+      AppDialog.showErrorDialog(error: res.error?.toString());
     }
   }
 }

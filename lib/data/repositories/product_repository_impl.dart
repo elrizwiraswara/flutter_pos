@@ -1,9 +1,8 @@
 import 'dart:convert';
 
-import '../../app/const/const.dart';
-import '../../app/services/connectivity/connectivity_service.dart';
-import '../../core/errors/errors.dart';
-import '../../core/usecase/usecase.dart';
+import '../../app/const/app_const.dart';
+import '../../app/services/connectivity/ping_service.dart';
+import '../../core/common/result.dart';
 import '../../domain/entities/product_entity.dart';
 import '../../domain/repositories/product_repository.dart';
 import '../datasources/local/product_local_datasource_impl.dart';
@@ -13,11 +12,13 @@ import '../models/product_model.dart';
 import '../models/queued_action_model.dart';
 
 class ProductRepositoryImpl extends ProductRepository {
+  final PingService pingService;
   final ProductLocalDatasourceImpl productLocalDatasource;
   final ProductRemoteDatasourceImpl productRemoteDatasource;
   final QueuedActionLocalDatasourceImpl queuedActionLocalDatasource;
 
   ProductRepositoryImpl({
+    required this.pingService,
     required this.productLocalDatasource,
     required this.productRemoteDatasource,
     required this.queuedActionLocalDatasource,
@@ -26,22 +27,25 @@ class ProductRepositoryImpl extends ProductRepository {
   @override
   Future<Result<int>> syncAllUserProducts(String userId) async {
     try {
-      if (ConnectivityService.isConnected) {
-        var local = await productLocalDatasource.getAllUserProducts(userId);
-        var remote = await productRemoteDatasource.getAllUserProducts(userId);
+      if (pingService.isConnected) {
+        final local = await productLocalDatasource.getAllUserProducts(userId);
+        if (local.isFailure) return Result.failure(error: local.error!);
 
-        var res = await syncProducts(local, remote);
+        final remote = await productRemoteDatasource.getAllUserProducts(userId);
+        if (remote.isFailure) return Result.failure(error: remote.error!);
+
+        final res = await _syncProducts(local.data!, remote.data!);
 
         // Sum all local and remote sync counts
         int totalSyncedCount = res.$1 + res.$2;
 
         // Return synced data count
-        return Result.success(totalSyncedCount);
+        return Result.success(data: totalSyncedCount);
       }
 
-      return Result.success(0);
+      return Result.success(data: 0);
     } catch (e) {
-      return Result.error(APIError(message: e.toString()));
+      return Result.failure(error: e);
     }
   }
 
@@ -55,7 +59,7 @@ class ProductRepositoryImpl extends ProductRepository {
     String? contains,
   }) async {
     try {
-      var local = await productLocalDatasource.getUserProducts(
+      final local = await productLocalDatasource.getUserProducts(
         userId,
         orderBy: orderBy,
         sortBy: sortBy,
@@ -64,8 +68,10 @@ class ProductRepositoryImpl extends ProductRepository {
         contains: contains,
       );
 
-      if (ConnectivityService.isConnected) {
-        var remote = await productRemoteDatasource.getUserProducts(
+      if (local.isFailure) return Result.failure(error: local.error!);
+
+      if (pingService.isConnected) {
+        final remote = await productRemoteDatasource.getUserProducts(
           userId,
           orderBy: orderBy,
           sortBy: sortBy,
@@ -74,7 +80,9 @@ class ProductRepositoryImpl extends ProductRepository {
           contains: contains,
         );
 
-        var res = await syncProducts(local, remote);
+        if (remote.isFailure) return Result.failure(error: remote.error!);
+
+        final res = await _syncProducts(local.data!, remote.data!);
 
         int syncedToLocalCount = res.$1;
         int syncedToRemoteCount = res.$2;
@@ -82,31 +90,33 @@ class ProductRepositoryImpl extends ProductRepository {
         // If more data was synced to the local, return the remote data
         if (syncedToLocalCount > syncedToRemoteCount) {
           // Return remote data
-          return Result.success(remote.map((e) => e.toEntity()).toList());
+          return Result.success(data: remote.data!.map((e) => e.toEntity()).toList());
         } else {
           // Return local data
-          return Result.success(local.map((e) => e.toEntity()).toList());
+          return Result.success(data: local.data!.map((e) => e.toEntity()).toList());
         }
       }
 
-      return Result.success(local.map((e) => e.toEntity()).toList());
+      return Result.success(data: local.data!.map((e) => e.toEntity()).toList());
     } catch (e) {
-      return Result.error(APIError(message: e.toString()));
+      return Result.failure(error: e);
     }
   }
 
   @override
-  Future<Result<ProductEntity>> getProduct(int productId) async {
+  Future<Result<ProductEntity?>> getProduct(int productId) async {
     try {
-      var local = await productLocalDatasource.getProduct(productId);
+      final local = await productLocalDatasource.getProduct(productId);
+      if (local.isFailure) return Result.failure(error: local.error!);
 
-      if (ConnectivityService.isConnected) {
-        var remote = await productRemoteDatasource.getProduct(productId);
+      if (pingService.isConnected) {
+        final remote = await productRemoteDatasource.getProduct(productId);
+        if (remote.isFailure) return Result.failure(error: remote.error!);
 
-        List<ProductModel> localToList = local != null ? [local] : [];
-        List<ProductModel> remoteToList = remote != null ? [remote] : [];
+        List<ProductModel> localToList = [if (local.data != null) local.data!];
+        List<ProductModel> remoteToList = [if (remote.data != null) remote.data!];
 
-        var res = await syncProducts(localToList, remoteToList);
+        final res = await _syncProducts(localToList, remoteToList);
 
         int syncedToLocalCount = res.$1;
         int syncedToRemoteCount = res.$2;
@@ -114,30 +124,32 @@ class ProductRepositoryImpl extends ProductRepository {
         // If more data was synced to the local, return the remote data
         if (syncedToLocalCount > syncedToRemoteCount) {
           // Return remote data
-          return Result.success(remote?.toEntity());
+          return Result.success(data: remote.data?.toEntity());
         } else {
           // Return local data
-          return Result.success(local?.toEntity());
+          return Result.success(data: local.data?.toEntity());
         }
       }
 
-      return Result.success(local?.toEntity());
+      return Result.success(data: local.data?.toEntity());
     } catch (e) {
-      return Result.error(APIError(message: e.toString()));
+      return Result.failure(error: e);
     }
   }
 
   @override
   Future<Result<int>> createProduct(ProductEntity product) async {
     try {
-      var data = ProductModel.fromEntity(product);
+      final data = ProductModel.fromEntity(product);
 
-      var productId = await productLocalDatasource.createProduct(data);
+      final local = await productLocalDatasource.createProduct(data);
+      if (local.isFailure) return Result.failure(error: local.error!);
 
-      if (ConnectivityService.isConnected) {
-        await productRemoteDatasource.createProduct(data);
+      if (pingService.isConnected) {
+        final remote = await productRemoteDatasource.createProduct(data);
+        if (remote.isFailure) return Result.failure(error: remote.error!);
       } else {
-        await queuedActionLocalDatasource.createQueuedAction(
+        final res = await queuedActionLocalDatasource.createQueuedAction(
           QueuedActionModel(
             id: DateTime.now().millisecond,
             repository: 'ProductRepositoryImpl',
@@ -147,23 +159,27 @@ class ProductRepositoryImpl extends ProductRepository {
             createdAt: DateTime.now().toIso8601String(),
           ),
         );
+
+        if (res.isFailure) return Result.failure(error: res.error!);
       }
 
-      return Result.success(productId);
+      return Result.success(data: local.data!);
     } catch (e) {
-      return Result.error(APIError(message: e.toString()));
+      return Result.failure(error: e);
     }
   }
 
   @override
   Future<Result<void>> deleteProduct(int productId) async {
     try {
-      await productLocalDatasource.deleteProduct(productId);
+      final local = await productLocalDatasource.deleteProduct(productId);
+      if (local.isFailure) return Result.failure(error: local.error!);
 
-      if (ConnectivityService.isConnected) {
-        await productRemoteDatasource.deleteProduct(productId);
+      if (pingService.isConnected) {
+        final remote = await productRemoteDatasource.deleteProduct(productId);
+        if (remote.isFailure) return Result.failure(error: remote.error!);
       } else {
-        await queuedActionLocalDatasource.createQueuedAction(
+        final res = await queuedActionLocalDatasource.createQueuedAction(
           QueuedActionModel(
             id: DateTime.now().millisecond,
             repository: 'ProductRepositoryImpl',
@@ -173,23 +189,27 @@ class ProductRepositoryImpl extends ProductRepository {
             createdAt: DateTime.now().toIso8601String(),
           ),
         );
+
+        if (res.isFailure) return Result.failure(error: res.error!);
       }
 
-      return Result.success(null);
+      return Result.success(data: null);
     } catch (e) {
-      return Result.error(APIError(message: e.toString()));
+      return Result.failure(error: e);
     }
   }
 
   @override
   Future<Result<void>> updateProduct(ProductEntity product) async {
     try {
-      await productLocalDatasource.updateProduct(ProductModel.fromEntity(product));
+      final local = await productLocalDatasource.updateProduct(ProductModel.fromEntity(product));
+      if (local.isFailure) return Result.failure(error: local.error!);
 
-      if (ConnectivityService.isConnected) {
-        await productRemoteDatasource.updateProduct(ProductModel.fromEntity(product));
+      if (pingService.isConnected) {
+        final remote = await productRemoteDatasource.updateProduct(ProductModel.fromEntity(product));
+        if (remote.isFailure) return Result.failure(error: remote.error!);
       } else {
-        await queuedActionLocalDatasource.createQueuedAction(
+        final res = await queuedActionLocalDatasource.createQueuedAction(
           QueuedActionModel(
             id: DateTime.now().millisecond,
             repository: 'ProductRepositoryImpl',
@@ -199,78 +219,71 @@ class ProductRepositoryImpl extends ProductRepository {
             createdAt: DateTime.now().toIso8601String(),
           ),
         );
+
+        if (res.isFailure) return Result.failure(error: res.error!);
       }
 
-      return Result.success(null);
+      return Result.success(data: null);
     } catch (e) {
-      return Result.error(APIError(message: e.toString()));
+      return Result.failure(error: e);
     }
   }
 
   // Perform a sync between local and remote data
-  Future<(int, int)> syncProducts(List<ProductModel> local, List<ProductModel> remote) async {
+  Future<(int, int)> _syncProducts(List<ProductModel> local, List<ProductModel> remote) async {
     int syncedToLocalCount = 0;
     int syncedToRemoteCount = 0;
 
-    // Local
-    // Local first
-    for (var localData in local) {
-      var matchRemoteData = remote.where((remoteData) => remoteData.id == localData.id).firstOrNull;
+    // Track processed IDs to avoid duplicate syncing
+    final processedIds = <int>{};
+
+    // Process local products first
+    for (final localData in local) {
+      final matchRemoteData = remote.where((remoteData) => remoteData.id == localData.id).firstOrNull;
 
       if (matchRemoteData != null) {
-        var updatedAtLocal = DateTime.tryParse(localData.updatedAt ?? DateTime.now().toIso8601String());
-        var updatedAtRemote = DateTime.tryParse(matchRemoteData.updatedAt ?? DateTime.now().toIso8601String());
-        var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
-        // Check is the difference is above the minimum interval sync tolerance
-        var isRemoteNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
-        var isLocalNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
+        // Mark as processed
+        processedIds.add(localData.id);
+
+        final updatedAtLocal = DateTime.tryParse(localData.updatedAt ?? '');
+        final updatedAtRemote = DateTime.tryParse(matchRemoteData.updatedAt ?? '');
+
+        // Skip if either timestamp is invalid
+        if (updatedAtLocal == null || updatedAtRemote == null) continue;
+
+        final differenceInMinutes = updatedAtRemote.difference(updatedAtLocal).inMinutes;
+        final isDiffSignificant = differenceInMinutes.abs() > AppConst.minSyncIntervalToleranceForCriticalInMinutes;
+
+        // Check which is newer based on the difference
+        final isRemoteNewer = isDiffSignificant && differenceInMinutes > 0;
+        final isLocalNewer = isDiffSignificant && differenceInMinutes < 0;
 
         if (isRemoteNewer) {
-          syncedToLocalCount += 1;
           // Save remote data to local db
-          await productLocalDatasource.updateProduct(matchRemoteData);
-        }
-
-        if (isLocalNewer) {
-          syncedToRemoteCount += 1;
+          final res = await productLocalDatasource.updateProduct(matchRemoteData);
+          if (res.isSuccess) syncedToLocalCount += 1;
+        } else if (isLocalNewer) {
           // Update remote with local data
-          await productRemoteDatasource.updateProduct(localData);
+          final res = await productRemoteDatasource.updateProduct(localData);
+          if (res.isSuccess) syncedToRemoteCount += 1;
         }
+        // If not significant difference, do nothing (already in sync)
       } else {
-        syncedToRemoteCount += 1;
         // No matching remote product, create it
-        await productRemoteDatasource.createProduct(localData);
+        processedIds.add(localData.id);
+        final res = await productRemoteDatasource.createProduct(localData);
+        if (res.isSuccess) syncedToRemoteCount += 1;
       }
     }
 
-    // Remote first
-    for (var remoteData in remote) {
-      var matchLocalData = local.where((localData) => localData.id == remoteData.id).firstOrNull;
+    // Process remaining remote products that weren't in local
+    for (final remoteData in remote) {
+      // Skip if already processed in the first loop
+      if (processedIds.contains(remoteData.id)) continue;
 
-      if (matchLocalData != null) {
-        var updatedAtLocal = DateTime.tryParse(remoteData.updatedAt ?? DateTime.now().toIso8601String());
-        var updatedAtRemote = DateTime.tryParse(matchLocalData.updatedAt ?? DateTime.now().toIso8601String());
-        var differenceInMinutes = updatedAtRemote?.difference(updatedAtLocal!).inMinutes ?? 0;
-        // Check is the difference is above the minimum interval sync tolerance
-        var isRemoteNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
-        var isLocalNewer = differenceInMinutes.abs() > MIN_SYNC_INTERVAL_TOLERANCE_FOR_CRITICAL_IN_MINUTES;
-
-        if (isRemoteNewer) {
-          syncedToLocalCount += 1;
-          // Save remote data to local db
-          await productLocalDatasource.updateProduct(remoteData);
-        }
-
-        if (isLocalNewer) {
-          syncedToRemoteCount += 1;
-          // Update remote with local data
-          await productRemoteDatasource.updateProduct(matchLocalData);
-        }
-      } else {
-        syncedToLocalCount += 1;
-        // No matching remote product, create it
-        await productLocalDatasource.createProduct(remoteData);
-      }
+      // No matching local product, create it locally
+      final res = await productLocalDatasource.createProduct(remoteData);
+      if (res.isSuccess) syncedToLocalCount += 1;
     }
 
     return (syncedToLocalCount, syncedToRemoteCount);

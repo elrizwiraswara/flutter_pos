@@ -1,7 +1,7 @@
 import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../../../app/routes/app_routes.dart';
 import '../../../../app/themes/app_sizes.dart';
 import '../../../../app/utilities/currency_formatter.dart';
 import '../../../widgets/app_button.dart';
@@ -140,9 +140,9 @@ class _OrderCardState extends State<OrderCard> {
                           text: 'Are you sure want to remove this product?',
                           rightButtonText: 'Remove',
                           leftButtonText: 'Cancel',
-                          onTapRightButton: () {
+                          onTapRightButton: (context) {
                             widget.onTapRemove!();
-                            AppRoutes.router.pop();
+                            context.pop();
                           },
                         );
                       },
