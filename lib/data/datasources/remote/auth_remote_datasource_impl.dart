@@ -2,10 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-import '../../../app/config/app_config.dart';
-import '../../../app/const/app_const.dart';
-import '../../../app/utilities/platform_wrapper.dart';
 import '../../../core/common/result.dart';
+import '../../../core/constants/constants.dart';
+import '../../../core/utilities/platform_wrapper.dart';
 import '../../../firebase_options.dart';
 import '../../models/user_model.dart';
 import '../interfaces/auth_datasource.dart';
@@ -24,7 +23,7 @@ class AuthRemoteDataSourceImpl implements AuthDataSource {
     try {
       await googleSignIn.initialize(
         clientId: PlatformWrapper().isIOS ? DefaultFirebaseOptions.ios.iosClientId : null,
-        serverClientId: AppConfig.googleServerClientId,
+        serverClientId: Constants.googleServerClientId,
       );
 
       final googleSignInAccount = await googleSignIn.attemptLightweightAuthentication();
@@ -32,7 +31,7 @@ class AuthRemoteDataSourceImpl implements AuthDataSource {
       final googleSignInAuthentication = googleSignInAccount?.authentication;
 
       final googleSignInAuthorization = await googleSignInAccount?.authorizationClient.authorizationForScopes(
-        AppConst.authScopes,
+        Constants.authScopes,
       );
 
       final credential = GoogleAuthProvider.credential(

@@ -5,8 +5,9 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i3;
 
-import 'package:flutter_pos/app/services/connectivity/ping_service.dart' as _i2;
 import 'package:flutter_pos/core/common/result.dart' as _i5;
+import 'package:flutter_pos/core/services/connectivity/ping_service.dart'
+    as _i2;
 import 'package:flutter_pos/data/datasources/local/queued_action_local_datasource_impl.dart'
     as _i9;
 import 'package:flutter_pos/data/datasources/local/transaction_local_datasource_impl.dart'

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../app/const/app_const.dart';
+import '../../../app/di/dependency_injection.dart';
 import '../../../app/routes/app_routes.dart';
-import '../../../service_locator.dart';
+import '../../../core/constants/constants.dart';
 import '../../providers/auth/auth_provider.dart';
 import '../../providers/main/main_provider.dart';
-import '../root_screen.dart';
+import '../welcome/welcome_screen.dart';
 
 class MainScreen extends StatefulWidget {
   final Widget child;
@@ -21,8 +21,8 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  final _authProvider = sl<AuthProvider>();
-  final _mainProvider = sl<MainProvider>()..resetStates();
+  final _authProvider = di<AuthProvider>();
+  final _mainProvider = di<MainProvider>()..resetStates();
 
   @override
   void initState() {
@@ -39,13 +39,13 @@ class _MainScreenState extends State<MainScreen> {
       builder: (context, provider, _) {
         // Display RootScreen when data is being load
         if (!provider.isLoaded) {
-          return const RootScreen();
+          return const WelcomeScreen();
         }
 
         // User data might still null for the first time app open or login without internet connection
         // So, throw error with a first time internet error message then the [ErrorScreen] will be shown
         if (provider.isLoaded && provider.user == null && !provider.isHasInternet) {
-          throw AppConst.firstTimeInternetErrorMessage;
+          throw Constants.firstTimeInternetErrorMessage;
         }
 
         return Scaffold(

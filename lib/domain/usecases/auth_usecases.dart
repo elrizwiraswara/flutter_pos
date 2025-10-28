@@ -1,9 +1,8 @@
-import 'package:flutter_pos/domain/usecases/params/no_param.dart';
-
 import '../../core/common/result.dart';
 import '../../core/usecase/usecase.dart';
 import '../entities/user_entity.dart';
 import '../repositories/auth_repository.dart';
+import 'params/no_param.dart';
 
 class SignInWithGoogleUsecase extends Usecase<Result, NoParam> {
   SignInWithGoogleUsecase(this._authRepository);

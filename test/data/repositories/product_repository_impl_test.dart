@@ -1,4 +1,4 @@
-import 'package:flutter_pos/app/services/connectivity/ping_service.dart';
+import 'package:flutter_pos/core/services/connectivity/ping_service.dart';
 import 'package:flutter_pos/core/common/result.dart';
 import 'package:flutter_pos/data/datasources/local/product_local_datasource_impl.dart';
 import 'package:flutter_pos/data/datasources/local/queued_action_local_datasource_impl.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_pos/app/utilities/console_logger.dart';
 
 import '../../../core/common/result.dart';
+import '../../../core/utilities/console_logger.dart';
 import '../../../domain/entities/user_entity.dart';
 import '../../../domain/repositories/auth_repository.dart';
 import '../../../domain/repositories/user_repository.dart';

@@ -2,9 +2,9 @@ import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-import '../../../app/assets/app_assets.dart';
-import '../../../app/themes/app_sizes.dart';
-import '../../../app/utilities/external_launcher.dart';
+import '../../../core/assets/assets.dart';
+import '../../../core/themes/app_sizes.dart';
+import '../../../core/utilities/external_launcher.dart';
 
 class AboutScreen extends StatefulWidget {
   const AboutScreen({super.key});
@@ -48,7 +48,7 @@ class _AboutScreenState extends State<AboutScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const AppImage(
-                image: AppAssets.welcome,
+                image: Assets.welcome,
                 imgProvider: ImgProvider.assetImage,
                 width: 150,
               ),

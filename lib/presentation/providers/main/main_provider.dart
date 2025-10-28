@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../app/const/app_const.dart';
-import '../../../app/services/connectivity/ping_service.dart';
-import '../../../app/services/info/device_info_service.dart';
+import '../../../app/di/dependency_injection.dart';
+import '../../../core/constants/constants.dart';
+import '../../../core/services/connectivity/ping_service.dart';
+import '../../../core/services/info/device_info_service.dart';
 import '../../../domain/entities/queued_action_entity.dart';
 import '../../../domain/entities/user_entity.dart' hide AuthProvider;
 import '../../../domain/repositories/product_repository.dart';
@@ -14,7 +15,6 @@ import '../../../domain/usecases/product_usecases.dart';
 import '../../../domain/usecases/queued_action_usecases.dart';
 import '../../../domain/usecases/transaction_usecases.dart';
 import '../../../domain/usecases/user_usecases.dart';
-import '../../../service_locator.dart';
 import '../../widgets/app_snack_bar.dart';
 import '../auth/auth_provider.dart';
 import '../products/products_provider.dart';
@@ -73,12 +73,12 @@ class MainProvider extends ChangeNotifier {
     if (!isLoaded) return;
 
     if (!pingService.isConnected) {
-      AppSnackBar.show(message: AppConst.syncPendingMessage);
+      AppSnackBar.show(message: Constants.syncPendingMessage);
       return;
     }
 
     try {
-      AppSnackBar.show(message: AppConst.synchronizingMessage);
+      AppSnackBar.show(message: Constants.synchronizingMessage);
 
       isSyncronizing = true;
       notifyListeners();
@@ -90,7 +90,7 @@ class MainProvider extends ChangeNotifier {
       await getAndSyncAllUserData();
 
       AppSnackBar.show(
-        message: "${AppConst.syncedMessage}! ${queueExecutedCount > 0 ? "$queueExecutedCount queues executed" : ""}",
+        message: "${Constants.syncedMessage}! ${queueExecutedCount > 0 ? "$queueExecutedCount queues executed" : ""}",
       );
 
       // Re-check queued actions
@@ -129,7 +129,7 @@ class MainProvider extends ChangeNotifier {
     }
 
     // Refresh products list
-    sl<ProductsProvider>().getAllProducts();
+    di<ProductsProvider>().getAllProducts();
 
     // Check queued actions
     checkIsHasQueuedActions();

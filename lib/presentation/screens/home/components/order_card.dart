@@ -2,8 +2,8 @@ import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../app/themes/app_sizes.dart';
-import '../../../../app/utilities/currency_formatter.dart';
+import '../../../../core/themes/app_sizes.dart';
+import '../../../../core/utilities/currency_formatter.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_dialog.dart';
 

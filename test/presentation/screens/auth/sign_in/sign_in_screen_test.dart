@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_pos/app/di/dependency_injection.dart';
 import 'package:flutter_pos/app/routes/app_routes.dart';
 import 'package:flutter_pos/core/common/result.dart';
 import 'package:flutter_pos/domain/entities/user_entity.dart' hide AuthProvider;
 import 'package:flutter_pos/presentation/providers/auth/auth_provider.dart';
-import 'package:flutter_pos/service_locator.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -22,21 +22,21 @@ void main() {
   setUp(() {
     mockAuthProvider = MockAuthProvider();
 
-    // Register mocks in service locator
-    sl.registerSingleton<AuthProvider>(mockAuthProvider);
+    // Register mocks in dependency injection
+    di.registerSingleton<AuthProvider>(mockAuthProvider);
 
     // Register AppRoutes with mock AuthProvider
     when(mockAuthProvider.isAuthenticated).thenReturn(false);
-    sl.registerSingleton<AppRoutes>(AppRoutes(mockAuthProvider));
+    di.registerSingleton<AppRoutes>(AppRoutes(mockAuthProvider));
   });
 
   tearDown(() {
-    sl.reset();
+    di.reset();
   });
 
   Widget createTestWidget() {
     return MaterialApp.router(
-      routerConfig: sl<AppRoutes>().router,
+      routerConfig: di<AppRoutes>().router,
     );
   }
 
@@ -95,7 +95,7 @@ void main() {
       // assert
       verify(mockAuthProvider.signIn()).called(1);
 
-      final router = sl<AppRoutes>().router;
+      final router = di<AppRoutes>().router;
 
       when(mockAuthProvider.isAuthenticated).thenReturn(true);
       router.refresh();

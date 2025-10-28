@@ -1,8 +1,8 @@
 import 'package:sqflite/sqflite.dart';
 
-import '../../../app/database/app_database.dart';
-import '../../../app/database/app_database_config.dart';
 import '../../../core/common/result.dart';
+import '../../../core/database/app_database.dart';
+import '../../../core/database/database_config.dart';
 import '../../models/ordered_product_model.dart';
 import '../../models/product_model.dart';
 import '../../models/transaction_model.dart';
@@ -20,7 +20,7 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
       final transactionId = await _appDatabase.database.transaction((trx) async {
         // Create transaction
         await trx.insert(
-          AppDatabaseConfig.transactionTableName,
+          DatabaseConfig.transactionTableName,
           transaction.toJson()
             ..remove('orderedProducts')
             ..remove('createdBy'),
@@ -36,14 +36,14 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
             orderedProduct.transactionId = transaction.id;
 
             batch.insert(
-              AppDatabaseConfig.orderedProductTableName,
+              DatabaseConfig.orderedProductTableName,
               orderedProduct.toJson(),
               conflictAlgorithm: ConflictAlgorithm.replace,
             );
 
             // Get product
             var rawProduct = await trx.query(
-              AppDatabaseConfig.productTableName,
+              DatabaseConfig.productTableName,
               where: 'id = ?',
               whereArgs: [orderedProduct.productId],
             );
@@ -57,7 +57,7 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
             int sold = product.sold + orderedProduct.quantity;
 
             batch.update(
-              AppDatabaseConfig.productTableName,
+              DatabaseConfig.productTableName,
               {'stock': stock, 'sold': sold},
               where: 'id = ?',
               whereArgs: [product.id],
@@ -85,7 +85,7 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
       await _appDatabase.database.transaction((trx) async {
         // Update transaction
         await trx.update(
-          AppDatabaseConfig.transactionTableName,
+          DatabaseConfig.transactionTableName,
           transaction.toJson()
             ..remove('orderedProducts')
             ..remove('createdBy'),
@@ -101,7 +101,7 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
           for (var orderedProduct in transaction.orderedProducts!) {
             // Update ordered product - Added proper where clause
             batch.update(
-              AppDatabaseConfig.orderedProductTableName,
+              DatabaseConfig.orderedProductTableName,
               orderedProduct.toJson(),
               where: 'id = ?',
               whereArgs: [orderedProduct.id],
@@ -109,7 +109,7 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
 
             // Get product
             var rawProduct = await trx.query(
-              AppDatabaseConfig.productTableName,
+              DatabaseConfig.productTableName,
               where: 'id = ?',
               whereArgs: [orderedProduct.productId],
             );
@@ -123,7 +123,7 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
             int sold = product.sold + orderedProduct.quantity;
 
             batch.update(
-              AppDatabaseConfig.productTableName,
+              DatabaseConfig.productTableName,
               {'stock': stock, 'sold': sold},
               where: 'id = ?',
               whereArgs: [product.id],
@@ -148,7 +148,7 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
       await _appDatabase.database.transaction((trx) async {
         // Get ordered products to revert stock
         var orderedProducts = await trx.query(
-          AppDatabaseConfig.orderedProductTableName,
+          DatabaseConfig.orderedProductTableName,
           where: 'transactionId = ?',
           whereArgs: [id],
         );
@@ -159,7 +159,7 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
 
           // Get current product data
           var productResults = await trx.query(
-            AppDatabaseConfig.productTableName,
+            DatabaseConfig.productTableName,
             where: 'id = ?',
             whereArgs: [orderedProduct.productId],
           );
@@ -172,7 +172,7 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
 
             // Update product stock and sold count
             await trx.update(
-              AppDatabaseConfig.productTableName,
+              DatabaseConfig.productTableName,
               {'stock': revertedStock, 'sold': revertedSold},
               where: 'id = ?',
               whereArgs: [orderedProduct.productId],
@@ -182,14 +182,14 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
 
         // Delete related ordered products
         await trx.delete(
-          AppDatabaseConfig.orderedProductTableName,
+          DatabaseConfig.orderedProductTableName,
           where: 'transactionId = ?',
           whereArgs: [id],
         );
 
         // Then delete the transaction
         await trx.delete(
-          AppDatabaseConfig.transactionTableName,
+          DatabaseConfig.transactionTableName,
           where: 'id = ?',
           whereArgs: [id],
         );
@@ -207,7 +207,7 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
       final transaction = await _appDatabase.database.transaction((trx) async {
         // Get transaction
         var rawTransactions = await trx.query(
-          AppDatabaseConfig.transactionTableName,
+          DatabaseConfig.transactionTableName,
           where: 'id = ?',
           whereArgs: [id],
         );
@@ -220,7 +220,7 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
 
         // Get transaction ordered products
         var rawOrderedProducts = await trx.query(
-          AppDatabaseConfig.orderedProductTableName,
+          DatabaseConfig.orderedProductTableName,
           where: 'transactionId = ?',
           whereArgs: [id],
         );
@@ -232,7 +232,7 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
 
         // Get created by
         var rawCreatedBy = await trx.query(
-          AppDatabaseConfig.userTableName,
+          DatabaseConfig.userTableName,
           where: 'id = ?',
           whereArgs: [transaction.createdById],
         );
@@ -256,7 +256,7 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
     try {
       final transactions = await _appDatabase.database.transaction((trx) async {
         var rawTransactions = await trx.query(
-          AppDatabaseConfig.transactionTableName,
+          DatabaseConfig.transactionTableName,
           where: 'createdById = ?',
           whereArgs: [userId],
           orderBy: 'createdAt DESC',
@@ -268,7 +268,7 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
         for (var transaction in transactions) {
           // Get transaction ordered products
           var rawOrderedProducts = await trx.query(
-            AppDatabaseConfig.orderedProductTableName,
+            DatabaseConfig.orderedProductTableName,
             where: 'transactionId = ?',
             whereArgs: [transaction.id],
           );
@@ -280,7 +280,7 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
 
           // Get created by
           var rawCreatedBy = await trx.query(
-            AppDatabaseConfig.userTableName,
+            DatabaseConfig.userTableName,
             where: 'id = ?',
             whereArgs: [transaction.createdById],
           );
@@ -312,7 +312,7 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
     try {
       final transactions = await _appDatabase.database.transaction((trx) async {
         var rawTransactions = await trx.query(
-          AppDatabaseConfig.transactionTableName,
+          DatabaseConfig.transactionTableName,
           where: 'createdById = ? AND id LIKE ?',
           whereArgs: [userId, "%${contains ?? ''}%"],
           orderBy: '$orderBy $sortBy',
@@ -325,7 +325,7 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
         for (var transaction in transactions) {
           // Get transaction ordered products
           var rawOrderedProducts = await trx.query(
-            AppDatabaseConfig.orderedProductTableName,
+            DatabaseConfig.orderedProductTableName,
             where: 'transactionId = ?',
             whereArgs: [transaction.id],
           );
@@ -337,7 +337,7 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
 
           // Get created by
           var rawCreatedBy = await trx.query(
-            AppDatabaseConfig.userTableName,
+            DatabaseConfig.userTableName,
             where: 'id = ?',
             whereArgs: [transaction.createdById],
           );

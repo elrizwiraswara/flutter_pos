@@ -1,10 +1,10 @@
 import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../app/assets/app_assets.dart';
+import '../../../../app/di/dependency_injection.dart';
 import '../../../../app/routes/app_routes.dart';
-import '../../../../app/themes/app_sizes.dart';
-import '../../../../service_locator.dart';
+import '../../../../core/assets/assets.dart';
+import '../../../../core/themes/app_sizes.dart';
 import '../../../providers/auth/auth_provider.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_dialog.dart';
@@ -36,7 +36,7 @@ class SignInScreen extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             const AppImage(
-              image: AppAssets.welcome,
+              image: Assets.welcome,
               imgProvider: ImgProvider.assetImage,
             ),
             const SizedBox(height: AppSizes.padding),
@@ -59,7 +59,7 @@ class SignInScreen extends StatelessWidget {
     return AppButton(
       text: 'Sign In With Google',
       onTap: () async {
-        var res = await sl<AuthProvider>().signIn();
+        var res = await di<AuthProvider>().signIn();
 
         if (res.isSuccess) {
           AppRoutes.instance.router.refresh();

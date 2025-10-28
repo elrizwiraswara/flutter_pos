@@ -2,14 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 
-import '../../../app/utilities/console_logger.dart';
+import '../../../app/di/dependency_injection.dart';
 import '../../../core/common/result.dart';
+import '../../../core/utilities/console_logger.dart';
 import '../../../domain/entities/product_entity.dart';
 import '../../../domain/repositories/product_repository.dart';
 import '../../../domain/repositories/storage_repository.dart';
 import '../../../domain/usecases/product_usecases.dart';
 import '../../../domain/usecases/storage_usecases.dart';
-import '../../../service_locator.dart';
 import '../auth/auth_provider.dart';
 import 'products_provider.dart';
 
@@ -92,7 +92,7 @@ class ProductFormProvider extends ChangeNotifier {
       var res = await CreateProductUsecase(productRepository).call(product);
 
       // Refresh products
-      sl<ProductsProvider>().getAllProducts();
+      di<ProductsProvider>().getAllProducts();
 
       return res;
     } catch (e) {
@@ -126,7 +126,7 @@ class ProductFormProvider extends ChangeNotifier {
       var res = await UpdateProductUsecase(productRepository).call(product);
 
       // Refresh products
-      sl<ProductsProvider>().getAllProducts();
+      di<ProductsProvider>().getAllProducts();
 
       return res;
     } catch (e) {
@@ -140,7 +140,7 @@ class ProductFormProvider extends ChangeNotifier {
       var res = await DeleteProductUsecase(productRepository).call(id);
 
       // Refresh products
-      sl<ProductsProvider>().getAllProducts();
+      di<ProductsProvider>().getAllProducts();
 
       return res;
     } catch (e) {

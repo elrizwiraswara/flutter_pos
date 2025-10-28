@@ -1,4 +1,4 @@
-import 'package:flutter_pos/app/database/app_database.dart';
+import 'package:flutter_pos/core/database/app_database.dart';
 import 'package:flutter_pos/data/datasources/local/product_local_datasource_impl.dart';
 import 'package:flutter_pos/data/models/product_model.dart';
 import 'package:flutter_test/flutter_test.dart';

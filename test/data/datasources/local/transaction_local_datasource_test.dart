@@ -1,4 +1,4 @@
-import 'package:flutter_pos/app/database/app_database.dart';
+import 'package:flutter_pos/core/database/app_database.dart';
 import 'package:flutter_pos/data/datasources/local/transaction_local_datasource_impl.dart';
 import 'package:flutter_pos/data/models/ordered_product_model.dart';
 import 'package:flutter_pos/data/models/transaction_model.dart';
