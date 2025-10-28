@@ -103,8 +103,9 @@ This application uses an offline-first approach, where data will be stored in th
 
 To test the application, run the following command:
 ```sh
-flutter test
+flutter test --coverage
 ```
+To view the test coverage you can use `genhtml` or [test_cov_console](https://pub.dev/packages/test_cov_console)
 
 ## Contributing
 
@@ -113,7 +114,3 @@ Contributions are welcome! Please open an issue or submit a pull request for any
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Support
-
-<a href="https://trakteer.id/elrizwiraswara/tip" target="_blank"><img id="wse-buttons-preview" src="https://cdn.trakteer.id/images/embed/trbtn-red-6.png?date=18-11-2023" height="40" style="border:0px;height:40px;margin-top:14px" alt="Trakteer Saya"></a>
