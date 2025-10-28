@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import '../../app/const/app_const.dart';
-import '../../app/services/connectivity/ping_service.dart';
 import '../../core/common/result.dart';
+import '../../core/constants/constants.dart';
+import '../../core/services/connectivity/ping_service.dart';
 import '../../domain/entities/product_entity.dart';
 import '../../domain/repositories/product_repository.dart';
 import '../datasources/local/product_local_datasource_impl.dart';
@@ -252,7 +252,7 @@ class ProductRepositoryImpl extends ProductRepository {
         if (updatedAtLocal == null || updatedAtRemote == null) continue;
 
         final differenceInMinutes = updatedAtRemote.difference(updatedAtLocal).inMinutes;
-        final isDiffSignificant = differenceInMinutes.abs() > AppConst.minSyncIntervalToleranceForCriticalInMinutes;
+        final isDiffSignificant = differenceInMinutes.abs() > Constants.minSyncIntervalToleranceForCriticalInMinutes;
 
         // Check which is newer based on the difference
         final isRemoteNewer = isDiffSignificant && differenceInMinutes > 0;

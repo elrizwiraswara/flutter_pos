@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../app/themes/app_sizes.dart';
+import '../../core/themes/app_sizes.dart';
 import 'app_button.dart';
 
 class AppEmptyState extends StatelessWidget {

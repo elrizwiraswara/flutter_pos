@@ -1,14 +1,13 @@
 import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/presentation/widgets/app_snack_bar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-import '../../../app/const/app_const.dart';
-import '../../../app/themes/app_sizes.dart';
+import '../../../app/di/dependency_injection.dart';
+import '../../../core/constants/constants.dart';
+import '../../../core/themes/app_sizes.dart';
 import '../../../domain/entities/product_entity.dart';
-import '../../../service_locator.dart';
 import '../../providers/home/home_provider.dart';
 import '../../providers/main/main_provider.dart';
 import '../../providers/products/products_provider.dart';
@@ -17,6 +16,7 @@ import '../../widgets/app_dialog.dart';
 import '../../widgets/app_empty_state.dart';
 import '../../widgets/app_loading_more_indicator.dart';
 import '../../widgets/app_progress_indicator.dart';
+import '../../widgets/app_snack_bar.dart';
 import '../../widgets/app_text_field.dart';
 import '../products/components/products_card.dart';
 import 'components/cart_panel_body.dart';
@@ -32,9 +32,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final mainProvider = sl<MainProvider>();
-  final homeProvider = sl<HomeProvider>();
-  final productProvider = sl<ProductsProvider>();
+  final mainProvider = di<MainProvider>();
+  final homeProvider = di<HomeProvider>();
+  final productProvider = di<ProductsProvider>();
 
   final scrollController = ScrollController();
 
@@ -208,7 +208,7 @@ class _HomeScreenState extends State<HomeScreen> {
               color: isHasInternet ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.outline,
             ),
             onTap: () {
-              AppSnackBar.show(message: isHasInternet ? AppConst.onlineMessage : AppConst.offlineMessage);
+              AppSnackBar.show(message: isHasInternet ? Constants.onlineMessage : Constants.offlineMessage);
             },
           ),
         );

@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import '../../app/services/connectivity/ping_service.dart';
-import '../../app/utilities/console_logger.dart';
 import '../../core/common/result.dart';
+import '../../core/services/connectivity/ping_service.dart';
+import '../../core/utilities/console_logger.dart';
 import '../../domain/entities/queued_action_entity.dart';
 import '../../domain/repositories/queued_action_repository.dart';
 import '../datasources/local/queued_action_local_datasource_impl.dart';

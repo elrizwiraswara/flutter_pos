@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 
-import '../../../app/utilities/console_logger.dart';
 import '../../../core/common/result.dart';
+import '../../../core/utilities/console_logger.dart';
 import '../../../domain/entities/user_entity.dart' hide AuthProvider;
 import '../../../domain/repositories/auth_repository.dart';
 import '../../../domain/repositories/storage_repository.dart';

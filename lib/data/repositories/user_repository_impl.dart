@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import '../../app/const/app_const.dart';
-import '../../app/services/connectivity/ping_service.dart';
 import '../../core/common/result.dart';
+import '../../core/constants/constants.dart';
+import '../../core/services/connectivity/ping_service.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/user_repository.dart';
 import '../datasources/local/queued_action_local_datasource_impl.dart';
@@ -169,7 +169,7 @@ class UserRepositoryImpl extends UserRepository {
       }
 
       final differenceInMinutes = updatedAtRemote.difference(updatedAtLocal).inMinutes;
-      final isDiffSignificant = differenceInMinutes.abs() > AppConst.minSyncIntervalToleranceForLessCriticalInMinutes;
+      final isDiffSignificant = differenceInMinutes.abs() > Constants.minSyncIntervalToleranceForLessCriticalInMinutes;
 
       // Check which is newer based on the difference
       final isRemoteNewer = isDiffSignificant && differenceInMinutes > 0;

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../app/themes/app_sizes.dart';
-import '../../../../app/utilities/currency_formatter.dart';
+import '../../../../core/themes/app_sizes.dart';
+import '../../../../core/utilities/currency_formatter.dart';
 import '../../../providers/home/home_provider.dart';
 import '../../../widgets/app_empty_state.dart';
 import 'order_card.dart';

@@ -1,7 +1,7 @@
 import '../../core/common/result.dart';
+import '../../core/usecase/usecase.dart';
 import '../entities/queued_action_entity.dart';
 import '../repositories/queued_action_repository.dart';
-import '../../core/usecase/usecase.dart';
 import 'params/no_param.dart';
 
 class GetAllQueuedActionUsecase extends Usecase<Result, NoParam> {

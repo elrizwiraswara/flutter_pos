@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/app/utilities/console_logger.dart';
 
 import '../../app/routes/app_routes.dart';
-import '../../app/themes/app_sizes.dart';
+import '../../core/themes/app_sizes.dart';
+import '../../core/utilities/console_logger.dart';
 import 'app_button.dart';
 import 'app_progress_indicator.dart';
 

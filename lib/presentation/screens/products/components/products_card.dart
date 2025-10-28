@@ -1,8 +1,8 @@
 import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../app/themes/app_sizes.dart';
-import '../../../../app/utilities/currency_formatter.dart';
+import '../../../../core/themes/app_sizes.dart';
+import '../../../../core/utilities/currency_formatter.dart';
 import '../../../../domain/entities/product_entity.dart';
 
 class ProductsCard extends StatelessWidget {

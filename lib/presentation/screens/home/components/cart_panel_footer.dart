@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/app/routes/app_routes.dart';
-import 'package:flutter_pos/presentation/widgets/app_snack_bar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../app/themes/app_sizes.dart';
-import '../../../../app/utilities/currency_formatter.dart';
-import '../../../../service_locator.dart';
+import '../../../../app/di/dependency_injection.dart';
+import '../../../../app/routes/app_routes.dart';
+import '../../../../core/themes/app_sizes.dart';
+import '../../../../core/utilities/currency_formatter.dart';
 import '../../../providers/home/home_provider.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_dialog.dart';
 import '../../../widgets/app_drop_down.dart';
+import '../../../widgets/app_snack_bar.dart';
 import '../../../widgets/app_text_field.dart';
 
 class CartPanelFooter extends StatefulWidget {
@@ -21,7 +21,7 @@ class CartPanelFooter extends StatefulWidget {
 }
 
 class _CartPanelFooterState extends State<CartPanelFooter> {
-  final _homeProvider = sl<HomeProvider>();
+  final _homeProvider = di<HomeProvider>();
 
   final _amountControlller = TextEditingController();
   final _customerControlller = TextEditingController();

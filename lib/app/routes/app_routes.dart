@@ -6,7 +6,7 @@ import '../../presentation/screens/account/about_screen.dart';
 import '../../presentation/screens/account/account_screen.dart';
 import '../../presentation/screens/account/profile_form_screen.dart';
 import '../../presentation/screens/auth/sign_in/sign_in_screen.dart';
-import '../../presentation/screens/error_handler_screen.dart';
+import '../../presentation/screens/error/error_screen.dart';
 import '../../presentation/screens/home/home_screen.dart';
 import '../../presentation/screens/main/main_screen.dart';
 import '../../presentation/screens/products/product_detail_screen.dart';
@@ -14,10 +14,10 @@ import '../../presentation/screens/products/product_form_screen.dart';
 import '../../presentation/screens/products/products_screen.dart';
 import '../../presentation/screens/transactions/transaction_detail_screen.dart';
 import '../../presentation/screens/transactions/transactions_screen.dart';
-import '../../service_locator.dart';
+import '../di/dependency_injection.dart';
 import 'params/error_screen_param.dart';
 
-// App routes
+/// App routes
 class AppRoutes {
   final AuthProvider authProvider;
 
@@ -27,7 +27,7 @@ class AppRoutes {
   }
 
   // Static convenience getter - returns the same instance from GetIt
-  static AppRoutes get instance => sl<AppRoutes>();
+  static AppRoutes get instance => di<AppRoutes>();
 
   final rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
   final navNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'nav');

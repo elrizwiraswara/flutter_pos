@@ -1,8 +1,8 @@
 import 'package:sqflite/sqflite.dart';
 
-import '../../../app/database/app_database.dart';
-import '../../../app/database/app_database_config.dart';
 import '../../../core/common/result.dart';
+import '../../../core/database/app_database.dart';
+import '../../../core/database/database_config.dart';
 import '../../models/queued_action_model.dart';
 import '../interfaces/queued_action_datasource.dart';
 
@@ -15,7 +15,7 @@ class QueuedActionLocalDatasourceImpl extends QueuedActionDatasource {
   Future<Result<int>> createQueuedAction(QueuedActionModel queue) async {
     try {
       await _appDatabase.database.insert(
-        AppDatabaseConfig.queuedActionTableName,
+        DatabaseConfig.queuedActionTableName,
         queue.toJson(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
@@ -31,7 +31,7 @@ class QueuedActionLocalDatasourceImpl extends QueuedActionDatasource {
   Future<Result<void>> deleteQueuedAction(int id) async {
     try {
       await _appDatabase.database.delete(
-        AppDatabaseConfig.queuedActionTableName,
+        DatabaseConfig.queuedActionTableName,
         where: 'id = ?',
         whereArgs: [id],
       );
@@ -46,7 +46,7 @@ class QueuedActionLocalDatasourceImpl extends QueuedActionDatasource {
   Future<Result<QueuedActionModel?>> getQueuedAction(int id) async {
     try {
       var res = await _appDatabase.database.query(
-        AppDatabaseConfig.queuedActionTableName,
+        DatabaseConfig.queuedActionTableName,
         where: 'id = ?',
         whereArgs: [id],
       );
@@ -63,7 +63,7 @@ class QueuedActionLocalDatasourceImpl extends QueuedActionDatasource {
   Future<Result<List<QueuedActionModel>>> getAllUserQueuedAction() async {
     try {
       var res = await _appDatabase.database.query(
-        AppDatabaseConfig.queuedActionTableName,
+        DatabaseConfig.queuedActionTableName,
       );
 
       return Result.success(

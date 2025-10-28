@@ -1,8 +1,8 @@
 import 'package:sqflite/sqflite.dart';
 
-import '../../../app/database/app_database.dart';
-import '../../../app/database/app_database_config.dart';
 import '../../../core/common/result.dart';
+import '../../../core/database/app_database.dart';
+import '../../../core/database/database_config.dart';
 import '../../models/product_model.dart';
 import '../interfaces/product_datasource.dart';
 
@@ -15,7 +15,7 @@ class ProductLocalDatasourceImpl extends ProductDatasource {
   Future<Result<int>> createProduct(ProductModel product) async {
     try {
       await _appDatabase.database.insert(
-        AppDatabaseConfig.productTableName,
+        DatabaseConfig.productTableName,
         product.toJson(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
@@ -31,7 +31,7 @@ class ProductLocalDatasourceImpl extends ProductDatasource {
   Future<Result<void>> updateProduct(ProductModel product) async {
     try {
       await _appDatabase.database.update(
-        AppDatabaseConfig.productTableName,
+        DatabaseConfig.productTableName,
         product.toJson(),
         where: 'id = ?',
         whereArgs: [product.id],
@@ -48,7 +48,7 @@ class ProductLocalDatasourceImpl extends ProductDatasource {
   Future<Result<void>> deleteProduct(int id) async {
     try {
       await _appDatabase.database.delete(
-        AppDatabaseConfig.productTableName,
+        DatabaseConfig.productTableName,
         where: 'id = ?',
         whereArgs: [id],
       );
@@ -63,7 +63,7 @@ class ProductLocalDatasourceImpl extends ProductDatasource {
   Future<Result<ProductModel?>> getProduct(int id) async {
     try {
       var res = await _appDatabase.database.query(
-        AppDatabaseConfig.productTableName,
+        DatabaseConfig.productTableName,
         where: 'id = ?',
         whereArgs: [id],
       );
@@ -80,7 +80,7 @@ class ProductLocalDatasourceImpl extends ProductDatasource {
   Future<Result<List<ProductModel>>> getAllUserProducts(String userId) async {
     try {
       var res = await _appDatabase.database.query(
-        AppDatabaseConfig.productTableName,
+        DatabaseConfig.productTableName,
         where: 'createdById = ?',
         whereArgs: [userId],
       );
@@ -104,7 +104,7 @@ class ProductLocalDatasourceImpl extends ProductDatasource {
   }) async {
     try {
       var res = await _appDatabase.database.query(
-        AppDatabaseConfig.productTableName,
+        DatabaseConfig.productTableName,
         where: 'createdById = ? AND name LIKE ?',
         whereArgs: [userId, "%${contains ?? ''}%"],
         orderBy: '$orderBy $sortBy',

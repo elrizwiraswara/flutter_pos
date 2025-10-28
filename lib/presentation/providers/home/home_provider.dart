@@ -1,14 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-import '../../../app/utilities/console_logger.dart';
+import '../../../app/di/dependency_injection.dart';
 import '../../../core/common/result.dart';
+import '../../../core/utilities/console_logger.dart';
 import '../../../domain/entities/ordered_product_entity.dart';
 import '../../../domain/entities/product_entity.dart';
 import '../../../domain/entities/transaction_entity.dart';
 import '../../../domain/repositories/transaction_repository.dart';
 import '../../../domain/usecases/transaction_usecases.dart';
-import '../../../service_locator.dart';
 import '../auth/auth_provider.dart';
 import '../products/products_provider.dart';
 
@@ -64,7 +64,7 @@ class HomeProvider extends ChangeNotifier {
       panelController.close();
 
       // Refresh products
-      sl<ProductsProvider>().getAllProducts();
+      di<ProductsProvider>().getAllProducts();
 
       return res;
     } catch (e) {

@@ -2,10 +2,10 @@ import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../app/themes/app_sizes.dart';
-import '../../../app/utilities/currency_formatter.dart';
-import '../../../app/utilities/date_formatter.dart';
-import '../../../service_locator.dart';
+import '../../../app/di/dependency_injection.dart';
+import '../../../core/themes/app_sizes.dart';
+import '../../../core/utilities/currency_formatter.dart';
+import '../../../core/utilities/date_time_formatter.dart';
 import '../../providers/products/product_detail_provider.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_empty_state.dart';
@@ -28,7 +28,7 @@ class ProductDetailScreen extends StatelessWidget {
         actions: [editButton(context)],
       ),
       body: FutureBuilder(
-        future: sl<ProductDetailProvider>().getProductDetail(id),
+        future: di<ProductDetailProvider>().getProductDetail(id),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const AppProgressIndicator();
@@ -146,14 +146,14 @@ class ProductDetailScreen extends StatelessWidget {
         ),
         const SizedBox(height: AppSizes.padding / 2),
         Text(
-          "Added at ${DateFormatter.stripDateWithClock(createdAt ?? '')}",
+          "Added at ${DateTimeFormatter.stripDateWithClock(createdAt ?? '')}",
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
             fontSize: 10,
             color: Theme.of(context).colorScheme.outline,
           ),
         ),
         Text(
-          "Last updated at ${DateFormatter.stripDateWithClock(updatedAt ?? '')}",
+          "Last updated at ${DateTimeFormatter.stripDateWithClock(updatedAt ?? '')}",
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
             fontSize: 10,
             color: Theme.of(context).colorScheme.outline,

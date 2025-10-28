@@ -3,19 +3,19 @@ import 'dart:io';
 import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_pos/app/routes/app_routes.dart';
-import 'package:flutter_pos/presentation/widgets/app_snack_bar.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
-import '../../../app/themes/app_sizes.dart';
-import '../../../service_locator.dart';
+import '../../../app/di/dependency_injection.dart';
+import '../../../app/routes/app_routes.dart';
+import '../../../core/themes/app_sizes.dart';
 import '../../providers/account/account_provider.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
 import '../../widgets/app_icon_button.dart';
 import '../../widgets/app_progress_indicator.dart';
+import '../../widgets/app_snack_bar.dart';
 import '../../widgets/app_text_field.dart';
 
 class ProfileFormScreen extends StatefulWidget {
@@ -26,7 +26,7 @@ class ProfileFormScreen extends StatefulWidget {
 }
 
 class _ProfileFormScreenState extends State<ProfileFormScreen> {
-  final accountProvider = sl<AccountProvider>()..resetStates();
+  final accountProvider = di<AccountProvider>()..resetStates();
 
   final nameController = TextEditingController();
   final emailController = TextEditingController();
