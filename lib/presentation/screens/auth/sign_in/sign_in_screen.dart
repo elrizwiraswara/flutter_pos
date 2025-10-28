@@ -64,7 +64,7 @@ class SignInScreen extends StatelessWidget {
         if (res.isSuccess) {
           AppRoutes.instance.router.refresh();
         } else {
-          AppDialog.showErrorDialog(error: res.error?.toString());
+          AppDialog.showError(error: res.error?.toString());
         }
       },
     );

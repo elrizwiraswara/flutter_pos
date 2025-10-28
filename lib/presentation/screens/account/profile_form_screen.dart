@@ -11,6 +11,7 @@ import '../../../app/di/dependency_injection.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../../core/themes/app_sizes.dart';
 import '../../providers/account/account_provider.dart';
+import '../../providers/main/main_provider.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
 import '../../widgets/app_icon_button.dart';
@@ -27,6 +28,7 @@ class ProfileFormScreen extends StatefulWidget {
 
 class _ProfileFormScreenState extends State<ProfileFormScreen> {
   final accountProvider = di<AccountProvider>()..resetStates();
+  final mainProvider = di<MainProvider>();
 
   final nameController = TextEditingController();
   final emailController = TextEditingController();
@@ -210,15 +212,18 @@ class _ProfileFormScreenState extends State<ProfileFormScreen> {
   }
 
   void updatedUser() async {
-    var res = await AppDialog.showDialogProgress(() {
+    var res = await AppDialog.showProgress(() {
       return accountProvider.updatedUser();
     });
 
     if (res.isSuccess) {
       AppRoutes.instance.router.pop();
-      AppSnackBar.show(message: 'Profile updated');
+      AppSnackBar.show('Profile updated');
+
+      // Refresh user data
+      mainProvider.getAndSyncAllUserData();
     } else {
-      AppDialog.showErrorDialog(error: res.error.toString());
+      AppDialog.showError(error: res.error.toString());
     }
   }
 }

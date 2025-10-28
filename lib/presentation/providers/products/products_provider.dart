@@ -46,7 +46,7 @@ class ProductsProvider extends ChangeNotifier {
       isLoadingMore = false;
       notifyListeners();
     } else {
-      throw res.error ?? 'Failed to load data';
+      throw Exception(res.error?.toString() ?? 'Failed to load data');
     }
   }
 }

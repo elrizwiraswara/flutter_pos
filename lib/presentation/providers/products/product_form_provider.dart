@@ -78,7 +78,7 @@ class ProductFormProvider extends ChangeNotifier {
         imageUrl = res.data;
       }
 
-      cl('[createProduct].imageUrl $imageUrl');
+      cl('imageUrl $imageUrl');
 
       var product = ProductEntity(
         createdById: userId,
@@ -96,7 +96,6 @@ class ProductFormProvider extends ChangeNotifier {
 
       return res;
     } catch (e) {
-      cl("[createProduct].error $e");
       return Result.failure(error: e);
     }
   }
@@ -111,7 +110,7 @@ class ProductFormProvider extends ChangeNotifier {
         imageUrl = res.data;
       }
 
-      cl('[updatedProduct].imageUrl $imageUrl');
+      cl('imageUrl $imageUrl');
 
       var product = ProductEntity(
         id: id,
@@ -130,7 +129,6 @@ class ProductFormProvider extends ChangeNotifier {
 
       return res;
     } catch (e) {
-      cl("[updatedProduct].error $e");
       return Result.failure(error: e);
     }
   }
@@ -144,7 +142,6 @@ class ProductFormProvider extends ChangeNotifier {
 
       return res;
     } catch (e) {
-      cl("[deleteProduct].error $e");
       return Result.failure(error: e);
     }
   }

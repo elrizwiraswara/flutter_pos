@@ -86,7 +86,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     ),
                   ),
                   SliverLayoutBuilder(
-                    builder: (context, constraint) {
+                    builder: (context, _) {
                       if (provider.allProducts == null) {
                         return const SliverFillRemaining(
                           hasScrollBody: false,

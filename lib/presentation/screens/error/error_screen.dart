@@ -22,7 +22,7 @@ class ErrorScreen extends StatelessWidget {
               error: param.error ?? param.flutterError,
               message: param.message,
             ),
-            const SizedBox(height: AppSizes.padding * 2),
+            const SizedBox(height: AppSizes.padding),
             AppButton(
               buttonColor: Theme.of(context).colorScheme.surface,
               borderColor: Theme.of(context).colorScheme.surfaceContainerLowest,

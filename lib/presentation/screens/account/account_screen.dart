@@ -245,9 +245,9 @@ class AccountScreen extends StatelessWidget {
               final res = await di<AuthProvider>().signOut();
 
               if (res.isSuccess) {
-                AppRoutes.instance.router.refresh();
+                AppRoutes.instance.router.go('/sign-in');
               } else {
-                AppSnackBar.show(message: res.error.toString(), isErrorMessage: true);
+                AppSnackBar.showError(res.error.toString());
               }
             },
           );

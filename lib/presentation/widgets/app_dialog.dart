@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 import '../../app/routes/app_routes.dart';
 import '../../core/themes/app_sizes.dart';
-import '../../core/utilities/console_logger.dart';
 import 'app_button.dart';
 import 'app_progress_indicator.dart';
 
@@ -63,7 +62,7 @@ class AppDialog {
     );
   }
 
-  static Future<void> showErrorDialog({
+  static Future<void> showError({
     String? title,
     String? message,
     String? error,
@@ -72,8 +71,6 @@ class AppDialog {
   }) async {
     final context = AppRoutes.instance.router.configuration.navigatorKey.currentContext;
     if (context == null) throw Exception('No context available for dialog');
-
-    cl(error, type: LogType.error);
 
     return await showDialog(
       context: context,
@@ -112,7 +109,7 @@ class AppDialog {
     );
   }
 
-  static Future<T> showDialogProgress<T>(
+  static Future<T> showProgress<T>(
     Future<T> Function() process, {
     bool dismissible = false,
   }) async {

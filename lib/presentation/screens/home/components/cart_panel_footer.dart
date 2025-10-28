@@ -10,7 +10,6 @@ import '../../../providers/home/home_provider.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_dialog.dart';
 import '../../../widgets/app_drop_down.dart';
-import '../../../widgets/app_snack_bar.dart';
 import '../../../widgets/app_text_field.dart';
 
 class CartPanelFooter extends StatefulWidget {
@@ -191,15 +190,14 @@ class _CartPanelFooterState extends State<CartPanelFooter> {
   }
 
   void onPay() async {
-    var res = await AppDialog.showDialogProgress(() {
+    var res = await AppDialog.showProgress(() {
       return _homeProvider.createTransaction();
     });
 
     if (res.isSuccess) {
       AppRoutes.instance.router.go('/transactions/transaction-detail/${res.data}');
-      AppSnackBar.show(message: 'Transaction created');
     } else {
-      AppDialog.showErrorDialog(error: res.error?.toString());
+      AppDialog.showError(error: res.error?.toString());
     }
   }
 }

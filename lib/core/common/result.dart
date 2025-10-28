@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:http/http.dart' show Response;
 
+import '../utilities/console_logger.dart';
+
 /// A generic result wrapper that encapsulates success/failure states
 sealed class Result<T> {
   const Result();
@@ -150,5 +152,8 @@ final class Failure<T> extends Result<T> {
     this.state,
     required this.error,
     this.stackTrace,
-  });
+  }) {
+    // Always log any error to console in debug mode
+    ce(error, title: title, message: message, state: state);
+  }
 }

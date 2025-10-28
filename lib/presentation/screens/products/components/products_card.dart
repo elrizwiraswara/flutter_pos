@@ -17,8 +17,7 @@ class ProductsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      borderRadius: BorderRadius.circular(4),
+    return RepaintBoundary(
       child: InkWell(
         onTap: onTap,
         splashColor: Colors.black.withValues(alpha: 0.06),
@@ -35,7 +34,7 @@ class ProductsCard extends StatelessWidget {
               color: Theme.of(context).colorScheme.surfaceContainerHighest,
             ),
           ),
-          child: Container(
+          child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 146, maxHeight: 226),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

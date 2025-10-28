@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import '../../../app/di/dependency_injection.dart';
-import '../../../core/constants/constants.dart';
 import '../../../core/themes/app_sizes.dart';
 import '../../../domain/entities/product_entity.dart';
 import '../../providers/home/home_provider.dart';
@@ -208,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
               color: isHasInternet ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.outline,
             ),
             onTap: () {
-              AppSnackBar.show(message: isHasInternet ? Constants.onlineMessage : Constants.offlineMessage);
+              AppSnackBar.show(isHasInternet ? 'Online mode' : 'No internet connection, running in offline mode');
             },
           ),
         );

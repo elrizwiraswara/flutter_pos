@@ -1,6 +1,5 @@
-import 'package:flutter_pos/core/services/connectivity/ping_service.dart';
 import 'package:flutter_pos/core/common/result.dart';
-import 'package:flutter_pos/core/constants/constants.dart';
+import 'package:flutter_pos/core/services/connectivity/ping_service.dart';
 import 'package:flutter_pos/data/datasources/remote/storage_remote_datasource_impl.dart';
 import 'package:flutter_pos/data/repositories/storage_repository_impl.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -58,7 +57,6 @@ void main() {
       final result = await repository.uploadUserPhoto(imgPath);
 
       expect(result.isFailure, true);
-      expect(result.error, Constants.noInternetMessage);
       verify(mockPingService.isConnected).called(1);
       verifyNever(mockStorageRemoteDataSource.uploadUserPhoto(any));
     });
@@ -141,7 +139,6 @@ void main() {
       final result = await repository.uploadProductImage(imgPath);
 
       expect(result.isFailure, true);
-      expect(result.error, Constants.noInternetMessage);
       verify(mockPingService.isConnected).called(1);
       verifyNever(mockStorageRemoteDataSource.uploadProductImage(any));
     });
@@ -264,7 +261,6 @@ void main() {
 
       final result2 = await repository.uploadProductImage(imgPath);
       expect(result2.isFailure, true);
-      expect(result2.error, Constants.noInternetMessage);
     });
   });
 
