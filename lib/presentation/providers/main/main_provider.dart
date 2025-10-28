@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/di/dependency_injection.dart';
-import '../../../core/constants/constants.dart';
 import '../../../core/services/connectivity/ping_service.dart';
 import '../../../core/services/info/device_info_service.dart';
 import '../../../domain/entities/queued_action_entity.dart';
@@ -70,16 +69,9 @@ class MainProvider extends ChangeNotifier {
 
   Future<void> checkAndSyncAllData() async {
     // Prevent sync during first time app open
-    if (!isLoaded) return;
-
-    if (!pingService.isConnected) {
-      AppSnackBar.show(message: Constants.syncPendingMessage);
-      return;
-    }
+    if (!isLoaded || !pingService.isConnected) return;
 
     try {
-      AppSnackBar.show(message: Constants.synchronizingMessage);
-
       isSyncronizing = true;
       notifyListeners();
 
@@ -89,9 +81,9 @@ class MainProvider extends ChangeNotifier {
       // Sync all data
       await getAndSyncAllUserData();
 
-      AppSnackBar.show(
-        message: "${Constants.syncedMessage}! ${queueExecutedCount > 0 ? "$queueExecutedCount queues executed" : ""}",
-      );
+      if (queueExecutedCount > 0) {
+        AppSnackBar.show("$queueExecutedCount queues executed");
+      }
 
       // Re-check queued actions
       checkIsHasQueuedActions();
@@ -102,10 +94,7 @@ class MainProvider extends ChangeNotifier {
       isSyncronizing = false;
       notifyListeners();
 
-      AppSnackBar.show(
-        message: 'Failed to sync data\n\n${e.toString()}',
-        isErrorMessage: true,
-      );
+      AppSnackBar.showError('Failed to sync data\n\n${e.toString()}');
     }
   }
 
@@ -123,10 +112,13 @@ class MainProvider extends ChangeNotifier {
     ]);
 
     // Set and notify user state
-    if (res.isNotEmpty && res.first.isSuccess) {
+    if (res.first.isSuccess) {
       user = res.first.data as UserEntity?;
       notifyListeners();
     }
+
+    if (res[1].isFailure) AppSnackBar.showError("Failed to sync product data");
+    if (res[2].isFailure) AppSnackBar.showError("Failed to sync transaction data");
 
     // Refresh products list
     di<ProductsProvider>().getAllProducts();

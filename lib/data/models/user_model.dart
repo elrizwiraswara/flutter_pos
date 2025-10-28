@@ -10,7 +10,7 @@ class UserModel {
   String? gender;
   String? birthdate;
   String? imageUrl;
-  AuthProvider? authProvider;
+  String? authProvider;
   String? createdAt;
   String? updatedAt;
 
@@ -66,7 +66,7 @@ class UserModel {
       gender: entity.gender,
       birthdate: entity.birthdate,
       imageUrl: entity.imageUrl,
-      authProvider: entity.authProvider,
+      authProvider: entity.authProvider?.value,
       createdAt: entity.createdAt ?? DateTime.now().toIso8601String(),
       updatedAt: entity.updatedAt ?? DateTime.now().toIso8601String(),
     );
@@ -81,7 +81,7 @@ class UserModel {
       gender: gender,
       birthdate: birthdate,
       imageUrl: imageUrl,
-      authProvider: authProvider,
+      authProvider: AuthProvider.fromValue(authProvider),
       createdAt: createdAt,
       updatedAt: updatedAt,
     );
@@ -100,7 +100,7 @@ class UserModel {
       gender: null,
       birthdate: null,
       imageUrl: firebaseUser.photoURL,
-      authProvider: authProvider,
+      authProvider: authProvider.value,
       createdAt: null,
       updatedAt: null,
     );

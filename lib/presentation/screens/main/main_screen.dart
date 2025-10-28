@@ -3,8 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../../../app/di/dependency_injection.dart';
 import '../../../app/routes/app_routes.dart';
-import '../../../core/constants/constants.dart';
-import '../../providers/auth/auth_provider.dart';
 import '../../providers/main/main_provider.dart';
 import '../welcome/welcome_screen.dart';
 
@@ -21,13 +19,11 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  final _authProvider = di<AuthProvider>();
   final _mainProvider = di<MainProvider>()..resetStates();
 
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await _authProvider.checkIsAuthenticated();
       await _mainProvider.initMainProvider();
     });
     super.initState();
@@ -45,7 +41,9 @@ class _MainScreenState extends State<MainScreen> {
         // User data might still null for the first time app open or login without internet connection
         // So, throw error with a first time internet error message then the [ErrorScreen] will be shown
         if (provider.isLoaded && provider.user == null && !provider.isHasInternet) {
-          throw Constants.firstTimeInternetErrorMessage;
+          throw Exception(
+            'No Internet connection! Internet connection is required for the first time app open or user login',
+          );
         }
 
         return Scaffold(

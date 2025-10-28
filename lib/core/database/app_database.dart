@@ -66,9 +66,9 @@ class AppDatabase {
       // Delete the database file
       await databaseFile.delete();
 
-      cl('[AppDatabase].dropDatabase = Database deleted successfully.');
+      cw('Database deleted successfully!');
     } else {
-      cl('[AppDatabase].dropDatabase = Database does not exist.');
+      ce('Database does not exist!');
     }
   }
 }

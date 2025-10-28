@@ -3,7 +3,6 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import '../../../app/di/dependency_injection.dart';
 import '../../../core/common/result.dart';
-import '../../../core/utilities/console_logger.dart';
 import '../../../domain/entities/ordered_product_entity.dart';
 import '../../../domain/entities/product_entity.dart';
 import '../../../domain/entities/transaction_entity.dart';
@@ -68,7 +67,6 @@ class HomeProvider extends ChangeNotifier {
 
       return res;
     } catch (e) {
-      cl('[createTransaction].error $e');
       return Result.failure(error: e);
     }
   }

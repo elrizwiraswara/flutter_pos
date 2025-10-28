@@ -273,41 +273,41 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   }
 
   void createProduct() async {
-    var res = await AppDialog.showDialogProgress(() {
+    var res = await AppDialog.showProgress(() {
       return productFormProvider.createProduct();
     });
 
     if (res.isSuccess) {
       AppRoutes.instance.router.go('/products');
-      AppSnackBar.show(message: 'Product created');
+      AppSnackBar.show('Product created');
     } else {
-      AppDialog.showErrorDialog(error: res.error?.toString());
+      AppDialog.showError(error: res.error?.toString());
     }
   }
 
   void updatedProduct() async {
-    var res = await AppDialog.showDialogProgress(() {
+    var res = await AppDialog.showProgress(() {
       return productFormProvider.updatedProduct(widget.id!);
     });
 
     if (res.isSuccess) {
       AppRoutes.instance.router.pop();
-      AppSnackBar.show(message: 'Product updated');
+      AppSnackBar.show('Product updated');
     } else {
-      AppDialog.showErrorDialog(error: res.error?.toString());
+      AppDialog.showError(error: res.error?.toString());
     }
   }
 
   void deleteProduct() async {
-    var res = await AppDialog.showDialogProgress(() {
+    var res = await AppDialog.showProgress(() {
       return productFormProvider.deleteProduct(widget.id!);
     });
 
     if (res.isSuccess) {
       AppRoutes.instance.router.go('/products');
-      AppSnackBar.show(message: 'Product deleted');
+      AppSnackBar.show('Product deleted');
     } else {
-      AppDialog.showErrorDialog(error: res.error?.toString());
+      AppDialog.showError(error: res.error?.toString());
     }
   }
 }

@@ -30,11 +30,11 @@ class AuthProvider extends ChangeNotifier {
     _user = res.data;
     notifyListeners();
 
-    cl('[checkIsAuthenticated].isAuthenticated: ${_user != null}');
+    cl('isAuthenticated: ${_user != null}');
   }
 
   Future<Result<String>> signIn() async {
-    return await AppDialog.showDialogProgress(() async {
+    return await AppDialog.showProgress(() async {
       var res = await SignInWithGoogleUsecase(authRepository).call(NoParam());
       if (res.isFailure) return Result.failure(error: res.error!);
 
@@ -49,7 +49,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<Result<void>> signOut() async {
-    return await AppDialog.showDialogProgress(() async {
+    return await AppDialog.showProgress(() async {
       final res = await SignOutUsecase(authRepository).call(NoParam());
       if (res.isFailure) return Result.failure(error: res.error!);
 

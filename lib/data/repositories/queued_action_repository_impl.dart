@@ -66,7 +66,7 @@ class QueuedActionRepositoryImpl extends QueuedActionRepository {
   @override
   Future<Result<bool>> executeQueuedAction(QueuedActionEntity queue) async {
     try {
-      cl("[executeQueuedAction].queue = ${QueuedActionModel.fromEntity(queue).toJson()}");
+      cl(QueuedActionModel.fromEntity(queue).toJson());
 
       final res = await _functionSelector(queue);
 
@@ -77,11 +77,9 @@ class QueuedActionRepositoryImpl extends QueuedActionRepository {
 
         return Result.success(data: true);
       } else {
-        cl("[executeQueuedAction].error = ${res.error}");
         return Result.failure(error: res.error ?? 'Unknown error');
       }
     } catch (e) {
-      cl("[executeQueuedAction].error = $e");
       return Result.failure(error: e);
     }
   }
@@ -177,7 +175,6 @@ class QueuedActionRepositoryImpl extends QueuedActionRepository {
 
       return Result.success(data: null);
     } catch (e) {
-      cl("[_functionSelector].error = $e");
       return Result.failure(error: e);
     }
   }

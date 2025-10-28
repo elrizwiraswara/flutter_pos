@@ -14,8 +14,15 @@ enum LogType {
 
 final _logPrinter = Logger(
   printer: PrettyPrinter(
+    methodCount: 1,
+    lineLength: 150,
     dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
     printEmojis: false,
+    excludePaths: [
+      'package:flutter_pos/core/utilities/console_logger.dart',
+      'package:flutter_pos/core/common/result.dart',
+      '<asynchronous suspension>',
+    ],
   ),
 );
 
@@ -38,7 +45,7 @@ void cl(
 
   if (onlyAnyHasValue) {
     // Print only the 'any' value without prefix
-    parsed = any is Map ? _jsonPrettier(any) : any.toString();
+    parsed = any is Map ? jsonPrettier(any) : any.toString();
   } else {
     // Build the formatted string, only including non-null values
     List<String> parts = [];
@@ -47,7 +54,7 @@ void cl(
 
     if (any != null) {
       parts.add(
-        'Detail  : ${any is Map ? _jsonPrettier(any) : any}',
+        'Detail  : ${any is Map ? jsonPrettier(any) : any}',
       );
     }
 
@@ -75,6 +82,26 @@ void cl(
   }
 }
 
+/// Quick concole log for error
+void ce(
+  dynamic any, {
+  String? title,
+  String? message,
+  String? state,
+}) {
+  return cl(any, title: title, message: message, state: state, type: LogType.error);
+}
+
+/// Quick concole log for warning
+void cw(
+  dynamic any, {
+  String? title,
+  String? message,
+  String? state,
+}) {
+  return cl(any, title: title, message: message, state: state, type: LogType.warning);
+}
+
 /// Build a log context string from optional title, message, and state
 String _buildLogContext({
   String? title,
@@ -99,7 +126,7 @@ String _buildLogContext({
 }
 
 /// Prettify a JSON object for better readability in logs
-String _jsonPrettier(Object? jsonObject) {
+String jsonPrettier(Object? jsonObject) {
   if (jsonObject == null) return 'null';
 
   try {

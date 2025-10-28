@@ -39,7 +39,7 @@ class ErrorHandlerBuilderState extends State<ErrorHandlerBuilder> {
 
   // Flutter error handling logic
   void onFlutterError(FlutterErrorDetails flutterError) {
-    cl('[onFlutterError].error = ${flutterError.exception}', type: LogType.error);
+    ce(flutterError.exception);
 
     _errorLoggerService.log(error: flutterError);
 
@@ -55,7 +55,7 @@ class ErrorHandlerBuilderState extends State<ErrorHandlerBuilder> {
 
   // Platform error handling logic
   Future<bool> onPlatformError(Object error, StackTrace stackTrace) async {
-    cl('[onFlutterError].error = $error', type: LogType.error);
+    ce(error);
 
     _errorLoggerService.log(error: error, stackTrace: stackTrace);
 

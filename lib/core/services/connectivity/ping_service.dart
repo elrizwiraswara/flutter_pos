@@ -114,7 +114,7 @@ class PingService {
     // Check if the status has changed
     if (_previousStatus != isConnected) {
       _previousStatus = isConnected;
-      cl("[PingService].isConnected: $isConnected");
+      cl("isConnected: $isConnected");
       // Notify connection status listeners
       for (var e in _connectionStatusListeners) {
         e.call(isConnected);

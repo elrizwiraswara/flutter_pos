@@ -22,7 +22,7 @@ class ErrorLoggerService {
     String? state,
   }) {
     // Always log to console in debug mode
-    cl(error, title: title, message: message, state: state, type: LogType.error);
+    ce(error, title: title, message: message, state: state);
 
     if (!_debugMode.isDebugMode) {
       _crashlytics.recordError(error, stackTrace);

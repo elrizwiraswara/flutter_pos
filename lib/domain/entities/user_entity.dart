@@ -72,4 +72,8 @@ enum AuthProvider {
 
   final String value;
   const AuthProvider(this.value);
+
+  static AuthProvider? fromValue(String? value) {
+    return AuthProvider.values.where((e) => e.value == value).firstOrNull;
+  }
 }
