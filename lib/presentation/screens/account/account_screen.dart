@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../../app/di/dependency_injection.dart';
 import '../../../app/routes/app_routes.dart';
-import '../../../app/services/auth/auth_service.dart';
-import '../../../app/themes/app_sizes.dart';
+import '../../../core/themes/app_sizes.dart';
+import '../../providers/auth/auth_provider.dart';
 import '../../providers/main/main_provider.dart';
 import '../../providers/theme/theme_provider.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
+import '../../widgets/app_snack_bar.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -237,10 +239,16 @@ class AccountScreen extends StatelessWidget {
             text: 'Are you sure want to sign out?',
             leftButtonText: 'Cancel',
             rightButtonText: 'Sign Out',
-            onTapRightButton: () async {
+            onTapRightButton: (context) async {
               context.pop();
-              await AuthService().signOut();
-              AppRoutes.router.refresh();
+
+              final res = await di<AuthProvider>().signOut();
+
+              if (res.isSuccess) {
+                AppRoutes.instance.router.go('/sign-in');
+              } else {
+                AppSnackBar.showError(res.error.toString());
+              }
             },
           );
         },

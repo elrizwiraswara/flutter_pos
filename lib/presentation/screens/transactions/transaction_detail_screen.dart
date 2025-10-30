@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 
-import '../../../app/themes/app_colors.dart';
-import '../../../app/themes/app_sizes.dart';
-import '../../../app/utilities/currency_formatter.dart';
-import '../../../app/utilities/date_formatter.dart';
+import '../../../app/di/dependency_injection.dart';
 import '../../../core/extensions/string_casing_extension.dart';
+import '../../../core/themes/app_colors.dart';
+import '../../../core/themes/app_sizes.dart';
+import '../../../core/utilities/currency_formatter.dart';
+import '../../../core/utilities/date_time_formatter.dart';
 import '../../../domain/entities/ordered_product_entity.dart';
 import '../../../domain/entities/transaction_entity.dart';
-import '../../../service_locator.dart';
 import '../../providers/transactions/transaction_detail_provider.dart';
 import '../../widgets/app_empty_state.dart';
 import '../../widgets/app_progress_indicator.dart';
-import '../error_handler_screen.dart';
 
 class TransactionDetailScreen extends StatelessWidget {
   final int id;
@@ -23,14 +22,14 @@ class TransactionDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(elevation: 0),
       body: FutureBuilder(
-        future: sl<TransactionDetailProvider>().getTransactionDetail(id),
+        future: di<TransactionDetailProvider>().getTransactionDetail(id),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const AppProgressIndicator();
           }
 
           if (snapshot.hasError) {
-            return ErrorScreen(errorMessage: snapshot.error.toString());
+            throw snapshot.error.toString();
           }
 
           if (snapshot.data == null) {
@@ -133,7 +132,7 @@ class TransactionDetailScreen extends StatelessWidget {
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               Text(
-                DateFormatter.normalWithClock(transaction.createdAt ?? ''),
+                DateTimeFormatter.normalWithClock(transaction.createdAt ?? ''),
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ],

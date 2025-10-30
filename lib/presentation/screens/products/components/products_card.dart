@@ -1,8 +1,8 @@
 import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../app/themes/app_sizes.dart';
-import '../../../../app/utilities/currency_formatter.dart';
+import '../../../../core/themes/app_sizes.dart';
+import '../../../../core/utilities/currency_formatter.dart';
 import '../../../../domain/entities/product_entity.dart';
 
 class ProductsCard extends StatelessWidget {
@@ -17,8 +17,7 @@ class ProductsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      borderRadius: BorderRadius.circular(4),
+    return RepaintBoundary(
       child: InkWell(
         onTap: onTap,
         splashColor: Colors.black.withValues(alpha: 0.06),
@@ -35,7 +34,7 @@ class ProductsCard extends StatelessWidget {
               color: Theme.of(context).colorScheme.surfaceContainerHighest,
             ),
           ),
-          child: Container(
+          child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 146, maxHeight: 226),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

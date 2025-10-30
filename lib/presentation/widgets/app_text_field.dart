@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../app/locale/app_locale.dart';
-import '../../app/themes/app_sizes.dart';
+import '../../core/locale/app_locale.dart';
+import '../../core/themes/app_sizes.dart';
 import 'app_icon_button.dart';
 
 enum AppTextFieldType {

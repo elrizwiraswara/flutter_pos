@@ -1,4 +1,4 @@
-import '../../core/usecase/usecase.dart';
+import '../../core/common/result.dart';
 import '../entities/queued_action_entity.dart';
 
 abstract class QueuedActionRepository {

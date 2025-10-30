@@ -1,9 +1,8 @@
 import 'dart:convert';
 
-import '../../app/services/connectivity/connectivity_service.dart';
-import '../../app/utilities/console_log.dart';
-import '../../core/errors/errors.dart';
-import '../../core/usecase/usecase.dart';
+import '../../core/common/result.dart';
+import '../../core/services/connectivity/ping_service.dart';
+import '../../core/utilities/console_logger.dart';
 import '../../domain/entities/queued_action_entity.dart';
 import '../../domain/repositories/queued_action_repository.dart';
 import '../datasources/local/queued_action_local_datasource_impl.dart';
@@ -16,12 +15,14 @@ import '../models/transaction_model.dart';
 import '../models/user_model.dart';
 
 class QueuedActionRepositoryImpl extends QueuedActionRepository {
+  final PingService pingService;
   final QueuedActionLocalDatasourceImpl queuedActionLocalDatasource;
   final UserRemoteDatasourceImpl userRemoteDatasource;
   final TransactionRemoteDatasourceImpl transactionRemoteDatasource;
   final ProductRemoteDatasourceImpl productRemoteDatasource;
 
   QueuedActionRepositoryImpl({
+    required this.pingService,
     required this.queuedActionLocalDatasource,
     required this.userRemoteDatasource,
     required this.transactionRemoteDatasource,
@@ -31,123 +32,150 @@ class QueuedActionRepositoryImpl extends QueuedActionRepository {
   @override
   Future<Result<List<QueuedActionEntity>>> getAllQueuedAction() async {
     try {
-      var res = await queuedActionLocalDatasource.getAllUserQueuedAction();
-      return Result.success(res.map((e) => e.toEntity()).toList());
+      final res = await queuedActionLocalDatasource.getAllUserQueuedAction();
+      if (res.isFailure) return Result.failure(error: res.error!);
+
+      return Result.success(data: res.data!.map((e) => e.toEntity()).toList());
     } catch (e) {
-      return Result.error(APIError(message: e.toString()));
+      return Result.failure(error: e);
     }
   }
 
   @override
   Future<Result<List<bool>>> executeAllQueuedActions(List<QueuedActionEntity> queues) async {
     try {
-      if (queues.isEmpty) return Result.success([]);
+      if (queues.isEmpty) return Result.success(data: []);
 
       List<bool> result = [];
 
-      for (var queue in queues) {
+      for (final queue in queues) {
         // Pass if the internet goes off in the process
-        if (!ConnectivityService.isConnected) continue;
+        if (!pingService.isConnected) continue;
 
-        var res = await executeQueuedAction(queue);
+        final res = await executeQueuedAction(queue);
 
-        if (res.isSuccess) {
-          result.add(res.data ?? false);
-        } else {
-          result.add(false);
-        }
+        result.add(res.isSuccess);
       }
 
-      return Result.success(result);
+      return Result.success(data: result);
     } catch (e) {
-      return Result.error(APIError(message: e.toString()));
+      return Result.failure(error: e);
     }
   }
 
   @override
   Future<Result<bool>> executeQueuedAction(QueuedActionEntity queue) async {
     try {
-      cl("[executeQueuedAction].queue = ${QueuedActionModel.fromEntity(queue).toJson()}");
+      cl(QueuedActionModel.fromEntity(queue).toJson());
 
-      var res = await _functionSelector(queue).catchError((e) {
-        return Result.error(APIError(message: e.toString()));
-      });
+      final res = await _functionSelector(queue);
 
       if (res.isSuccess) {
         // Delete executed queue from db
-        await queuedActionLocalDatasource.deleteQueuedAction(queue.id!);
-        return Result.success(true);
+        final deleteRes = await queuedActionLocalDatasource.deleteQueuedAction(queue.id!);
+        if (deleteRes.isFailure) return Result.failure(error: res.error!);
+
+        return Result.success(data: true);
       } else {
-        cl("[executeQueuedAction].error = ${res.error}");
-        return Result.error(res.error);
+        return Result.failure(error: res.error ?? 'Unknown error');
       }
     } catch (e) {
-      cl("[executeQueuedAction].error = $e");
-      return Result.error(APIError(message: e.toString()));
+      return Result.failure(error: e);
     }
   }
 
-  Future<Result> _functionSelector(QueuedActionEntity queue) async {
-    if (queue.repository == 'UserRepositoryImpl') {
-      if (queue.method == 'createUser') {
-        UserModel param = UserModel.fromJson(jsonDecode(queue.param));
-        await userRemoteDatasource.createUser(param);
-        return Result.success(null);
+  Future<Result<Null>> _functionSelector(QueuedActionEntity queue) async {
+    try {
+      if (queue.repository == 'UserRepositoryImpl') {
+        if (queue.method == 'createUser') {
+          UserModel param = UserModel.fromJson(jsonDecode(queue.param));
+
+          final res = await userRemoteDatasource.createUser(param);
+          if (res.isFailure) return Result.failure(error: res.error!);
+
+          return Result.success(data: null);
+        }
+
+        if (queue.method == 'deleteUser') {
+          final param = queue.param;
+
+          final res = await userRemoteDatasource.deleteUser(param);
+          if (res.isFailure) return Result.failure(error: res.error!);
+
+          return Result.success(data: null);
+        }
+
+        if (queue.method == 'updateUser') {
+          UserModel param = UserModel.fromJson(jsonDecode(queue.param));
+
+          final res = await userRemoteDatasource.updateUser(param);
+          if (res.isFailure) return Result.failure(error: res.error!);
+
+          return Result.success(data: null);
+        }
       }
 
-      if (queue.method == 'deleteUser') {
-        var param = queue.param;
-        await userRemoteDatasource.deleteUser(param);
-        return Result.success(null);
+      if (queue.repository == 'TransactionRepositoryImpl') {
+        if (queue.method == 'createTransaction') {
+          TransactionModel param = TransactionModel.fromJson(jsonDecode(queue.param));
+
+          final res = await transactionRemoteDatasource.createTransaction(param);
+          if (res.isFailure) return Result.failure(error: res.error!);
+
+          return Result.success(data: null);
+        }
+
+        if (queue.method == 'deleteTransaction') {
+          final param = int.parse(queue.param);
+
+          final res = await transactionRemoteDatasource.deleteTransaction(param);
+          if (res.isFailure) return Result.failure(error: res.error!);
+
+          return Result.success(data: null);
+        }
+
+        if (queue.method == 'updateTransaction') {
+          TransactionModel param = TransactionModel.fromJson(jsonDecode(queue.param));
+
+          final res = await transactionRemoteDatasource.updateTransaction(param);
+          if (res.isFailure) return Result.failure(error: res.error!);
+
+          return Result.success(data: null);
+        }
       }
 
-      if (queue.method == 'updateUser') {
-        UserModel param = UserModel.fromJson(jsonDecode(queue.param));
-        await userRemoteDatasource.updateUser(param);
-        return Result.success(null);
+      if (queue.repository == 'ProductRepositoryImpl') {
+        if (queue.method == 'createProduct') {
+          ProductModel param = ProductModel.fromJson(jsonDecode(queue.param));
+
+          final res = await productRemoteDatasource.createProduct(param);
+          if (res.isFailure) return Result.failure(error: res.error!);
+
+          return Result.success(data: null);
+        }
+
+        if (queue.method == 'deleteProduct') {
+          final param = int.parse(queue.param);
+
+          final res = await productRemoteDatasource.deleteProduct(param);
+          if (res.isFailure) return Result.failure(error: res.error!);
+
+          return Result.success(data: null);
+        }
+
+        if (queue.method == 'updateProduct') {
+          ProductModel param = ProductModel.fromJson(jsonDecode(queue.param));
+
+          final res = await productRemoteDatasource.updateProduct(param);
+          if (res.isFailure) return Result.failure(error: res.error!);
+
+          return Result.success(data: null);
+        }
       }
+
+      return Result.success(data: null);
+    } catch (e) {
+      return Result.failure(error: e);
     }
-
-    if (queue.repository == 'TransactionRepositoryImpl') {
-      if (queue.method == 'createTransaction') {
-        TransactionModel param = TransactionModel.fromJson(jsonDecode(queue.param));
-        await transactionRemoteDatasource.createTransaction(param);
-        return Result.success(null);
-      }
-
-      if (queue.method == 'deleteTransaction') {
-        var param = int.parse(queue.param);
-        await transactionRemoteDatasource.deleteTransaction(param);
-        return Result.success(null);
-      }
-
-      if (queue.method == 'updateTransaction') {
-        TransactionModel param = TransactionModel.fromJson(jsonDecode(queue.param));
-        await transactionRemoteDatasource.updateTransaction(param);
-        return Result.success(null);
-      }
-    }
-
-    if (queue.repository == 'ProductRepositoryImpl') {
-      if (queue.method == 'createProduct') {
-        ProductModel param = ProductModel.fromJson(jsonDecode(queue.param));
-        await productRemoteDatasource.createProduct(param);
-        return Result.success(null);
-      }
-
-      if (queue.method == 'deleteProduct') {
-        var param = int.parse(queue.param);
-        await productRemoteDatasource.deleteProduct(param);
-        return Result.success(null);
-      }
-
-      if (queue.method == 'updateProduct') {
-        ProductModel param = ProductModel.fromJson(jsonDecode(queue.param));
-        await productRemoteDatasource.updateProduct(param);
-        return Result.success(null);
-      }
-    }
-
-    return Future.value(Result.success(null));
   }
 }

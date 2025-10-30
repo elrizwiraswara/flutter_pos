@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import '../../../app/themes/app_sizes.dart';
+import '../../../app/di/dependency_injection.dart';
+import '../../../core/themes/app_sizes.dart';
 import '../../../domain/entities/product_entity.dart';
-import '../../../service_locator.dart';
 import '../../providers/products/products_provider.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_empty_state.dart';
@@ -21,7 +21,7 @@ class ProductsScreen extends StatefulWidget {
 }
 
 class _ProductsScreenState extends State<ProductsScreen> {
-  final productProvider = sl<ProductsProvider>();
+  final productProvider = di<ProductsProvider>();
 
   final scrollController = ScrollController();
 
@@ -86,7 +86,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     ),
                   ),
                   SliverLayoutBuilder(
-                    builder: (context, constraint) {
+                    builder: (context, _) {
                       if (provider.allProducts == null) {
                         return const SliverFillRemaining(
                           hasScrollBody: false,
