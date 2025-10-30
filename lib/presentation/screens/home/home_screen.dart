@@ -327,9 +327,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget productCard(ProductEntity product) {
     return ProductsCard(
       product: product,
+      enabled: product.stock > 0,
       onTap: () {
-        if (product.stock == 0) return;
-
         int currentQty =
             homeProvider.orderedProducts.where((e) => e.productId == product.id).firstOrNull?.quantity ?? 0;
 

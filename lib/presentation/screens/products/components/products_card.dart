@@ -8,18 +8,20 @@ import '../../../../domain/entities/product_entity.dart';
 class ProductsCard extends StatelessWidget {
   final ProductEntity product;
   final Function()? onTap;
+  final bool   enabled;
 
   const ProductsCard({
     super.key,
     required this.product,
     this.onTap,
+    this.enabled = true,
   });
 
   @override
   Widget build(BuildContext context) {
     return RepaintBoundary(
       child: InkWell(
-        onTap: onTap,
+        onTap: enabled ?  onTap : null,
         splashColor: Colors.black.withValues(alpha: 0.06),
         splashFactory: InkRipple.splashFactory,
         highlightColor: Colors.black12,
@@ -55,7 +57,7 @@ class ProductsCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    product.stock == 0
+                    product.stock <= 0
                         ? AspectRatio(
                             aspectRatio: 1,
                             child: Container(

@@ -116,6 +116,7 @@ class ProductDetailScreen extends StatelessWidget {
     return ConstrainedBox(
       constraints: BoxConstraints(
         minWidth: AppSizes.screenWidth(context),
+        minHeight: AppSizes.screenHeight(context) / 3,
         maxHeight: AppSizes.screenHeight(context) / 3,
       ),
       child: AppImage(
