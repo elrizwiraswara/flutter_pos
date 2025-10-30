@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../utilities/console_logger.dart';
 import 'database_config.dart';
@@ -18,6 +18,11 @@ class AppDatabase {
   late Database database;
 
   Future<void> init() async {
+    if (Platform.isWindows || Platform.isLinux) {
+      // Initialize FFI
+      sqfliteFfiInit();
+    }
+
     // Get the path to the database
     String path = join(await getDatabasesPath(), DatabaseConfig.dbPath);
 
