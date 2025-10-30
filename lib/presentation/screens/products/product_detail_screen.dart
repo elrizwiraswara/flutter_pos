@@ -113,8 +113,11 @@ class ProductDetailScreen extends StatelessWidget {
     String? createdAt,
     String? updatedAt,
   }) {
-    return AspectRatio(
-      aspectRatio: 1.5,
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        minWidth: AppSizes.screenWidth(context),
+        maxHeight: AppSizes.screenHeight(context) / 3,
+      ),
       child: AppImage(
         image: imageUrl ?? '',
         backgroundColor: Theme.of(context).colorScheme.surface,
