@@ -2,17 +2,18 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-orange)](./LICENSE)
 [![Made with Flutter](https://img.shields.io/badge/made%20with-Flutter-blue)](https://flutter.dev/)
 
-A simple Point of Sale (POS) application built with Flutter with clean architecture design. The application is designed to be used both online and offline. The application's local data (sqflite) will be automatically synchronized with the cloud data (firestore) when the application detects an internet connection.
+A Point of Sale (POS) application built with Flutter, demonstrating **Clean Architecture** principles and **offline-first** design patterns. This project serves as a learning resource and reference implementation for building Flutter apps with proper architecture and automatic data synchronization between local storage (SQLite) and cloud database (Firestore).
 
-This application uses an offline-first approach, where data will be stored in the local database first and then in the cloud database if there is an internet connection. If there is no internet connection, all actions performed by the user (create, update, delete) will be recorded as 'QueuedActions' in local database and will be executed automatically when the internet connection available.
+The app prioritizes local-first operations, storing all data in SQLite and automatically syncing with Firestore when online. When offline, all user actions (create, update, delete) are recorded as `QueuedActions` in the local database and automatically executed in sequence when internet connectivity is restored.
+
 <br/>
 <br/>
 <p align="left">
-  <img src="1.jpeg" alt="Image 1" height="350" style="margin-right: 10px;">
-  <img src="2.jpeg" alt="Image 2" height="350" style="margin-right: 10px;">
-  <img src="3.jpeg" alt="Image 2" height="350" style="margin-right: 10px;">
-  <img src="4.jpeg" alt="Image 2" height="350" style="margin-right: 10px;">
-  <img src="5.jpeg" alt="Image 2" height="350">
+  <img src="docs/screenshoot_2.jpeg" alt="Image 2" height="350" style="margin-right: 10px;">
+  <img src="docs/screenshoot_1.jpeg" alt="Image 1" height="350" style="margin-right: 10px;">
+  <img src="docs/screenshoot_3.jpeg" alt="Image 2" height="350" style="margin-right: 10px;">
+  <img src="docs/screenshoot_4.jpeg" alt="Image 2" height="350" style="margin-right: 10px;">
+  <img src="docs/screenshoot_5.jpeg" alt="Image 2" height="350">
 </p>
 
 ## Demo APK
@@ -20,14 +21,109 @@ This application uses an offline-first approach, where data will be stored in th
 
 ## Features
 
-- **Product Management**: Add, update, and delete products.
-- **Sales Tracking**: Record and manage sales transactions.
-- **User Authentication**: Secure login and user management.
-- **Responsive UI**: Used Material UI 3, support dark & light mode, and user-friendly error handler UI.
-- **Customizeable Theme**: Customizeable & adaptive theme colors, text-style, etc.
+### Core Functionality
+- **Product Management**: Full CRUD operations for products with image upload support
+- **Sales Transactions**: POS interface with cart management and transaction history
+- **User Authentication**: Firebase Authentication with Google Sign-In integration
+- **Account Management**: User profile management and settings
+
+### Technical Implementation
+- **Offline-First Architecture**: Works seamlessly without internet connection
+- **Automatic Data Sync**: SQLite ↔ Firestore bidirectional synchronization
+- **Queued Actions**: Automatic retry mechanism for offline operations (create, update, delete)
+- **Clean Architecture**: Separation between presentation, domain, and data layers
+- **State Management**: Provider pattern for state management
+- **Dependency Injection**: Centralized DI setup for better code organization
+- **Unit Testing**: Tests for datasources, repositories, and use cases
+- **Material Design 3**: Material design 3 and Dark & Light theme switching support
+- **Customizable Theming**: Adjustable colors and typography
+- **Multi-Platform**: Supports Android, iOS, Windows, macOS, and Linux
+- **Error Handling**: User-friendly error messages and states
+- **Reusable Widgets**: Custom UI components for consistent design
 
 ## Architecture
-<img src="6.png" alt="Architecture">
+<img src="docs/architecture.png" alt="Architecture">
+
+## Project Structure
+
+```
+flutter_pos/
+├── lib/
+│   ├── app/                          # Application setup and configuration
+│   │   ├── di/                       # Dependency injection
+│   │   ├── error/                    # Error handling
+│   │   └── routes/                   # App routing and navigation
+│   │
+│   ├── core/                         # Core utilities and shared resources
+│   │   ├── assets/                   # Asset management
+│   │   ├── common/                   # Common utilities (Result wrapper)
+│   │   ├── constants/                # App constants
+│   │   ├── database/                 # Local database configuration (sqflite)
+│   │   ├── extensions/               # Dart extensions
+│   │   ├── locale/                   # Localization
+│   │   ├── services/                 # Core services
+│   │   │   ├── connectivity/         # Network connectivity checking
+│   │   │   ├── info/                 # Device info service
+│   │   │   └── logger/               # Error logging service
+│   │   ├── themes/                   # App theming (colors, sizes, themes)
+│   │   ├── usecase/                  # Base usecase interface
+│   │   └── utilities/                # Helper utilities (formatters, loggers, etc.)
+│   │
+│   ├── data/                         # Data layer
+│   │   ├── datasources/              # Data sources
+│   │   │   ├── interfaces/           # Datasource interfaces
+│   │   │   ├── local/                # Local datasources (sqflite)
+│   │   │   └── remote/               # Remote datasources (Firestore, Firebase Auth)
+│   │   ├── models/                   # Data models with JSON serialization
+│   │   └── repositories/             # Repository implementations
+│   │
+│   ├── domain/                       # Domain layer (Business logic)
+│   │   ├── entities/                 # Business entities
+│   │   ├── repositories/             # Repository interfaces
+│   │   └── usecases/                 # Use cases (business logic operations)
+│   │
+│   ├── presentation/                 # Presentation layer (UI)
+│   │   ├── providers/                # State management (Provider)
+│   │   │   ├── account/              # Account-related state
+│   │   │   ├── auth/                 # Authentication state
+│   │   │   ├── home/                 # Home screen state
+│   │   │   ├── main/                 # Main navigation state
+│   │   │   ├── products/             # Products management state
+│   │   │   ├── theme/                # Theme state
+│   │   │   └── transactions/         # Transactions state
+│   │   ├── screens/                  # UI screens
+│   │   │   ├── account/              # Account screens
+│   │   │   ├── auth/                 # Authentication screens
+│   │   │   ├── error/                # Error screens
+│   │   │   ├── home/                 # Home/POS screen
+│   │   │   ├── main/                 # Main navigation screen
+│   │   │   ├── products/             # Product management screens
+│   │   │   └── transactions/         # Transaction history screens
+│   │   └── widgets/                  # Reusable UI components
+│   │
+│   ├── firebase_options.dart         # Firebase configuration
+│   └── main.dart                     # App entry point
+│
+├── test/                             # Unit and widget tests
+│   ├── core/services/                # Service tests
+│   ├── data/                         # Data layer tests
+│   │   ├── datasources/              # Datasource tests
+│   │   └── repositories/             # Repository tests
+│   ├── domain/usecases/              # Usecase tests
+│   └── presentation/screens/         # Screen tests
+│
+├── assets/                           # Static assets
+├── android/                          # Android platform files
+├── ios/                              # iOS platform files
+├── linux/                            # Linux platform files
+├── macos/                            # macOS platform files
+├── web/                              # Web platform files
+├── windows/                          # Windows platform files
+│
+├── analysis_options.yaml             # Dart analyzer configuration
+├── pubspec.yaml                      # Package dependencies
+└── README.md                         # Project documentation
+```
 
 ## Getting Started
 
@@ -68,7 +164,7 @@ This application uses an offline-first approach, where data will be stored in th
     ```
     - Add cloud firestore indexes to enable query
     <br/>
-    <img src="indexes.png" alt="Cloud Firestore Indexes" width=800px>
+    <img src="docs/firestore_indexes.png" alt="Cloud Firestore Indexes" width=800px>
     <br/>
     <br/>
     
