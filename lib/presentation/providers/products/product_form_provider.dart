@@ -2,21 +2,27 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 
-import '../../../app/services/auth/auth_service.dart';
-import '../../../app/services/firebase_storage/firebase_storage_service.dart';
-import '../../../app/utilities/console_log.dart';
-import '../../../core/errors/errors.dart';
-import '../../../core/usecase/usecase.dart';
+import '../../../app/di/dependency_injection.dart';
+import '../../../core/common/result.dart';
+import '../../../core/utilities/console_logger.dart';
 import '../../../domain/entities/product_entity.dart';
 import '../../../domain/repositories/product_repository.dart';
+import '../../../domain/repositories/storage_repository.dart';
 import '../../../domain/usecases/product_usecases.dart';
-import '../../../service_locator.dart';
+import '../../../domain/usecases/storage_usecases.dart';
+import '../auth/auth_provider.dart';
 import 'products_provider.dart';
 
 class ProductFormProvider extends ChangeNotifier {
+  final AuthProvider authProvider;
   final ProductRepository productRepository;
+  final StorageRepository storageRepository;
 
-  ProductFormProvider({required this.productRepository});
+  ProductFormProvider({
+    required this.authProvider,
+    required this.productRepository,
+    required this.storageRepository,
+  });
 
   File? imageFile;
   String? imageUrl;
@@ -58,20 +64,24 @@ class ProductFormProvider extends ChangeNotifier {
       isLoaded = true;
       notifyListeners();
     } else {
-      throw res.error?.message ?? 'Failed to load data';
+      throw res.error ?? 'Failed to load data';
     }
   }
 
   Future<Result<int>> createProduct() async {
     try {
+      var userId = authProvider.user?.id;
+      if (userId == null) throw 'Unathenticated!';
+
       if (imageFile != null) {
-        imageUrl = await FirebaseStorageService().uploadProductImage(imageFile!.path);
+        final res = await UploadProductImageUsecase(storageRepository).call(imageFile!.path);
+        imageUrl = res.data;
       }
 
-      cl('[createProduct].imageUrl $imageUrl');
+      cl('imageUrl $imageUrl');
 
       var product = ProductEntity(
-        createdById: AuthService().getAuthData()!.uid,
+        createdById: userId,
         name: name ?? '',
         imageUrl: imageUrl ?? '',
         stock: stock ?? 0,
@@ -82,26 +92,29 @@ class ProductFormProvider extends ChangeNotifier {
       var res = await CreateProductUsecase(productRepository).call(product);
 
       // Refresh products
-      sl<ProductsProvider>().getAllProducts();
+      di<ProductsProvider>().getAllProducts();
 
       return res;
     } catch (e) {
-      cl("[createProduct].error $e");
-      return Result.error(UnknownError(message: e.toString()));
+      return Result.failure(error: e);
     }
   }
 
   Future<Result<void>> updatedProduct(int id) async {
     try {
+      var userId = authProvider.user?.id;
+      if (userId == null) throw 'Unathenticated!';
+
       if (imageFile != null) {
-        imageUrl = await FirebaseStorageService().uploadProductImage(imageFile!.path);
+        final res = await UploadProductImageUsecase(storageRepository).call(imageFile!.path);
+        imageUrl = res.data;
       }
 
-      cl('[updatedProduct].imageUrl $imageUrl');
+      cl('imageUrl $imageUrl');
 
       var product = ProductEntity(
         id: id,
-        createdById: AuthService().getAuthData()!.uid,
+        createdById: userId,
         name: name!,
         imageUrl: imageUrl ?? '',
         stock: stock ?? 0,
@@ -112,12 +125,11 @@ class ProductFormProvider extends ChangeNotifier {
       var res = await UpdateProductUsecase(productRepository).call(product);
 
       // Refresh products
-      sl<ProductsProvider>().getAllProducts();
+      di<ProductsProvider>().getAllProducts();
 
       return res;
     } catch (e) {
-      cl("[updatedProduct].error $e");
-      return Result.error(UnknownError(message: e.toString()));
+      return Result.failure(error: e);
     }
   }
 
@@ -126,12 +138,11 @@ class ProductFormProvider extends ChangeNotifier {
       var res = await DeleteProductUsecase(productRepository).call(id);
 
       // Refresh products
-      sl<ProductsProvider>().getAllProducts();
+      di<ProductsProvider>().getAllProducts();
 
       return res;
     } catch (e) {
-      cl("[deleteProduct].error $e");
-      return Result.error(UnknownError(message: e.toString()));
+      return Result.failure(error: e);
     }
   }
 
@@ -162,7 +173,6 @@ class ProductFormProvider extends ChangeNotifier {
 
   bool isFormValid() {
     List validator = [
-      AuthService().getAuthData()?.uid != null,
       name?.isNotEmpty,
       (price ?? 0) > 0,
       (stock ?? 0) > 0,

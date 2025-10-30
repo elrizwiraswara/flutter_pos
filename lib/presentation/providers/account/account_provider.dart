@@ -2,18 +2,27 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 
-import '../../../app/services/firebase_storage/firebase_storage_service.dart';
-import '../../../app/utilities/console_log.dart';
-import '../../../core/errors/errors.dart';
-import '../../../core/usecase/usecase.dart';
-import '../../../domain/entities/user_entity.dart';
+import '../../../core/common/result.dart';
+import '../../../domain/entities/user_entity.dart' hide AuthProvider;
+import '../../../domain/repositories/auth_repository.dart';
+import '../../../domain/repositories/storage_repository.dart';
 import '../../../domain/repositories/user_repository.dart';
+import '../../../domain/usecases/storage_usecases.dart';
 import '../../../domain/usecases/user_usecases.dart';
+import '../auth/auth_provider.dart';
 
 class AccountProvider extends ChangeNotifier {
+  final AuthProvider authProvider;
+  final AuthRepository authRepository;
   final UserRepository userRepository;
+  final StorageRepository storageRepository;
 
-  AccountProvider({required this.userRepository});
+  AccountProvider({
+    required this.authProvider,
+    required this.authRepository,
+    required this.userRepository,
+    required this.storageRepository,
+  });
 
   File? imageFile;
   String? imageUrl;
@@ -32,8 +41,11 @@ class AccountProvider extends ChangeNotifier {
     isLoaded = false;
   }
 
-  Future<void> initProfileForm(String id) async {
-    var res = await GetUserUsecase(userRepository).call(id);
+  Future<void> initProfileForm() async {
+    var userId = authProvider.user?.id;
+    if (userId == null) throw 'Unathenticated!';
+
+    var res = await GetUserUsecase(userRepository).call(userId);
 
     if (res.isSuccess) {
       imageUrl = res.data?.imageUrl;
@@ -48,16 +60,18 @@ class AccountProvider extends ChangeNotifier {
     }
   }
 
-  Future<Result<void>> updatedUser(String id) async {
+  Future<Result<void>> updatedUser() async {
     try {
+      var userId = authProvider.user?.id;
+      if (userId == null) throw 'Unathenticated!';
+
       if (imageFile != null) {
-        imageUrl = await FirebaseStorageService().uploadUserPhoto(imageFile!.path);
+        final res = await UploadUserPhotoUsecase(storageRepository).call(imageFile!.path);
+        imageUrl = res.data;
       }
 
-      cl('[updatedUser].imageUrl $imageUrl');
-
       var product = UserEntity(
-        id: id,
+        id: userId,
         email: email,
         phone: phone,
         name: name!,
@@ -68,8 +82,7 @@ class AccountProvider extends ChangeNotifier {
 
       return res;
     } catch (e) {
-      cl("[updatedUser].error $e");
-      return Result.error(UnknownError(message: e.toString()));
+      return Result.failure(error: e);
     }
   }
 

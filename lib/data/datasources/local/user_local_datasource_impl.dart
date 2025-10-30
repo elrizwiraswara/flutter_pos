@@ -1,6 +1,8 @@
 import 'package:sqflite/sqflite.dart';
 
-import '../../../app/database/app_database.dart';
+import '../../../core/common/result.dart';
+import '../../../core/database/app_database.dart';
+import '../../../core/database/database_config.dart';
 import '../../models/user_model.dart';
 import '../interfaces/user_datasource.dart';
 
@@ -10,47 +12,67 @@ class UserLocalDatasourceImpl extends UserDatasource {
   UserLocalDatasourceImpl(this._appDatabase);
 
   @override
-  Future<String> createUser(UserModel user) async {
-    await _appDatabase.database.insert(
-      AppDatabaseConfig.userTableName,
-      user.toJson(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+  Future<Result<String>> createUser(UserModel user) async {
+    try {
+      await _appDatabase.database.insert(
+        DatabaseConfig.userTableName,
+        user.toJson(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
 
-    // The id is uid from GoogleSignIn credential
-    return user.id;
+      // The id is uid from GoogleSignIn credential
+      return Result.success(data: user.id);
+    } catch (e) {
+      return Result.failure(error: e);
+    }
   }
 
   @override
-  Future<void> updateUser(UserModel user) async {
-    await _appDatabase.database.update(
-      AppDatabaseConfig.userTableName,
-      user.toJson(),
-      where: 'id = ?',
-      whereArgs: [user.id],
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+  Future<Result<void>> updateUser(UserModel user) async {
+    try {
+      await _appDatabase.database.update(
+        DatabaseConfig.userTableName,
+        user.toJson(),
+        where: 'id = ?',
+        whereArgs: [user.id],
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+
+      return Result.success(data: null);
+    } catch (e) {
+      return Result.failure(error: e);
+    }
   }
 
   @override
-  Future<void> deleteUser(String id) async {
-    await _appDatabase.database.delete(
-      AppDatabaseConfig.userTableName,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+  Future<Result<void>> deleteUser(String id) async {
+    try {
+      await _appDatabase.database.delete(
+        DatabaseConfig.userTableName,
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+
+      return Result.success(data: null);
+    } catch (e) {
+      return Result.failure(error: e);
+    }
   }
 
   @override
-  Future<UserModel?> getUser(String id) async {
-    var res = await _appDatabase.database.query(
-      AppDatabaseConfig.userTableName,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+  Future<Result<UserModel?>> getUser(String id) async {
+    try {
+      var res = await _appDatabase.database.query(
+        DatabaseConfig.userTableName,
+        where: 'id = ?',
+        whereArgs: [id],
+      );
 
-    if (res.isEmpty) return null;
+      if (res.isEmpty) return Result.success(data: null);
 
-    return UserModel.fromJson(res.first);
+      return Result.success(data: UserModel.fromJson(res.first));
+    } catch (e) {
+      return Result.failure(error: e);
+    }
   }
 }

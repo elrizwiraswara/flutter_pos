@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../app/themes/app_sizes.dart';
-import '../../../../app/utilities/console_log.dart';
-import '../../../../app/utilities/currency_formatter.dart';
-import '../../../../service_locator.dart';
+import '../../../../app/di/dependency_injection.dart';
+import '../../../../app/routes/app_routes.dart';
+import '../../../../core/themes/app_sizes.dart';
+import '../../../../core/utilities/currency_formatter.dart';
 import '../../../providers/home/home_provider.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_dialog.dart';
@@ -20,7 +20,7 @@ class CartPanelFooter extends StatefulWidget {
 }
 
 class _CartPanelFooterState extends State<CartPanelFooter> {
-  final _homeProvider = sl<HomeProvider>();
+  final _homeProvider = di<HomeProvider>();
 
   final _amountControlller = TextEditingController();
   final _customerControlller = TextEditingController();
@@ -190,21 +190,14 @@ class _CartPanelFooterState extends State<CartPanelFooter> {
   }
 
   void onPay() async {
-    final router = GoRouter.of(context);
-    final messenger = ScaffoldMessenger.of(context);
-
-    AppDialog.showDialogProgress();
-
-    var res = await _homeProvider.createTransaction();
-
-    AppDialog.closeDialog();
+    var res = await AppDialog.showProgress(() {
+      return _homeProvider.createTransaction();
+    });
 
     if (res.isSuccess) {
-      router.go('/transactions/transaction-detail/${res.data}');
-      messenger.showSnackBar(const SnackBar(content: Text('Transaction created')));
+      AppRoutes.instance.router.go('/transactions/transaction-detail/${res.data}');
     } else {
-      cl('[createTransaction].error ${res.error}');
-      AppDialog.showErrorDialog(error: res.error?.message);
+      AppDialog.showError(error: res.error?.toString());
     }
   }
 }

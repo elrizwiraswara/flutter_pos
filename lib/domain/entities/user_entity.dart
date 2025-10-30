@@ -8,6 +8,7 @@ class UserEntity extends Equatable {
   final String? gender;
   final String? birthdate;
   final String? imageUrl;
+  final AuthProvider? authProvider;
   final String? createdAt;
   final String? updatedAt;
 
@@ -19,6 +20,7 @@ class UserEntity extends Equatable {
     this.gender,
     this.birthdate,
     this.imageUrl,
+    this.authProvider,
     this.createdAt,
     this.updatedAt,
   });
@@ -31,6 +33,7 @@ class UserEntity extends Equatable {
     String? gender,
     String? birthdate,
     String? imageUrl,
+    AuthProvider? authProvider,
     String? createdAt,
     String? updatedAt,
   }) {
@@ -42,6 +45,7 @@ class UserEntity extends Equatable {
       gender: gender ?? this.gender,
       birthdate: birthdate ?? this.birthdate,
       imageUrl: imageUrl ?? this.imageUrl,
+      authProvider: authProvider ?? this.authProvider,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -56,7 +60,20 @@ class UserEntity extends Equatable {
     gender,
     birthdate,
     imageUrl,
+    authProvider,
     createdAt,
     updatedAt,
   ];
+}
+
+enum AuthProvider {
+  google('google');
+  // add other if needed
+
+  final String value;
+  const AuthProvider(this.value);
+
+  static AuthProvider? fromValue(String? value) {
+    return AuthProvider.values.where((e) => e.value == value).firstOrNull;
+  }
 }

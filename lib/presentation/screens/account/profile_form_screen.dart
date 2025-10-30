@@ -3,19 +3,20 @@ import 'dart:io';
 import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:go_router/go_router.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
-import '../../../app/services/auth/auth_service.dart';
-import '../../../app/themes/app_sizes.dart';
-import '../../../service_locator.dart';
+import '../../../app/di/dependency_injection.dart';
+import '../../../app/routes/app_routes.dart';
+import '../../../core/themes/app_sizes.dart';
 import '../../providers/account/account_provider.dart';
+import '../../providers/main/main_provider.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
 import '../../widgets/app_icon_button.dart';
 import '../../widgets/app_progress_indicator.dart';
+import '../../widgets/app_snack_bar.dart';
 import '../../widgets/app_text_field.dart';
 
 class ProfileFormScreen extends StatefulWidget {
@@ -26,7 +27,8 @@ class ProfileFormScreen extends StatefulWidget {
 }
 
 class _ProfileFormScreenState extends State<ProfileFormScreen> {
-  final accountProvider = sl<AccountProvider>()..resetStates();
+  final accountProvider = di<AccountProvider>()..resetStates();
+  final mainProvider = di<MainProvider>();
 
   final nameController = TextEditingController();
   final emailController = TextEditingController();
@@ -35,7 +37,7 @@ class _ProfileFormScreenState extends State<ProfileFormScreen> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await accountProvider.initProfileForm(AuthService().getAuthData()!.uid);
+      await accountProvider.initProfileForm();
 
       nameController.text = accountProvider.name ?? '';
       emailController.text = accountProvider.email ?? '';
@@ -210,20 +212,18 @@ class _ProfileFormScreenState extends State<ProfileFormScreen> {
   }
 
   void updatedUser() async {
-    final router = GoRouter.of(context);
-    final messenger = ScaffoldMessenger.of(context);
-
-    AppDialog.showDialogProgress();
-
-    var res = await accountProvider.updatedUser(AuthService().getAuthData()!.uid);
-
-    AppDialog.closeDialog();
+    var res = await AppDialog.showProgress(() {
+      return accountProvider.updatedUser();
+    });
 
     if (res.isSuccess) {
-      router.pop();
-      messenger.showSnackBar(const SnackBar(content: Text('Profile updated')));
+      AppRoutes.instance.router.pop();
+      AppSnackBar.show('Profile updated');
+
+      // Refresh user data
+      mainProvider.getAndSyncAllUserData();
     } else {
-      AppDialog.showErrorDialog(error: res.error?.message);
+      AppDialog.showError(error: res.error.toString());
     }
   }
 }

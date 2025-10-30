@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../presentation/providers/auth/auth_provider.dart';
 import '../../presentation/screens/account/about_screen.dart';
 import '../../presentation/screens/account/account_screen.dart';
 import '../../presentation/screens/account/profile_form_screen.dart';
 import '../../presentation/screens/auth/sign_in/sign_in_screen.dart';
-import '../../presentation/screens/error_handler_screen.dart';
+import '../../presentation/screens/error/error_screen.dart';
 import '../../presentation/screens/home/home_screen.dart';
 import '../../presentation/screens/main/main_screen.dart';
 import '../../presentation/screens/products/product_detail_screen.dart';
@@ -13,84 +14,79 @@ import '../../presentation/screens/products/product_form_screen.dart';
 import '../../presentation/screens/products/products_screen.dart';
 import '../../presentation/screens/transactions/transaction_detail_screen.dart';
 import '../../presentation/screens/transactions/transactions_screen.dart';
-import '../services/auth/auth_service.dart';
+import '../di/dependency_injection.dart';
+import 'params/error_screen_param.dart';
 
-// App routes
+/// App routes
 class AppRoutes {
-  // This class is not meant to be instatiated or extended; this constructor
-  // prevents instantiation and extension.
-  AppRoutes._();
+  final AuthProvider authProvider;
 
-  static final rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
-  static final navNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'nav');
+  AppRoutes(this.authProvider) {
+    // Called automatically when instance is created
+    initRouter();
+  }
 
-  static final router = GoRouter(
-    initialLocation: '/home',
-    navigatorKey: rootNavigatorKey,
-    errorBuilder: (context, state) => ErrorScreen(
-      errorMessage: state.error?.message,
-    ),
-    redirect: (context, state) async {
-      // if isAuthenticated = false, go to sign-in screen
-      // else continue to current intended route screen
-      if (!await AuthService().isAuthenticated()) {
-        return '/auth/sign-in';
-      } else {
+  // Static convenience getter - returns the same instance from GetIt
+  static AppRoutes get instance => di<AppRoutes>();
+
+  final rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
+  final navNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'nav');
+
+  late final GoRouter _router;
+  GoRouter get router => _router;
+
+  void initRouter() async {
+    await authProvider.checkIsAuthenticated();
+
+    _router = GoRouter(
+      initialLocation: '/home',
+      navigatorKey: rootNavigatorKey,
+      refreshListenable: authProvider,
+      errorBuilder: (context, state) => ErrorScreen(param: ErrorScreenParam(error: state.error)),
+      redirect: (context, state) {
+        final isAuthenticated = authProvider.isAuthenticated;
+        final isAuthRoute = state.matchedLocation.startsWith('/sign-in');
+
+        if (!isAuthenticated && !isAuthRoute) {
+          return '/sign-in';
+        }
+
+        if (isAuthenticated && isAuthRoute) {
+          return '/home';
+        }
+
         return null;
-      }
-    },
-    routes: [
-      _main,
-      _auth,
-      _error,
-    ],
-  );
+      },
+      routes: [
+        _main,
+        _signIn,
+        _error,
+      ],
+    );
+  }
 
-  static final _error = GoRoute(
+  GoRoute get _error => GoRoute(
     path: '/error',
     builder: (context, state) {
-      return ErrorScreen(
-        errorDetails: state.extra as FlutterErrorDetails?,
-      );
-    },
-  );
-
-  static final _auth = GoRoute(
-    path: '/auth',
-    redirect: (context, state) async {
-      // if isAuthenticated = false, go to intended route screen
-      // else back to main screen
-      if (!await AuthService().isAuthenticated()) {
-        return '/auth/sign-in';
-      } else {
-        return '/home';
+      if (state.extra == null || state.extra! is ErrorScreenParam) {
+        throw 'Required ErrorScreenParam is not provided!';
       }
+
+      return ErrorScreen(param: state.extra as ErrorScreenParam);
     },
-    routes: [
-      _signIn,
-    ],
   );
 
-  static final _signIn = GoRoute(
-    path: 'sign-in',
+  GoRoute get _signIn => GoRoute(
+    path: '/sign-in',
     builder: (context, state) {
       return const SignInScreen();
     },
   );
 
-  static final _main = ShellRoute(
+  ShellRoute get _main => ShellRoute(
     navigatorKey: navNavigatorKey,
     builder: (BuildContext context, GoRouterState state, Widget child) {
       return MainScreen(child: child);
-    },
-    redirect: (context, state) async {
-      // if isAuthenticated = true, go to intended route screen
-      // else return to auth screen
-      if (!await AuthService().isAuthenticated()) {
-        return '/auth';
-      } else {
-        return null;
-      }
     },
     routes: [
       _home,
@@ -100,7 +96,7 @@ class AppRoutes {
     ],
   );
 
-  static final _home = GoRoute(
+  GoRoute get _home => GoRoute(
     path: '/home',
     pageBuilder: (context, state) {
       return const NoTransitionPage<void>(
@@ -109,7 +105,7 @@ class AppRoutes {
     },
   );
 
-  static final _products = GoRoute(
+  GoRoute get _products => GoRoute(
     path: '/products',
     pageBuilder: (context, state) {
       return const NoTransitionPage<void>(
@@ -123,7 +119,7 @@ class AppRoutes {
     ],
   );
 
-  static final _transactions = GoRoute(
+  GoRoute get _transactions => GoRoute(
     path: '/transactions',
     pageBuilder: (context, state) {
       return const NoTransitionPage<void>(
@@ -135,7 +131,7 @@ class AppRoutes {
     ],
   );
 
-  static final _account = GoRoute(
+  GoRoute get _account => GoRoute(
     path: '/account',
     pageBuilder: (context, state) {
       return const NoTransitionPage<void>(
@@ -148,7 +144,7 @@ class AppRoutes {
     ],
   );
 
-  static final _productCreate = GoRoute(
+  GoRoute get _productCreate => GoRoute(
     path: 'product-create',
     parentNavigatorKey: navNavigatorKey,
     builder: (context, state) {
@@ -156,7 +152,7 @@ class AppRoutes {
     },
   );
 
-  static final _productEdit = GoRoute(
+  GoRoute get _productEdit => GoRoute(
     path: 'product-edit/:id',
     builder: (context, state) {
       int? id = int.tryParse(state.pathParameters["id"] ?? '');
@@ -169,7 +165,7 @@ class AppRoutes {
     },
   );
 
-  static final _productDetail = GoRoute(
+  GoRoute get _productDetail => GoRoute(
     path: 'product-detail/:id',
     builder: (context, state) {
       int? id = int.tryParse(state.pathParameters["id"] ?? '');
@@ -182,7 +178,7 @@ class AppRoutes {
     },
   );
 
-  static final _transactionDetail = GoRoute(
+  GoRoute get _transactionDetail => GoRoute(
     path: 'transaction-detail/:id',
     builder: (context, state) {
       int? id = int.tryParse(state.pathParameters["id"] ?? '');
@@ -195,14 +191,14 @@ class AppRoutes {
     },
   );
 
-  static final _profileEdit = GoRoute(
+  GoRoute get _profileEdit => GoRoute(
     path: 'profile',
     builder: (context, state) {
       return const ProfileFormScreen();
     },
   );
 
-  static final _about = GoRoute(
+  GoRoute get _about => GoRoute(
     path: 'about',
     builder: (context, state) {
       return const AboutScreen();

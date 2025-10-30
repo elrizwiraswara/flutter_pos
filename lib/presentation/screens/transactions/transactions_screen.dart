@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../app/themes/app_sizes.dart';
-import '../../../service_locator.dart';
+import '../../../app/di/dependency_injection.dart';
+import '../../../core/themes/app_sizes.dart';
 import '../../providers/transactions/transactions_provider.dart';
 import '../../widgets/app_empty_state.dart';
 import '../../widgets/app_loading_more_indicator.dart';
@@ -18,7 +18,7 @@ class TransactionsScreen extends StatefulWidget {
 }
 
 class _TransactionsScreenState extends State<TransactionsScreen> {
-  final transactionProvider = sl<TransactionsProvider>();
+  final transactionProvider = di<TransactionsProvider>();
 
   final scrollController = ScrollController();
 

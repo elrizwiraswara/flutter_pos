@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../app/themes/app_sizes.dart';
-import '../../../../app/utilities/currency_formatter.dart';
-import '../../../../app/utilities/date_formatter.dart';
+import '../../../../core/themes/app_sizes.dart';
+import '../../../../core/utilities/currency_formatter.dart';
+import '../../../../core/utilities/date_time_formatter.dart';
 import '../../../../domain/entities/transaction_entity.dart';
 
 class TransactionCard extends StatelessWidget {
@@ -46,7 +46,7 @@ class TransactionCard extends StatelessWidget {
                       ),
                       const SizedBox(height: AppSizes.padding / 2),
                       Text(
-                        DateFormatter.normalWithClock(transaction.createdAt ?? ''),
+                        DateTimeFormatter.normalWithClock(transaction.createdAt ?? ''),
                         overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.bodySmall,
                       ),

@@ -1,22 +1,24 @@
 import 'package:flutter/foundation.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-import '../../../app/services/auth/auth_service.dart';
-import '../../../app/utilities/console_log.dart';
-import '../../../core/errors/errors.dart';
-import '../../../core/usecase/usecase.dart';
+import '../../../app/di/dependency_injection.dart';
+import '../../../core/common/result.dart';
 import '../../../domain/entities/ordered_product_entity.dart';
 import '../../../domain/entities/product_entity.dart';
 import '../../../domain/entities/transaction_entity.dart';
 import '../../../domain/repositories/transaction_repository.dart';
 import '../../../domain/usecases/transaction_usecases.dart';
-import '../../../service_locator.dart';
+import '../auth/auth_provider.dart';
 import '../products/products_provider.dart';
 
 class HomeProvider extends ChangeNotifier {
+  final AuthProvider authProvider;
   final TransactionRepository transactionRepository;
 
-  HomeProvider({required this.transactionRepository});
+  HomeProvider({
+    required this.authProvider,
+    required this.transactionRepository,
+  });
 
   final panelController = PanelController();
 
@@ -39,13 +41,16 @@ class HomeProvider extends ChangeNotifier {
 
   Future<Result<int>> createTransaction() async {
     try {
+      var userId = authProvider.user?.id;
+      if (userId == null) throw 'Unathenticated!';
+
       var transaction = TransactionEntity(
         id: DateTime.now().millisecondsSinceEpoch,
         paymentMethod: selectedPaymentMethod,
         customerName: customerName,
         description: description,
         orderedProducts: orderedProducts,
-        createdById: AuthService().getAuthData()!.uid,
+        createdById: userId,
         receivedAmount: receivedAmount,
         returnAmount: receivedAmount - getTotalAmount(),
         totalOrderedProduct: orderedProducts.length,
@@ -58,12 +63,11 @@ class HomeProvider extends ChangeNotifier {
       panelController.close();
 
       // Refresh products
-      sl<ProductsProvider>().getAllProducts();
+      di<ProductsProvider>().getAllProducts();
 
       return res;
     } catch (e) {
-      cl('[createTransaction].error $e');
-      return Result.error(UnknownError(message: e.toString()));
+      return Result.failure(error: e);
     }
   }
 

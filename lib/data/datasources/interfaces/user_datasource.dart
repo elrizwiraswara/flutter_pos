@@ -1,11 +1,12 @@
+import '../../../core/common/result.dart';
 import '../../models/user_model.dart';
 
 abstract class UserDatasource {
-  Future<String> createUser(UserModel user);
+  Future<Result<String>> createUser(UserModel user);
 
-  Future<void> updateUser(UserModel user);
+  Future<Result<void>> updateUser(UserModel user);
 
-  Future<void> deleteUser(String id);
+  Future<Result<void>> deleteUser(String id);
 
-  Future<UserModel?> getUser(String id);
+  Future<Result<UserModel?>> getUser(String id);
 }

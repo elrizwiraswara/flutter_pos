@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../app/themes/app_sizes.dart';
+import '../../core/themes/app_sizes.dart';
 
 class AppDropDown<T> extends StatelessWidget {
   final T? selectedValue;
@@ -43,7 +43,7 @@ class AppDropDown<T> extends StatelessWidget {
               ),
             ),
           DropdownButtonFormField<T>(
-            value: selectedValue,
+            initialValue: selectedValue,
             onChanged: onChanged,
             items: dropdownItems,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(

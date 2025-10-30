@@ -3,20 +3,21 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i4;
+import 'dart:async' as _i3;
 
-import 'package:flutter_pos/app/services/connectivity/connectivity_service.dart'
+import 'package:flutter_pos/core/common/result.dart' as _i5;
+import 'package:flutter_pos/core/services/connectivity/ping_service.dart'
     as _i2;
 import 'package:flutter_pos/data/datasources/local/queued_action_local_datasource_impl.dart'
-    as _i8;
+    as _i9;
 import 'package:flutter_pos/data/datasources/local/user_local_datasource_impl.dart'
-    as _i3;
+    as _i4;
 import 'package:flutter_pos/data/datasources/remote/user_remote_datasource_impl.dart'
-    as _i7;
-import 'package:flutter_pos/data/models/queued_action_model.dart' as _i9;
-import 'package:flutter_pos/data/models/user_model.dart' as _i5;
+    as _i8;
+import 'package:flutter_pos/data/models/queued_action_model.dart' as _i10;
+import 'package:flutter_pos/data/models/user_model.dart' as _i6;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:mockito/src/dummies.dart' as _i6;
+import 'package:mockito/src/dummies.dart' as _i7;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -31,156 +32,299 @@ import 'package:mockito/src/dummies.dart' as _i6;
 // ignore_for_file: unnecessary_parenthesis
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
+// ignore_for_file: invalid_use_of_internal_member
 
-/// A class which mocks [ConnectivityService].
+class _FakePingData_0 extends _i1.SmartFake implements _i2.PingData {
+  _FakePingData_0(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+/// A class which mocks [PingService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockConnectivityService extends _i1.Mock
-    implements _i2.ConnectivityService {
-  MockConnectivityService() {
+class MockPingService extends _i1.Mock implements _i2.PingService {
+  MockPingService() {
     _i1.throwOnMissingStub(this);
   }
+
+  @override
+  bool get isConnected =>
+      (super.noSuchMethod(Invocation.getter(#isConnected), returnValue: false)
+          as bool);
+
+  @override
+  _i3.Future<void> startPing({
+    String? host = '8.8.8.8',
+    int? count,
+    int? interval = 1,
+    int? maxPingLatencyTolerance = 400,
+    int? pingLatencyToleranceCount = 3,
+    int? maxLines = 100,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#startPing, [], {
+              #host: host,
+              #count: count,
+              #interval: interval,
+              #maxPingLatencyTolerance: maxPingLatencyTolerance,
+              #pingLatencyToleranceCount: pingLatencyToleranceCount,
+              #maxLines: maxLines,
+            }),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
+          )
+          as _i3.Future<void>);
+
+  @override
+  void addListener(dynamic Function(List<int>, List<String>)? listener) =>
+      super.noSuchMethod(
+        Invocation.method(#addListener, [listener]),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void removeListener(dynamic Function(List<int>, List<String>)? listener) =>
+      super.noSuchMethod(
+        Invocation.method(#removeListener, [listener]),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void clearListeners() => super.noSuchMethod(
+    Invocation.method(#clearListeners, []),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void addConnectionStatusListener(dynamic Function(bool)? listener) =>
+      super.noSuchMethod(
+        Invocation.method(#addConnectionStatusListener, [listener]),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void removeConnectionStatusListener(dynamic Function(bool)? listener) =>
+      super.noSuchMethod(
+        Invocation.method(#removeConnectionStatusListener, [listener]),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void clearConnectionStatusListeners() => super.noSuchMethod(
+    Invocation.method(#clearConnectionStatusListeners, []),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void stopPing() => super.noSuchMethod(
+    Invocation.method(#stopPing, []),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  _i2.PingData parsePingLine(String? line) =>
+      (super.noSuchMethod(
+            Invocation.method(#parsePingLine, [line]),
+            returnValue: _FakePingData_0(
+              this,
+              Invocation.method(#parsePingLine, [line]),
+            ),
+          )
+          as _i2.PingData);
+
+  @override
+  void dispose() => super.noSuchMethod(
+    Invocation.method(#dispose, []),
+    returnValueForMissingStub: null,
+  );
 }
 
 /// A class which mocks [UserLocalDatasourceImpl].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockUserLocalDatasourceImpl extends _i1.Mock
-    implements _i3.UserLocalDatasourceImpl {
+    implements _i4.UserLocalDatasourceImpl {
   MockUserLocalDatasourceImpl() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Future<String> createUser(_i5.UserModel? user) =>
+  _i3.Future<_i5.Result<String>> createUser(_i6.UserModel? user) =>
       (super.noSuchMethod(
             Invocation.method(#createUser, [user]),
-            returnValue: _i4.Future<String>.value(
-              _i6.dummyValue<String>(
+            returnValue: _i3.Future<_i5.Result<String>>.value(
+              _i7.dummyValue<_i5.Result<String>>(
                 this,
                 Invocation.method(#createUser, [user]),
               ),
             ),
           )
-          as _i4.Future<String>);
+          as _i3.Future<_i5.Result<String>>);
 
   @override
-  _i4.Future<void> updateUser(_i5.UserModel? user) =>
+  _i3.Future<_i5.Result<void>> updateUser(_i6.UserModel? user) =>
       (super.noSuchMethod(
             Invocation.method(#updateUser, [user]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i3.Future<_i5.Result<void>>.value(
+              _i7.dummyValue<_i5.Result<void>>(
+                this,
+                Invocation.method(#updateUser, [user]),
+              ),
+            ),
           )
-          as _i4.Future<void>);
+          as _i3.Future<_i5.Result<void>>);
 
   @override
-  _i4.Future<void> deleteUser(String? id) =>
+  _i3.Future<_i5.Result<void>> deleteUser(String? id) =>
       (super.noSuchMethod(
             Invocation.method(#deleteUser, [id]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i3.Future<_i5.Result<void>>.value(
+              _i7.dummyValue<_i5.Result<void>>(
+                this,
+                Invocation.method(#deleteUser, [id]),
+              ),
+            ),
           )
-          as _i4.Future<void>);
+          as _i3.Future<_i5.Result<void>>);
 
   @override
-  _i4.Future<_i5.UserModel?> getUser(String? id) =>
+  _i3.Future<_i5.Result<_i6.UserModel?>> getUser(String? id) =>
       (super.noSuchMethod(
             Invocation.method(#getUser, [id]),
-            returnValue: _i4.Future<_i5.UserModel?>.value(),
+            returnValue: _i3.Future<_i5.Result<_i6.UserModel?>>.value(
+              _i7.dummyValue<_i5.Result<_i6.UserModel?>>(
+                this,
+                Invocation.method(#getUser, [id]),
+              ),
+            ),
           )
-          as _i4.Future<_i5.UserModel?>);
+          as _i3.Future<_i5.Result<_i6.UserModel?>>);
 }
 
 /// A class which mocks [UserRemoteDatasourceImpl].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockUserRemoteDatasourceImpl extends _i1.Mock
-    implements _i7.UserRemoteDatasourceImpl {
+    implements _i8.UserRemoteDatasourceImpl {
   MockUserRemoteDatasourceImpl() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Future<String> createUser(_i5.UserModel? user) =>
+  _i3.Future<_i5.Result<String>> createUser(_i6.UserModel? user) =>
       (super.noSuchMethod(
             Invocation.method(#createUser, [user]),
-            returnValue: _i4.Future<String>.value(
-              _i6.dummyValue<String>(
+            returnValue: _i3.Future<_i5.Result<String>>.value(
+              _i7.dummyValue<_i5.Result<String>>(
                 this,
                 Invocation.method(#createUser, [user]),
               ),
             ),
           )
-          as _i4.Future<String>);
+          as _i3.Future<_i5.Result<String>>);
 
   @override
-  _i4.Future<void> updateUser(_i5.UserModel? user) =>
+  _i3.Future<_i5.Result<void>> updateUser(_i6.UserModel? user) =>
       (super.noSuchMethod(
             Invocation.method(#updateUser, [user]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i3.Future<_i5.Result<void>>.value(
+              _i7.dummyValue<_i5.Result<void>>(
+                this,
+                Invocation.method(#updateUser, [user]),
+              ),
+            ),
           )
-          as _i4.Future<void>);
+          as _i3.Future<_i5.Result<void>>);
 
   @override
-  _i4.Future<void> deleteUser(String? id) =>
+  _i3.Future<_i5.Result<void>> deleteUser(String? id) =>
       (super.noSuchMethod(
             Invocation.method(#deleteUser, [id]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i3.Future<_i5.Result<void>>.value(
+              _i7.dummyValue<_i5.Result<void>>(
+                this,
+                Invocation.method(#deleteUser, [id]),
+              ),
+            ),
           )
-          as _i4.Future<void>);
+          as _i3.Future<_i5.Result<void>>);
 
   @override
-  _i4.Future<_i5.UserModel?> getUser(String? id) =>
+  _i3.Future<_i5.Result<_i6.UserModel?>> getUser(String? id) =>
       (super.noSuchMethod(
             Invocation.method(#getUser, [id]),
-            returnValue: _i4.Future<_i5.UserModel?>.value(),
+            returnValue: _i3.Future<_i5.Result<_i6.UserModel?>>.value(
+              _i7.dummyValue<_i5.Result<_i6.UserModel?>>(
+                this,
+                Invocation.method(#getUser, [id]),
+              ),
+            ),
           )
-          as _i4.Future<_i5.UserModel?>);
+          as _i3.Future<_i5.Result<_i6.UserModel?>>);
 }
 
 /// A class which mocks [QueuedActionLocalDatasourceImpl].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockQueuedActionLocalDatasourceImpl extends _i1.Mock
-    implements _i8.QueuedActionLocalDatasourceImpl {
+    implements _i9.QueuedActionLocalDatasourceImpl {
   MockQueuedActionLocalDatasourceImpl() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Future<int> createQueuedAction(_i9.QueuedActionModel? queue) =>
+  _i3.Future<_i5.Result<int>> createQueuedAction(
+    _i10.QueuedActionModel? queue,
+  ) =>
       (super.noSuchMethod(
             Invocation.method(#createQueuedAction, [queue]),
-            returnValue: _i4.Future<int>.value(0),
-          )
-          as _i4.Future<int>);
-
-  @override
-  _i4.Future<void> deleteQueuedAction(int? id) =>
-      (super.noSuchMethod(
-            Invocation.method(#deleteQueuedAction, [id]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
-          )
-          as _i4.Future<void>);
-
-  @override
-  _i4.Future<_i9.QueuedActionModel?> getQueuedAction(int? id) =>
-      (super.noSuchMethod(
-            Invocation.method(#getQueuedAction, [id]),
-            returnValue: _i4.Future<_i9.QueuedActionModel?>.value(),
-          )
-          as _i4.Future<_i9.QueuedActionModel?>);
-
-  @override
-  _i4.Future<List<_i9.QueuedActionModel>> getAllUserQueuedAction() =>
-      (super.noSuchMethod(
-            Invocation.method(#getAllUserQueuedAction, []),
-            returnValue: _i4.Future<List<_i9.QueuedActionModel>>.value(
-              <_i9.QueuedActionModel>[],
+            returnValue: _i3.Future<_i5.Result<int>>.value(
+              _i7.dummyValue<_i5.Result<int>>(
+                this,
+                Invocation.method(#createQueuedAction, [queue]),
+              ),
             ),
           )
-          as _i4.Future<List<_i9.QueuedActionModel>>);
+          as _i3.Future<_i5.Result<int>>);
+
+  @override
+  _i3.Future<_i5.Result<void>> deleteQueuedAction(int? id) =>
+      (super.noSuchMethod(
+            Invocation.method(#deleteQueuedAction, [id]),
+            returnValue: _i3.Future<_i5.Result<void>>.value(
+              _i7.dummyValue<_i5.Result<void>>(
+                this,
+                Invocation.method(#deleteQueuedAction, [id]),
+              ),
+            ),
+          )
+          as _i3.Future<_i5.Result<void>>);
+
+  @override
+  _i3.Future<_i5.Result<_i10.QueuedActionModel?>> getQueuedAction(int? id) =>
+      (super.noSuchMethod(
+            Invocation.method(#getQueuedAction, [id]),
+            returnValue: _i3.Future<_i5.Result<_i10.QueuedActionModel?>>.value(
+              _i7.dummyValue<_i5.Result<_i10.QueuedActionModel?>>(
+                this,
+                Invocation.method(#getQueuedAction, [id]),
+              ),
+            ),
+          )
+          as _i3.Future<_i5.Result<_i10.QueuedActionModel?>>);
+
+  @override
+  _i3.Future<_i5.Result<List<_i10.QueuedActionModel>>>
+  getAllUserQueuedAction() =>
+      (super.noSuchMethod(
+            Invocation.method(#getAllUserQueuedAction, []),
+            returnValue:
+                _i3.Future<_i5.Result<List<_i10.QueuedActionModel>>>.value(
+                  _i7.dummyValue<_i5.Result<List<_i10.QueuedActionModel>>>(
+                    this,
+                    Invocation.method(#getAllUserQueuedAction, []),
+                  ),
+                ),
+          )
+          as _i3.Future<_i5.Result<List<_i10.QueuedActionModel>>>);
 }
