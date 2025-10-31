@@ -108,6 +108,7 @@ class ProductRemoteDatasourceImpl extends ProductDatasource {
 
       var rawProducts = await query.get();
       var products = rawProducts.docs.map((e) => ProductModel.fromJson(e.data())).toList();
+
       return Result.success(data: products);
     } catch (e) {
       return Result.failure(error: e);
