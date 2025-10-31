@@ -242,6 +242,13 @@ class AccountScreen extends StatelessWidget {
             onTapRightButton: (context) async {
               context.pop();
 
+              final isSyncronizing = di<MainProvider>().isSyncronizing;
+
+              if (isSyncronizing) {
+                AppSnackBar.showError('Cannot sign out while synchronizing data is in progress. Please wait a moment.');
+                return;
+              }
+
               final res = await di<AuthProvider>().signOut();
 
               if (res.isSuccess) {
