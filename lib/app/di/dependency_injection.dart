@@ -42,7 +42,7 @@ import '../routes/app_routes.dart';
 final GetIt di = GetIt.instance;
 
 /// Setup dependency injection
-void setupDependencyInjection() async {
+Future<void> setupDependencyInjection() async {
   // Third parties
   di.registerSingleton<FirebaseFirestore>(FirebaseFirestore.instance);
   di.registerSingleton<FirebaseStorage>(FirebaseStorage.instance);

@@ -26,13 +26,13 @@ void main() async {
   await FirebaseFirestore.instance.clearPersistence();
 
   // Initialize date formatting
-  initializeDateFormatting();
+  await initializeDateFormatting();
 
   // Setup dependency injection
-  setupDependencyInjection();
+  await  setupDependencyInjection();
 
   // Set/lock screen orientation
-  SystemChrome.setPreferredOrientations([]);
+  await SystemChrome.setPreferredOrientations([]);
 
   // Set Default SystemUIOverlayStyle
   SystemChrome.setSystemUIOverlayStyle(
