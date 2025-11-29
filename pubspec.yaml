@@ -62,7 +62,7 @@ dependencies:
   http: ^1.2.1
   package_info_plus: ^8.0.0
   url_launcher: ^6.3.0
-  app_image: ^1.0.12
+  app_image: ^1.0.13
   firebase_crashlytics: ^4.3.10
   firebase_core_platform_interface: ^6.0.2
   device_info_plus: ^12.2.0
