@@ -14,61 +14,81 @@ import '../../presentation/screens/products/product_form_screen.dart';
 import '../../presentation/screens/products/products_screen.dart';
 import '../../presentation/screens/transactions/transaction_detail_screen.dart';
 import '../../presentation/screens/transactions/transactions_screen.dart';
+import '../../presentation/screens/welcome/welcome_screen.dart';
 import '../di/dependency_injection.dart';
 import 'params/error_screen_param.dart';
 
 /// App routes
 class AppRoutes {
-  final AuthProvider authProvider;
+  final AuthProvider _authProvider;
 
-  AppRoutes(this.authProvider) {
-    // Called automatically when instance is created
-    initRouter();
+  AppRoutes(this._authProvider) {
+    _initialize();
   }
 
   // Static convenience getter - returns the same instance from GetIt
   static AppRoutes get instance => di<AppRoutes>();
 
-  final rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
-  final navNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'nav');
+  static final rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
+  static final navNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'nav');
 
-  late final GoRouter _router;
-  GoRouter get router => _router;
+  GoRouter? _router;
+  GoRouter get router {
+    if (_router == null) _initialize();
+    return _router!;
+  }
 
-  void initRouter() async {
-    await authProvider.checkIsAuthenticated();
-
+  void _initialize() {
     _router = GoRouter(
-      initialLocation: '/home',
+      initialLocation: '/',
       navigatorKey: rootNavigatorKey,
-      refreshListenable: authProvider,
+      refreshListenable: _authProvider.isAuthenticated,
       errorBuilder: (context, state) => ErrorScreen(param: ErrorScreenParam(error: state.error)),
-      redirect: (context, state) {
-        final isAuthenticated = authProvider.isAuthenticated;
-        final isAuthRoute = state.matchedLocation.startsWith('/sign-in');
-
-        if (!isAuthenticated && !isAuthRoute) {
-          return '/sign-in';
-        }
-
-        if (isAuthenticated && isAuthRoute) {
-          return '/home';
-        }
-
-        return null;
-      },
-      routes: [
-        _main,
-        _signIn,
-        _error,
-      ],
+      routes: [_splash],
     );
   }
 
-  GoRoute get _error => GoRoute(
+  static final _splash = GoRoute(
+    path: '/',
+    builder: (context, state) => const WelcomeScreen(),
+    redirect: (context, state) {
+      final isChecking = instance._authProvider.isChecking.value;
+      final isAuthenticated = instance._authProvider.isAuthenticated.value;
+      final isSplashRoute = state.fullPath == '/';
+      final isAuthRoute = state.fullPath?.startsWith('/sign-in') ?? false;
+
+      print(
+        'state.fullPath: ${state.fullPath}',
+      );
+      print(
+        'isAuthenticated: $isAuthenticated, isChecking: $isChecking, isSplashRoute: $isSplashRoute, isAuthRoute: $isAuthRoute',
+      );
+
+      if (isChecking) {
+        return '/';
+      }
+
+      if (!isAuthenticated && !isAuthRoute) {
+        return '/sign-in';
+      }
+
+      if (isAuthenticated && isAuthRoute) {
+        return '/home';
+      }
+
+      return isSplashRoute ? '/home' : null;
+    },
+    routes: [
+      _main,
+      _signIn,
+      _error,
+    ],
+  );
+
+  static final _error = GoRoute(
     path: '/error',
     builder: (context, state) {
-      if (state.extra == null || state.extra! is ErrorScreenParam) {
+      if (state.extra == null || state.extra! is! ErrorScreenParam) {
         throw 'Required ErrorScreenParam is not provided!';
       }
 
@@ -76,14 +96,14 @@ class AppRoutes {
     },
   );
 
-  GoRoute get _signIn => GoRoute(
+  static final _signIn = GoRoute(
     path: '/sign-in',
     builder: (context, state) {
       return const SignInScreen();
     },
   );
 
-  ShellRoute get _main => ShellRoute(
+  static final _main = ShellRoute(
     navigatorKey: navNavigatorKey,
     builder: (BuildContext context, GoRouterState state, Widget child) {
       return MainScreen(child: child);
@@ -96,7 +116,7 @@ class AppRoutes {
     ],
   );
 
-  GoRoute get _home => GoRoute(
+  static final _home = GoRoute(
     path: '/home',
     pageBuilder: (context, state) {
       return const NoTransitionPage<void>(
@@ -105,7 +125,7 @@ class AppRoutes {
     },
   );
 
-  GoRoute get _products => GoRoute(
+  static final _products = GoRoute(
     path: '/products',
     pageBuilder: (context, state) {
       return const NoTransitionPage<void>(
@@ -119,7 +139,7 @@ class AppRoutes {
     ],
   );
 
-  GoRoute get _transactions => GoRoute(
+  static final _transactions = GoRoute(
     path: '/transactions',
     pageBuilder: (context, state) {
       return const NoTransitionPage<void>(
@@ -131,7 +151,7 @@ class AppRoutes {
     ],
   );
 
-  GoRoute get _account => GoRoute(
+  static final _account = GoRoute(
     path: '/account',
     pageBuilder: (context, state) {
       return const NoTransitionPage<void>(
@@ -144,7 +164,7 @@ class AppRoutes {
     ],
   );
 
-  GoRoute get _productCreate => GoRoute(
+  static final _productCreate = GoRoute(
     path: 'product-create',
     parentNavigatorKey: navNavigatorKey,
     builder: (context, state) {
@@ -152,7 +172,7 @@ class AppRoutes {
     },
   );
 
-  GoRoute get _productEdit => GoRoute(
+  static final _productEdit = GoRoute(
     path: 'product-edit/:id',
     builder: (context, state) {
       int? id = int.tryParse(state.pathParameters["id"] ?? '');
@@ -165,7 +185,7 @@ class AppRoutes {
     },
   );
 
-  GoRoute get _productDetail => GoRoute(
+  static final _productDetail = GoRoute(
     path: 'product-detail/:id',
     builder: (context, state) {
       int? id = int.tryParse(state.pathParameters["id"] ?? '');
@@ -178,7 +198,7 @@ class AppRoutes {
     },
   );
 
-  GoRoute get _transactionDetail => GoRoute(
+  static final _transactionDetail = GoRoute(
     path: 'transaction-detail/:id',
     builder: (context, state) {
       int? id = int.tryParse(state.pathParameters["id"] ?? '');
@@ -191,14 +211,14 @@ class AppRoutes {
     },
   );
 
-  GoRoute get _profileEdit => GoRoute(
+  static final _profileEdit = GoRoute(
     path: 'profile',
     builder: (context, state) {
       return const ProfileFormScreen();
     },
   );
 
-  GoRoute get _about => GoRoute(
+  static final _about = GoRoute(
     path: 'about',
     builder: (context, state) {
       return const AboutScreen();

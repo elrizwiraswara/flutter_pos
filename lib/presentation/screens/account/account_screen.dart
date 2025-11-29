@@ -249,7 +249,9 @@ class AccountScreen extends StatelessWidget {
                 return;
               }
 
-              final res = await di<AuthProvider>().signOut();
+              final res = await AppDialog.showProgress(() async {
+                return await di<AuthProvider>().signOut();
+              });
 
               if (res.isSuccess) {
                 AppRoutes.instance.router.go('/sign-in');

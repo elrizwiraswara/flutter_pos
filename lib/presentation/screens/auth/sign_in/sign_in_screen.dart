@@ -59,7 +59,9 @@ class SignInScreen extends StatelessWidget {
     return AppButton(
       text: 'Sign In With Google',
       onTap: () async {
-        var res = await di<AuthProvider>().signIn();
+        var res = await AppDialog.showProgress(() async {
+          return await di<AuthProvider>().signIn();
+        });
 
         if (res.isSuccess) {
           AppRoutes.instance.router.refresh();
