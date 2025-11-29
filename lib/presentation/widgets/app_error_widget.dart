@@ -7,12 +7,27 @@ import '../../core/utilities/console_logger.dart';
 class AppErrorWidget extends StatelessWidget {
   final Object? error;
   final String? message;
+  final bool textOnly;
 
-  const AppErrorWidget({super.key, this.error, this.message});
+  const AppErrorWidget({
+    super.key,
+    this.error,
+    this.message,
+    this.textOnly = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     ce(error);
+
+    if (textOnly) {
+      return Text(
+        message ??
+            'Something went wrong!\n${kDebugMode ? "${error is FlutterErrorDetails ? (error as FlutterErrorDetails).summary : error ?? '(No error details)'}" : ""}',
+        textAlign: TextAlign.center,
+        style: Theme.of(context).textTheme.bodyMedium,
+      );
+    }
 
     return Center(
       child: ConstrainedBox(

@@ -6,6 +6,7 @@ import '../../core/utilities/console_logger.dart';
 import '../../presentation/widgets/app_error_widget.dart';
 import '../di/dependency_injection.dart';
 import '../routes/app_routes.dart';
+import '../routes/params/error_screen_param.dart';
 
 class ErrorHandlerBuilder extends StatefulWidget {
   final Widget? child;
@@ -25,16 +26,16 @@ class ErrorHandlerBuilderState extends State<ErrorHandlerBuilder> {
   @override
   void initState() {
     super.initState();
-    // Set up custom widget error
-    ErrorWidget.builder = (error) => AppErrorWidget(error: error);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Set up custom widget error
+      ErrorWidget.builder = (error) => AppErrorWidget(error: error, textOnly: true);
 
-    // Called whenever the Flutter framework catches an error
-    FlutterError.onError = onFlutterError;
+      // Called whenever the Flutter framework catches an error
+      FlutterError.onError = onFlutterError;
 
-    // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
-    PlatformDispatcher.instance.onError = (error, stackTrace) {
-      return true;
-    };
+      // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
+      PlatformDispatcher.instance.onError = onPlatformError;
+    });
   }
 
   // Flutter error handling logic
@@ -43,30 +44,29 @@ class ErrorHandlerBuilderState extends State<ErrorHandlerBuilder> {
 
     _errorLoggerService.log(error: flutterError);
 
-    // Prevent to push to ErrorScreen multiple times
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (kDebugMode) return;
+    if (!mounted) return;
 
-      if (AppRoutes.instance.router.routeInformationProvider.value.uri.path != '/error') {
-        AppRoutes.instance.router.go('/error', extra: {'flutterError': flutterError});
-      }
-    });
+    // Prevent to push to ErrorScreen multiple times
+    if (AppRoutes.instance.router.routeInformationProvider.value.uri.path != '/error') {
+      AppRoutes.instance.router.go('/error', extra: ErrorScreenParam(flutterError: flutterError));
+    }
   }
 
   // Platform error handling logic
-  Future<bool> onPlatformError(Object error, StackTrace stackTrace) async {
+  bool onPlatformError(Object error, StackTrace stackTrace) {
     ce(error);
 
     _errorLoggerService.log(error: error, stackTrace: stackTrace);
 
-    // Prevent to push to ErrorScreen multiple times
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (kDebugMode) return;
+    if (!mounted) return false;
 
-      if (AppRoutes.instance.router.routeInformationProvider.value.uri.path != '/error') {
-        AppRoutes.instance.router.go('/error', extra: {'error': error, 'stackTrace': stackTrace});
-      }
-    });
+    // Prevent to push to ErrorScreen multiple times
+    if (AppRoutes.instance.router.routeInformationProvider.value.uri.path != '/error') {
+      AppRoutes.instance.router.go(
+        '/error',
+        extra: ErrorScreenParam(error: error, stackTrace: stackTrace),
+      );
+    }
 
     return true;
   }
