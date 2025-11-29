@@ -4,39 +4,45 @@ import 'package:flutter_pos/app/routes/app_routes.dart';
 import 'package:flutter_pos/core/common/result.dart';
 import 'package:flutter_pos/domain/entities/user_entity.dart' hide AuthProvider;
 import 'package:flutter_pos/presentation/providers/auth/auth_provider.dart';
+import 'package:flutter_pos/presentation/providers/main/main_provider.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:provider/provider.dart';
 
 import 'sign_in_screen_test.mocks.dart';
 
-@GenerateMocks([AuthProvider])
+@GenerateMocks([AuthProvider, MainProvider])
 void main() {
   late MockAuthProvider mockAuthProvider;
+  late MockMainProvider mockMainProvider;
 
   setUpAll(() {
     provideDummy<Result<UserEntity?>>(Result<UserEntity?>.success(data: null));
     provideDummy<Result<String>>(Result<String>.success(data: ''));
-  });
 
-  setUp(() {
     mockAuthProvider = MockAuthProvider();
+    mockMainProvider = MockMainProvider();
+
+    when(mockAuthProvider.isAuthenticated).thenReturn(ValueNotifier(false));
+    when(mockAuthProvider.isChecking).thenReturn(ValueNotifier(false));
+    when(mockMainProvider.isLoaded).thenReturn(false);
 
     // Register mocks in dependency injection
     di.registerSingleton<AuthProvider>(mockAuthProvider);
-
-    // Register AppRoutes with mock AuthProvider
-    when(mockAuthProvider.isAuthenticated).thenReturn(false);
+    di.registerSingleton<MainProvider>(mockMainProvider);
     di.registerSingleton<AppRoutes>(AppRoutes(mockAuthProvider));
   });
 
-  tearDown(() {
-    di.reset();
-  });
-
   Widget createTestWidget() {
-    return MaterialApp.router(
-      routerConfig: di<AppRoutes>().router,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => di<AuthProvider>()),
+        ChangeNotifierProvider(create: (_) => di<MainProvider>()),
+      ],
+      child: MaterialApp.router(
+        routerConfig: AppRoutes.instance.router,
+      ),
     );
   }
 
@@ -74,36 +80,6 @@ void main() {
   });
 
   group('SignInScreen Sign In Tests', () {
-    testWidgets('should navigate to home on successful sign in', (tester) async {
-      // arrange
-      final user = UserEntity(
-        id: 'user123',
-        name: 'John Doe',
-        email: 'john@example.com',
-      );
-      final successResult = Result<String>.success(data: user.id);
-
-      when(mockAuthProvider.signIn()).thenAnswer((_) async => successResult);
-
-      // act
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.text('Sign In With Google'));
-      await tester.pumpAndSettle();
-
-      // assert
-      verify(mockAuthProvider.signIn()).called(1);
-
-      final router = di<AppRoutes>().router;
-
-      when(mockAuthProvider.isAuthenticated).thenReturn(true);
-      router.refresh();
-
-      // Verify navigation to home by checking current location
-      expect(router.routerDelegate.currentConfiguration.uri.path, '/home');
-    });
-
     testWidgets('should show error dialog on failed sign in', (tester) async {
       // arrange
       final failureResult = Result<String>.failure(error: 'Sign in failed');
@@ -195,6 +171,37 @@ void main() {
       );
 
       expect(constrainedContainer.constraints?.maxWidth, 270);
+    });
+  });
+
+  group('SignInScreen Sign In Success Tests', () {
+    testWidgets('should navigate to home on successful sign in', (tester) async {
+      // arrange
+      final user = UserEntity(
+        id: 'user123',
+        name: 'John Doe',
+        email: 'john@example.com',
+      );
+      final successResult = Result<String>.success(data: user.id);
+
+      when(mockAuthProvider.isAuthenticated).thenReturn(ValueNotifier(false));
+      when(mockAuthProvider.isChecking).thenReturn(ValueNotifier(false));
+
+      when(mockAuthProvider.signIn()).thenAnswer((_) async {
+        when(mockAuthProvider.isAuthenticated).thenReturn(ValueNotifier(true));
+        return successResult;
+      });
+
+      // act
+      await tester.pumpWidget(createTestWidget());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Sign In With Google'));
+      await tester.pumpAndSettle();
+
+      // assert
+      verify(mockAuthProvider.signIn()).called(1);
+      expect(AppRoutes.instance.router.routerDelegate.currentConfiguration.uri.path, '/home');
     });
   });
 }

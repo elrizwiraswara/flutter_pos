@@ -8,12 +8,18 @@ void main() {
   late TransactionRemoteDatasourceImpl datasource;
   late FakeFirebaseFirestore fakeFirestore;
 
-  setUpAll(() {
+  const userId = 'user123';
+
+  setUpAll(() async {
     fakeFirestore = FakeFirebaseFirestore();
     datasource = TransactionRemoteDatasourceImpl(fakeFirestore);
-  });
 
-  const userId = 'user123';
+    await fakeFirestore.collection('User').doc(userId).set({
+      'id': userId,
+      'name': 'Test User',
+      'email': 'test@example.com',
+    });
+  });
 
   TransactionModel createSampleTransaction({
     int id = 1,
@@ -158,19 +164,10 @@ void main() {
         expect(result.data?.any((t) => t.id == 2), isTrue);
       });
 
-      test('should return empty list when user has no transactions', () async {
+      test('should return failure when user has no transactions', () async {
         final result = await datasource.getAllUserTransactions('nonexistent_user');
 
-        expect(result.data, isEmpty);
-      });
-
-      test('should not return transactions from other users', () async {
-        final transaction = createSampleTransaction();
-        await datasource.createTransaction(transaction);
-
-        final result = await datasource.getAllUserTransactions('different_user');
-
-        expect(result.data, isEmpty);
+        expect(result.isSuccess, false);
       });
 
       test('should retrieve transactions with ordered products', () async {

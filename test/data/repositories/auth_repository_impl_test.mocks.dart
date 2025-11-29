@@ -28,7 +28,6 @@ import 'package:mockito/src/dummies.dart' as _i9;
 // ignore_for_file: unnecessary_parenthesis
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
-// ignore_for_file: invalid_use_of_internal_member
 
 class _FakeFirebaseAuth_0 extends _i1.SmartFake implements _i2.FirebaseAuth {
   _FakeFirebaseAuth_0(Object parent, Invocation parentInvocation)
@@ -133,62 +132,62 @@ class MockUserModel extends _i1.Mock implements _i8.UserModel {
           as String);
 
   @override
-  set id(String? value) => super.noSuchMethod(
-    Invocation.setter(#id, value),
+  set id(String? _id) => super.noSuchMethod(
+    Invocation.setter(#id, _id),
     returnValueForMissingStub: null,
   );
 
   @override
-  set email(String? value) => super.noSuchMethod(
-    Invocation.setter(#email, value),
+  set email(String? _email) => super.noSuchMethod(
+    Invocation.setter(#email, _email),
     returnValueForMissingStub: null,
   );
 
   @override
-  set phone(String? value) => super.noSuchMethod(
-    Invocation.setter(#phone, value),
+  set phone(String? _phone) => super.noSuchMethod(
+    Invocation.setter(#phone, _phone),
     returnValueForMissingStub: null,
   );
 
   @override
-  set name(String? value) => super.noSuchMethod(
-    Invocation.setter(#name, value),
+  set name(String? _name) => super.noSuchMethod(
+    Invocation.setter(#name, _name),
     returnValueForMissingStub: null,
   );
 
   @override
-  set gender(String? value) => super.noSuchMethod(
-    Invocation.setter(#gender, value),
+  set gender(String? _gender) => super.noSuchMethod(
+    Invocation.setter(#gender, _gender),
     returnValueForMissingStub: null,
   );
 
   @override
-  set birthdate(String? value) => super.noSuchMethod(
-    Invocation.setter(#birthdate, value),
+  set birthdate(String? _birthdate) => super.noSuchMethod(
+    Invocation.setter(#birthdate, _birthdate),
     returnValueForMissingStub: null,
   );
 
   @override
-  set imageUrl(String? value) => super.noSuchMethod(
-    Invocation.setter(#imageUrl, value),
+  set imageUrl(String? _imageUrl) => super.noSuchMethod(
+    Invocation.setter(#imageUrl, _imageUrl),
     returnValueForMissingStub: null,
   );
 
   @override
-  set authProvider(_i4.AuthProvider? value) => super.noSuchMethod(
-    Invocation.setter(#authProvider, value),
+  set authProvider(String? _authProvider) => super.noSuchMethod(
+    Invocation.setter(#authProvider, _authProvider),
     returnValueForMissingStub: null,
   );
 
   @override
-  set createdAt(String? value) => super.noSuchMethod(
-    Invocation.setter(#createdAt, value),
+  set createdAt(String? _createdAt) => super.noSuchMethod(
+    Invocation.setter(#createdAt, _createdAt),
     returnValueForMissingStub: null,
   );
 
   @override
-  set updatedAt(String? value) => super.noSuchMethod(
-    Invocation.setter(#updatedAt, value),
+  set updatedAt(String? _updatedAt) => super.noSuchMethod(
+    Invocation.setter(#updatedAt, _updatedAt),
     returnValueForMissingStub: null,
   );
 

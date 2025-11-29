@@ -3,16 +3,29 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i5;
-import 'dart:ui' as _i8;
+import 'dart:async' as _i11;
+import 'dart:ui' as _i14;
 
-import 'package:flutter_pos/core/common/result.dart' as _i6;
+import 'package:flutter/foundation.dart' as _i4;
+import 'package:flutter_pos/core/common/result.dart' as _i12;
+import 'package:flutter_pos/core/services/connectivity/ping_service.dart'
+    as _i5;
+import 'package:flutter_pos/core/services/info/device_info_service.dart' as _i6;
+import 'package:flutter_pos/domain/entities/queued_action_entity.dart' as _i17;
+import 'package:flutter_pos/domain/entities/user_entity.dart' as _i16;
 import 'package:flutter_pos/domain/repositories/auth_repository.dart' as _i3;
+import 'package:flutter_pos/domain/repositories/product_repository.dart' as _i8;
+import 'package:flutter_pos/domain/repositories/queued_action_repository.dart'
+    as _i10;
+import 'package:flutter_pos/domain/repositories/transaction_repository.dart'
+    as _i9;
 import 'package:flutter_pos/domain/repositories/user_repository.dart' as _i2;
 import 'package:flutter_pos/presentation/providers/auth/auth_provider.dart'
-    as _i4;
+    as _i7;
+import 'package:flutter_pos/presentation/providers/main/main_provider.dart'
+    as _i15;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:mockito/src/dummies.dart' as _i7;
+import 'package:mockito/src/dummies.dart' as _i13;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -27,7 +40,6 @@ import 'package:mockito/src/dummies.dart' as _i7;
 // ignore_for_file: unnecessary_parenthesis
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
-// ignore_for_file: invalid_use_of_internal_member
 
 class _FakeUserRepository_0 extends _i1.SmartFake
     implements _i2.UserRepository {
@@ -41,10 +53,50 @@ class _FakeAuthRepository_1 extends _i1.SmartFake
     : super(parent, parentInvocation);
 }
 
+class _FakeValueNotifier_2<T> extends _i1.SmartFake
+    implements _i4.ValueNotifier<T> {
+  _FakeValueNotifier_2(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakePingService_3 extends _i1.SmartFake implements _i5.PingService {
+  _FakePingService_3(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeDeviceInfoService_4 extends _i1.SmartFake
+    implements _i6.DeviceInfoService {
+  _FakeDeviceInfoService_4(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeAuthProvider_5 extends _i1.SmartFake implements _i7.AuthProvider {
+  _FakeAuthProvider_5(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeProductRepository_6 extends _i1.SmartFake
+    implements _i8.ProductRepository {
+  _FakeProductRepository_6(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeTransactionRepository_7 extends _i1.SmartFake
+    implements _i9.TransactionRepository {
+  _FakeTransactionRepository_7(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeQueuedActionRepository_8 extends _i1.SmartFake
+    implements _i10.QueuedActionRepository {
+  _FakeQueuedActionRepository_8(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
 /// A class which mocks [AuthProvider].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockAuthProvider extends _i1.Mock implements _i4.AuthProvider {
+class MockAuthProvider extends _i1.Mock implements _i7.AuthProvider {
   MockAuthProvider() {
     _i1.throwOnMissingStub(this);
   }
@@ -72,12 +124,26 @@ class MockAuthProvider extends _i1.Mock implements _i4.AuthProvider {
           as _i3.AuthRepository);
 
   @override
-  bool get isAuthenticated =>
+  _i4.ValueNotifier<bool> get isAuthenticated =>
       (super.noSuchMethod(
             Invocation.getter(#isAuthenticated),
-            returnValue: false,
+            returnValue: _FakeValueNotifier_2<bool>(
+              this,
+              Invocation.getter(#isAuthenticated),
+            ),
           )
-          as bool);
+          as _i4.ValueNotifier<bool>);
+
+  @override
+  _i4.ValueNotifier<bool> get isChecking =>
+      (super.noSuchMethod(
+            Invocation.getter(#isChecking),
+            returnValue: _FakeValueNotifier_2<bool>(
+              this,
+              Invocation.getter(#isChecking),
+            ),
+          )
+          as _i4.ValueNotifier<bool>);
 
   @override
   bool get hasListeners =>
@@ -85,48 +151,297 @@ class MockAuthProvider extends _i1.Mock implements _i4.AuthProvider {
           as bool);
 
   @override
-  _i5.Future<void> checkIsAuthenticated() =>
+  _i11.Future<void> initialize() =>
       (super.noSuchMethod(
-            Invocation.method(#checkIsAuthenticated, []),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            Invocation.method(#initialize, []),
+            returnValue: _i11.Future<void>.value(),
+            returnValueForMissingStub: _i11.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i11.Future<void>);
 
   @override
-  _i5.Future<_i6.Result<String>> signIn() =>
+  _i11.Future<_i12.Result<String>> signIn() =>
       (super.noSuchMethod(
             Invocation.method(#signIn, []),
-            returnValue: _i5.Future<_i6.Result<String>>.value(
-              _i7.dummyValue<_i6.Result<String>>(
+            returnValue: _i11.Future<_i12.Result<String>>.value(
+              _i13.dummyValue<_i12.Result<String>>(
                 this,
                 Invocation.method(#signIn, []),
               ),
             ),
           )
-          as _i5.Future<_i6.Result<String>>);
+          as _i11.Future<_i12.Result<String>>);
 
   @override
-  _i5.Future<_i6.Result<void>> signOut() =>
+  _i11.Future<_i12.Result<void>> signOut() =>
       (super.noSuchMethod(
             Invocation.method(#signOut, []),
-            returnValue: _i5.Future<_i6.Result<void>>.value(
-              _i7.dummyValue<_i6.Result<void>>(
+            returnValue: _i11.Future<_i12.Result<void>>.value(
+              _i13.dummyValue<_i12.Result<void>>(
                 this,
                 Invocation.method(#signOut, []),
               ),
             ),
           )
-          as _i5.Future<_i6.Result<void>>);
+          as _i11.Future<_i12.Result<void>>);
 
   @override
-  void addListener(_i8.VoidCallback? listener) => super.noSuchMethod(
+  void addListener(_i14.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#addListener, [listener]),
     returnValueForMissingStub: null,
   );
 
   @override
-  void removeListener(_i8.VoidCallback? listener) => super.noSuchMethod(
+  void removeListener(_i14.VoidCallback? listener) => super.noSuchMethod(
+    Invocation.method(#removeListener, [listener]),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void dispose() => super.noSuchMethod(
+    Invocation.method(#dispose, []),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void notifyListeners() => super.noSuchMethod(
+    Invocation.method(#notifyListeners, []),
+    returnValueForMissingStub: null,
+  );
+}
+
+/// A class which mocks [MainProvider].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockMainProvider extends _i1.Mock implements _i15.MainProvider {
+  MockMainProvider() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i5.PingService get pingService =>
+      (super.noSuchMethod(
+            Invocation.getter(#pingService),
+            returnValue: _FakePingService_3(
+              this,
+              Invocation.getter(#pingService),
+            ),
+          )
+          as _i5.PingService);
+
+  @override
+  _i6.DeviceInfoService get deviceInforService =>
+      (super.noSuchMethod(
+            Invocation.getter(#deviceInforService),
+            returnValue: _FakeDeviceInfoService_4(
+              this,
+              Invocation.getter(#deviceInforService),
+            ),
+          )
+          as _i6.DeviceInfoService);
+
+  @override
+  _i7.AuthProvider get authProvider =>
+      (super.noSuchMethod(
+            Invocation.getter(#authProvider),
+            returnValue: _FakeAuthProvider_5(
+              this,
+              Invocation.getter(#authProvider),
+            ),
+          )
+          as _i7.AuthProvider);
+
+  @override
+  _i2.UserRepository get userRepository =>
+      (super.noSuchMethod(
+            Invocation.getter(#userRepository),
+            returnValue: _FakeUserRepository_0(
+              this,
+              Invocation.getter(#userRepository),
+            ),
+          )
+          as _i2.UserRepository);
+
+  @override
+  _i8.ProductRepository get productRepository =>
+      (super.noSuchMethod(
+            Invocation.getter(#productRepository),
+            returnValue: _FakeProductRepository_6(
+              this,
+              Invocation.getter(#productRepository),
+            ),
+          )
+          as _i8.ProductRepository);
+
+  @override
+  _i9.TransactionRepository get transactionRepository =>
+      (super.noSuchMethod(
+            Invocation.getter(#transactionRepository),
+            returnValue: _FakeTransactionRepository_7(
+              this,
+              Invocation.getter(#transactionRepository),
+            ),
+          )
+          as _i9.TransactionRepository);
+
+  @override
+  _i10.QueuedActionRepository get queuedActionRepository =>
+      (super.noSuchMethod(
+            Invocation.getter(#queuedActionRepository),
+            returnValue: _FakeQueuedActionRepository_8(
+              this,
+              Invocation.getter(#queuedActionRepository),
+            ),
+          )
+          as _i10.QueuedActionRepository);
+
+  @override
+  bool get isLoaded =>
+      (super.noSuchMethod(Invocation.getter(#isLoaded), returnValue: false)
+          as bool);
+
+  @override
+  bool get isHasInternet =>
+      (super.noSuchMethod(Invocation.getter(#isHasInternet), returnValue: false)
+          as bool);
+
+  @override
+  bool get isHasQueuedActions =>
+      (super.noSuchMethod(
+            Invocation.getter(#isHasQueuedActions),
+            returnValue: false,
+          )
+          as bool);
+
+  @override
+  bool get isSyncronizing =>
+      (super.noSuchMethod(
+            Invocation.getter(#isSyncronizing),
+            returnValue: false,
+          )
+          as bool);
+
+  @override
+  set isLoaded(bool? _isLoaded) => super.noSuchMethod(
+    Invocation.setter(#isLoaded, _isLoaded),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  set isHasInternet(bool? _isHasInternet) => super.noSuchMethod(
+    Invocation.setter(#isHasInternet, _isHasInternet),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  set isHasQueuedActions(bool? _isHasQueuedActions) => super.noSuchMethod(
+    Invocation.setter(#isHasQueuedActions, _isHasQueuedActions),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  set isSyncronizing(bool? _isSyncronizing) => super.noSuchMethod(
+    Invocation.setter(#isSyncronizing, _isSyncronizing),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  set user(_i16.UserEntity? _user) => super.noSuchMethod(
+    Invocation.setter(#user, _user),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  bool get hasListeners =>
+      (super.noSuchMethod(Invocation.getter(#hasListeners), returnValue: false)
+          as bool);
+
+  @override
+  void resetStates() => super.noSuchMethod(
+    Invocation.method(#resetStates, []),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  _i11.Future<void> initMainProvider() =>
+      (super.noSuchMethod(
+            Invocation.method(#initMainProvider, []),
+            returnValue: _i11.Future<void>.value(),
+            returnValueForMissingStub: _i11.Future<void>.value(),
+          )
+          as _i11.Future<void>);
+
+  @override
+  _i11.Future<void> startPingService() =>
+      (super.noSuchMethod(
+            Invocation.method(#startPingService, []),
+            returnValue: _i11.Future<void>.value(),
+            returnValueForMissingStub: _i11.Future<void>.value(),
+          )
+          as _i11.Future<void>);
+
+  @override
+  _i11.Future<void> checkAndSyncAllData() =>
+      (super.noSuchMethod(
+            Invocation.method(#checkAndSyncAllData, []),
+            returnValue: _i11.Future<void>.value(),
+            returnValueForMissingStub: _i11.Future<void>.value(),
+          )
+          as _i11.Future<void>);
+
+  @override
+  _i11.Future<void> getAndSyncAllUserData() =>
+      (super.noSuchMethod(
+            Invocation.method(#getAndSyncAllUserData, []),
+            returnValue: _i11.Future<void>.value(),
+            returnValueForMissingStub: _i11.Future<void>.value(),
+          )
+          as _i11.Future<void>);
+
+  @override
+  _i11.Future<int> executeAllQueuedActions() =>
+      (super.noSuchMethod(
+            Invocation.method(#executeAllQueuedActions, []),
+            returnValue: _i11.Future<int>.value(0),
+          )
+          as _i11.Future<int>);
+
+  @override
+  _i11.Future<List<_i17.QueuedActionEntity>> getQueuedActions() =>
+      (super.noSuchMethod(
+            Invocation.method(#getQueuedActions, []),
+            returnValue: _i11.Future<List<_i17.QueuedActionEntity>>.value(
+              <_i17.QueuedActionEntity>[],
+            ),
+          )
+          as _i11.Future<List<_i17.QueuedActionEntity>>);
+
+  @override
+  _i11.Future<void> onHasInternet(bool? value) =>
+      (super.noSuchMethod(
+            Invocation.method(#onHasInternet, [value]),
+            returnValue: _i11.Future<void>.value(),
+            returnValueForMissingStub: _i11.Future<void>.value(),
+          )
+          as _i11.Future<void>);
+
+  @override
+  _i11.Future<void> checkIsHasQueuedActions() =>
+      (super.noSuchMethod(
+            Invocation.method(#checkIsHasQueuedActions, []),
+            returnValue: _i11.Future<void>.value(),
+            returnValueForMissingStub: _i11.Future<void>.value(),
+          )
+          as _i11.Future<void>);
+
+  @override
+  void addListener(_i14.VoidCallback? listener) => super.noSuchMethod(
+    Invocation.method(#addListener, [listener]),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void removeListener(_i14.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#removeListener, [listener]),
     returnValueForMissingStub: null,
   );

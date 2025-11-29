@@ -28,7 +28,6 @@ import 'package:mockito/src/dummies.dart' as _i8;
 // ignore_for_file: unnecessary_parenthesis
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
-// ignore_for_file: invalid_use_of_internal_member
 
 class _FakeFirebaseApp_0 extends _i1.SmartFake implements _i2.FirebaseApp {
   _FakeFirebaseApp_0(Object parent, Invocation parentInvocation)
@@ -118,8 +117,8 @@ class MockFirebaseAuth extends _i1.Mock implements _i4.FirebaseAuth {
           as _i2.FirebaseApp);
 
   @override
-  set app(_i2.FirebaseApp? value) => super.noSuchMethod(
-    Invocation.setter(#app, value),
+  set app(_i2.FirebaseApp? _app) => super.noSuchMethod(
+    Invocation.setter(#app, _app),
     returnValueForMissingStub: null,
   );
 
@@ -1115,17 +1114,6 @@ class MockGoogleSignInAuthorizationClient extends _i1.Mock
                 _i7.Future<_i6.GoogleSignInServerAuthorization?>.value(),
           )
           as _i7.Future<_i6.GoogleSignInServerAuthorization?>);
-
-  @override
-  _i7.Future<void> clearAuthorizationToken({required String? accessToken}) =>
-      (super.noSuchMethod(
-            Invocation.method(#clearAuthorizationToken, [], {
-              #accessToken: accessToken,
-            }),
-            returnValue: _i7.Future<void>.value(),
-            returnValueForMissingStub: _i7.Future<void>.value(),
-          )
-          as _i7.Future<void>);
 }
 
 /// A class which mocks [GoogleSignInClientAuthorization].
