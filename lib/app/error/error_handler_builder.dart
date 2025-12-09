@@ -73,6 +73,9 @@ class ErrorHandlerBuilderState extends State<ErrorHandlerBuilder> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.child ?? const SizedBox.shrink();
+    return SafeArea(
+      top: false,
+      child: widget.child ?? const SizedBox.shrink(),
+    );
   }
 }
