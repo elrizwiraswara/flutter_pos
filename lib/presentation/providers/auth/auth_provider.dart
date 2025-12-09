@@ -50,6 +50,7 @@ class AuthProvider extends ChangeNotifier {
     if (createRes.isFailure) return Result.failure(error: createRes.error!);
 
     _user = res.data;
+    isAuthenticated.value = true;
     notifyListeners();
 
     return createRes;
