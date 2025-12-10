@@ -7,30 +7,30 @@ import '../../../providers/home/home_provider.dart';
 import '../../../widgets/app_empty_state.dart';
 import 'order_card.dart';
 
-class CartPanelBody extends StatefulWidget {
+class CartPanelBody extends StatelessWidget {
   const CartPanelBody({super.key});
 
   @override
-  State<CartPanelBody> createState() => _CartPanelBodyState();
-}
-
-class _CartPanelBodyState extends State<CartPanelBody> {
-  @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(vertical: 62),
-      physics: const NeverScrollableScrollPhysics(),
+    return const SingleChildScrollView(
+      padding: EdgeInsets.symmetric(vertical: 62),
+      physics: NeverScrollableScrollPhysics(),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          orderList(),
-          orderTotal(),
+          _OrderList(),
+          _OrderTotal(),
         ],
       ),
     );
   }
+}
 
-  Widget orderList() {
+class _OrderList extends StatelessWidget {
+  const _OrderList();
+
+  @override
+  Widget build(BuildContext context) {
     return Consumer<HomeProvider>(
       builder: (context, provider, _) {
         if (provider.orderedProducts.isEmpty) {
@@ -73,8 +73,13 @@ class _CartPanelBodyState extends State<CartPanelBody> {
       },
     );
   }
+}
 
-  Widget orderTotal() {
+class _OrderTotal extends StatelessWidget {
+  const _OrderTotal();
+
+  @override
+  Widget build(BuildContext context) {
     return Consumer<HomeProvider>(
       builder: (context, provider, _) {
         return Container(
@@ -92,11 +97,15 @@ class _CartPanelBodyState extends State<CartPanelBody> {
             children: [
               Text(
                 'Total (${provider.orderedProducts.length})',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               Text(
                 CurrencyFormatter.format(provider.getTotalAmount()),
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),

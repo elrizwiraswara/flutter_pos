@@ -21,6 +21,7 @@ class _AboutScreenState extends State<AboutScreen> {
 
   @override
   void initState() {
+    super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
@@ -31,7 +32,6 @@ class _AboutScreenState extends State<AboutScreen> {
 
       setState(() {});
     });
-    super.initState();
   }
 
   @override

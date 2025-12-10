@@ -28,8 +28,8 @@ class AppTextField extends StatefulWidget {
   final Widget? suffixWidget;
   final EdgeInsets contentPadding;
   final Function(String text)? onChanged;
-  final Function()? onEditingComplete;
-  final Function()? onTapClearButton;
+  final VoidCallback? onEditingComplete;
+  final VoidCallback? onTapClearButton;
   final List<TextInputFormatter>? inputFormatters;
   final bool showCounter;
   final bool showBorder;
@@ -72,6 +72,50 @@ class _AppTextFieldState extends State<AppTextField> {
   void initState() {
     textEditingController = widget.controller ?? TextEditingController();
     super.initState();
+  }
+
+  void onChanged(String val) {
+    if (widget.onChanged != null) {
+      widget.onChanged!(val);
+    }
+
+    setState(() {});
+  }
+
+  TextInputType? textInputType() {
+    if (widget.keyboardType != null) {
+      return widget.keyboardType!;
+    }
+
+    if (widget.type == AppTextFieldType.currency) {
+      return TextInputType.number;
+    }
+
+    return null;
+  }
+
+  List<TextInputFormatter>? inputFormatters() {
+    if (widget.inputFormatters != null) {
+      return widget.inputFormatters!;
+    }
+
+    if (widget.type == AppTextFieldType.currency) {
+      return [FilteringTextInputFormatter.digitsOnly];
+    }
+
+    return null;
+  }
+
+  TextInputAction? textInputAction() {
+    if (widget.textInputAction != null) {
+      return widget.textInputAction!;
+    }
+
+    if (widget.type == AppTextFieldType.search) {
+      return TextInputAction.search;
+    }
+
+    return null;
   }
 
   @override
@@ -166,14 +210,6 @@ class _AppTextFieldState extends State<AppTextField> {
     );
   }
 
-  void onChanged(String val) {
-    if (widget.onChanged != null) {
-      widget.onChanged!(val);
-    }
-
-    setState(() {});
-  }
-
   Widget? prefix(BuildContext context) {
     if (widget.prefixWidget != null) {
       return widget.prefixWidget!;
@@ -227,42 +263,6 @@ class _AppTextFieldState extends State<AppTextField> {
               ),
             )
           : null;
-    }
-
-    return null;
-  }
-
-  TextInputType? textInputType() {
-    if (widget.keyboardType != null) {
-      return widget.keyboardType!;
-    }
-
-    if (widget.type == AppTextFieldType.currency) {
-      return TextInputType.number;
-    }
-
-    return null;
-  }
-
-  List<TextInputFormatter>? inputFormatters() {
-    if (widget.inputFormatters != null) {
-      return widget.inputFormatters!;
-    }
-
-    if (widget.type == AppTextFieldType.currency) {
-      return [FilteringTextInputFormatter.digitsOnly];
-    }
-
-    return null;
-  }
-
-  TextInputAction? textInputAction() {
-    if (widget.textInputAction != null) {
-      return widget.textInputAction!;
-    }
-
-    if (widget.type == AppTextFieldType.search) {
-      return TextInputAction.search;
     }
 
     return null;

@@ -41,79 +41,71 @@ class _CartPanelHeaderState extends State<CartPanelHeader> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          slideIndicator(),
-          const SizedBox(height: AppSizes.padding / 1.5),
-          header(),
-        ],
-      ),
-    );
-  }
-
-  Widget slideIndicator() {
-    return Center(
-      child: Container(
-        width: 40,
-        height: 4,
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.54),
-          borderRadius: BorderRadius.circular(100),
-        ),
-      ),
-    );
-  }
-
-  Widget header() {
-    return Consumer<HomeProvider>(
-      builder: (context, provider, _) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              '${provider.orderedProducts.length} Products',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.bold,
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.54),
+                borderRadius: BorderRadius.circular(100),
               ),
             ),
-            AppButton(
-              height: 26,
-              borderRadius: BorderRadius.circular(4),
-              padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding / 2),
-              buttonColor: Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.32),
-              enabled: provider.orderedProducts.isNotEmpty,
-              onTap: () {
-                AppDialog.show(
-                  title: 'Confirm',
-                  text: 'Are you sure want to remove all product?',
-                  rightButtonText: 'Remove',
-                  leftButtonText: 'Cancel',
-                  onTapRightButton: (context) {
-                    provider.onRemoveAllOrderedProduct();
-                    context.pop();
-                  },
-                );
-              },
-              child: Row(
+          ),
+          const SizedBox(height: AppSizes.padding / 1.5),
+          Consumer<HomeProvider>(
+            builder: (context, provider, _) {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Icon(
-                    Icons.clear_rounded,
-                    size: 12,
-                    color: Theme.of(context).colorScheme.error,
-                  ),
-                  const SizedBox(width: AppSizes.padding / 4),
                   Text(
-                    'Remove All',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      fontSize: 10,
+                    '${provider.orderedProducts.length} Products',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                  AppButton(
+                    height: 26,
+                    borderRadius: BorderRadius.circular(4),
+                    padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding / 2),
+                    buttonColor: Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.32),
+                    enabled: provider.orderedProducts.isNotEmpty,
+                    onTap: () {
+                      AppDialog.show(
+                        title: 'Confirm',
+                        text: 'Are you sure want to remove all product?',
+                        rightButtonText: 'Remove',
+                        leftButtonText: 'Cancel',
+                        onTapRightButton: (context) {
+                          provider.onRemoveAllOrderedProduct();
+                          context.pop();
+                        },
+                      );
+                    },
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.clear_rounded,
+                          size: 12,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                        const SizedBox(width: AppSizes.padding / 4),
+                        Text(
+                          'Remove All',
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
-              ),
-            ),
-          ],
-        );
-      },
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 }

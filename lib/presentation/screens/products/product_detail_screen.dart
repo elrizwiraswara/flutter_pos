@@ -25,7 +25,7 @@ class ProductDetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Product Detail'),
         titleSpacing: 0,
-        actions: [editButton(context)],
+        actions: [_EditButton(id: id)],
       ),
       body: FutureBuilder(
         future: di<ProductDetailProvider>().getProductDetail(id),
@@ -42,26 +42,27 @@ class ProductDetailScreen extends StatelessWidget {
             return const AppEmptyState(title: 'Not Found');
           }
 
+          final product = snapshot.data!;
+
           return SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                image(context, imageUrl: snapshot.data!.imageUrl),
+                _ProductImage(imageUrl: product.imageUrl),
                 Padding(
                   padding: const EdgeInsets.all(AppSizes.padding),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      name(
-                        context,
-                        productName: snapshot.data!.name,
-                        createdAt: snapshot.data!.createdAt,
-                        updatedAt: snapshot.data!.updatedAt,
+                      _ProductName(
+                        productName: product.name,
+                        createdAt: product.createdAt,
+                        updatedAt: product.updatedAt,
                       ),
-                      price(context, snapshot.data!.price),
-                      stock(context, snapshot.data!.stock),
-                      sold(context, snapshot.data!.sold),
-                      description(context, snapshot.data!.description),
+                      _ProductPrice(price: product.price),
+                      _ProductStock(stock: product.stock),
+                      _ProductSold(sold: product.sold),
+                      _ProductDescription(description: product.description),
                     ],
                   ),
                 ),
@@ -72,8 +73,15 @@ class ProductDetailScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget editButton(BuildContext context) {
+class _EditButton extends StatelessWidget {
+  final int id;
+
+  const _EditButton({required this.id});
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(right: AppSizes.padding),
       child: AppButton(
@@ -105,14 +113,15 @@ class ProductDetailScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget image(
-    BuildContext context, {
-    String? imageUrl,
-    String? productName,
-    String? createdAt,
-    String? updatedAt,
-  }) {
+class _ProductImage extends StatelessWidget {
+  final String? imageUrl;
+
+  const _ProductImage({required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
     return ConstrainedBox(
       constraints: BoxConstraints(
         minWidth: AppSizes.screenWidth(context),
@@ -122,7 +131,10 @@ class ProductDetailScreen extends StatelessWidget {
       child: AppImage(
         image: imageUrl ?? '',
         backgroundColor: Theme.of(context).colorScheme.surface,
-        border: Border.all(width: 0.5, color: Theme.of(context).colorScheme.primaryContainer),
+        border: Border.all(
+          width: 0.5,
+          color: Theme.of(context).colorScheme.primaryContainer,
+        ),
         enableFullScreenView: true,
         errorWidget: Icon(
           Icons.image,
@@ -132,21 +144,29 @@ class ProductDetailScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget name(
-    BuildContext context, {
-    String? productName,
-    String? createdAt,
-    String? updatedAt,
-  }) {
+class _ProductName extends StatelessWidget {
+  final String? productName;
+  final String? createdAt;
+  final String? updatedAt;
+
+  const _ProductName({
+    required this.productName,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           productName ?? '(No name)',
-          style: Theme.of(
-            context,
-          ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: AppSizes.padding / 2),
         Text(
@@ -166,8 +186,15 @@ class ProductDetailScreen extends StatelessWidget {
       ],
     );
   }
+}
 
-  Widget price(BuildContext context, int? price) {
+class _ProductPrice extends StatelessWidget {
+  final int? price;
+
+  const _ProductPrice({required this.price});
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: AppSizes.padding),
       child: Column(
@@ -175,18 +202,27 @@ class ProductDetailScreen extends StatelessWidget {
         children: [
           Text(
             "Price",
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(),
+            style: Theme.of(context).textTheme.bodyMedium,
           ),
           Text(
             CurrencyFormatter.format(price ?? 0),
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
     );
   }
+}
 
-  Widget stock(BuildContext context, int? stock) {
+class _ProductStock extends StatelessWidget {
+  final int? stock;
+
+  const _ProductStock({required this.stock});
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: AppSizes.padding),
       child: Column(
@@ -194,18 +230,27 @@ class ProductDetailScreen extends StatelessWidget {
         children: [
           Text(
             "Stock",
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(),
+            style: Theme.of(context).textTheme.bodyMedium,
           ),
           Text(
             "$stock",
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
     );
   }
+}
 
-  Widget sold(BuildContext context, int? sold) {
+class _ProductSold extends StatelessWidget {
+  final int? sold;
+
+  const _ProductSold({required this.sold});
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: AppSizes.padding),
       child: Column(
@@ -213,18 +258,27 @@ class ProductDetailScreen extends StatelessWidget {
         children: [
           Text(
             "Sold",
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(),
+            style: Theme.of(context).textTheme.bodyMedium,
           ),
           Text(
             "$sold",
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
     );
   }
+}
 
-  Widget description(BuildContext context, String? description) {
+class _ProductDescription extends StatelessWidget {
+  final String? description;
+
+  const _ProductDescription({required this.description});
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: AppSizes.padding),
       child: Column(
@@ -232,11 +286,13 @@ class ProductDetailScreen extends StatelessWidget {
         children: [
           Text(
             "Description",
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(),
+            style: Theme.of(context).textTheme.bodyMedium,
           ),
           Text(
             description ?? '(No description)',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),

@@ -77,6 +77,22 @@ class _ProfileFormScreenState extends State<ProfileFormScreen> {
     }
   }
 
+  void updatedUser() async {
+    var res = await AppDialog.showProgress(() {
+      return accountProvider.updatedUser();
+    });
+
+    if (res.isSuccess) {
+      AppRoutes.instance.router.pop();
+      AppSnackBar.show('Profile updated');
+
+      // Refresh user data
+      mainProvider.getAndSyncAllUserData();
+    } else {
+      AppDialog.showError(error: res.error.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -96,11 +112,11 @@ class _ProfileFormScreenState extends State<ProfileFormScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                image(),
-                name(),
-                email(),
-                phone(),
-                button(),
+                _ImageSection(onTapImage: onTapImage),
+                _NameField(controller: nameController),
+                _EmailField(controller: emailController),
+                _PhoneField(controller: phoneController),
+                _UpdateButton(onTap: updatedUser),
               ],
             ),
           );
@@ -108,14 +124,23 @@ class _ProfileFormScreenState extends State<ProfileFormScreen> {
       ),
     );
   }
+}
 
-  Widget image() {
+class _ImageSection extends StatelessWidget {
+  final VoidCallback onTapImage;
+
+  const _ImageSection({required this.onTapImage});
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Profile Image',
-          style: Theme.of(context).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: AppSizes.padding / 2),
         Consumer<AccountProvider>(
@@ -131,7 +156,10 @@ class _ProfileFormScreenState extends State<ProfileFormScreen> {
                     height: 100,
                     borderRadius: BorderRadius.circular(AppSizes.radius),
                     backgroundColor: Theme.of(context).colorScheme.surface,
-                    border: Border.all(width: 1, color: Theme.of(context).colorScheme.primaryContainer),
+                    border: Border.all(
+                      width: 1,
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                    ),
                     errorWidget: Icon(
                       Icons.image,
                       color: Theme.of(context).colorScheme.surfaceDim,
@@ -157,46 +185,74 @@ class _ProfileFormScreenState extends State<ProfileFormScreen> {
       ],
     );
   }
+}
 
-  Widget name() {
+class _NameField extends StatelessWidget {
+  final TextEditingController controller;
+
+  const _NameField({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: AppSizes.padding),
       child: AppTextField(
-        controller: nameController,
+        controller: controller,
         labelText: 'Name',
         hintText: 'Your name...',
-        onChanged: accountProvider.onChangedName,
+        onChanged: di<AccountProvider>().onChangedName,
       ),
     );
   }
+}
 
-  Widget email() {
+class _EmailField extends StatelessWidget {
+  final TextEditingController controller;
+
+  const _EmailField({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: AppSizes.padding),
       child: AppTextField(
-        controller: emailController,
+        controller: controller,
         labelText: 'Email',
         hintText: 'Your email...',
-        onChanged: accountProvider.onChangedEmail,
+        onChanged: di<AccountProvider>().onChangedEmail,
       ),
     );
   }
+}
 
-  Widget phone() {
+class _PhoneField extends StatelessWidget {
+  final TextEditingController controller;
+
+  const _PhoneField({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: AppSizes.padding),
       child: AppTextField(
-        controller: phoneController,
+        controller: controller,
         labelText: 'Phone Number',
         hintText: 'Your phone number...',
         keyboardType: TextInputType.number,
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        onChanged: accountProvider.onChangedPhone,
+        onChanged: di<AccountProvider>().onChangedPhone,
       ),
     );
   }
+}
 
-  Widget button() {
+class _UpdateButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _UpdateButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(
         top: AppSizes.padding * 1.5,
@@ -204,26 +260,8 @@ class _ProfileFormScreenState extends State<ProfileFormScreen> {
       ),
       child: AppButton(
         text: 'Update',
-        onTap: () {
-          updatedUser();
-        },
+        onTap: onTap,
       ),
     );
-  }
-
-  void updatedUser() async {
-    var res = await AppDialog.showProgress(() {
-      return accountProvider.updatedUser();
-    });
-
-    if (res.isSuccess) {
-      AppRoutes.instance.router.pop();
-      AppSnackBar.show('Profile updated');
-
-      // Refresh user data
-      mainProvider.getAndSyncAllUserData();
-    } else {
-      AppDialog.showError(error: res.error.toString());
-    }
   }
 }

@@ -7,8 +7,8 @@ import '../../../../domain/entities/product_entity.dart';
 
 class ProductsCard extends StatelessWidget {
   final ProductEntity product;
-  final Function()? onTap;
-  final bool   enabled;
+  final VoidCallback? onTap;
+  final bool enabled;
 
   const ProductsCard({
     super.key,
@@ -21,7 +21,7 @@ class ProductsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return RepaintBoundary(
       child: InkWell(
-        onTap: enabled ?  onTap : null,
+        onTap: enabled ? onTap : null,
         splashColor: Colors.black.withValues(alpha: 0.06),
         splashFactory: InkRipple.splashFactory,
         highlightColor: Colors.black12,
@@ -57,50 +57,7 @@ class ProductsCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    product.stock <= 0
-                        ? AspectRatio(
-                            aspectRatio: 1,
-                            child: Container(
-                              padding: const EdgeInsets.all(6),
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: Colors.white70,
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: AppSizes.padding / 4,
-                                  horizontal: AppSizes.padding / 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.surfaceContainerLowest,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.remove_circle,
-                                      color: Theme.of(context).colorScheme.outline,
-                                      size: 10,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Flexible(
-                                      child: Text(
-                                        'Out of stock',
-                                        overflow: TextOverflow.ellipsis,
-                                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                          color: Theme.of(context).colorScheme.outline,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          )
-                        : const SizedBox.shrink(),
+                    product.stock <= 0 ? _OutOfStock() : const SizedBox.shrink(),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -132,6 +89,56 @@ class ProductsCard extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _OutOfStock extends StatelessWidget {
+  const _OutOfStock();
+
+  @override
+  Widget build(BuildContext context) {
+    return AspectRatio(
+      aspectRatio: 1,
+      child: Container(
+        padding: const EdgeInsets.all(6),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Colors.white70,
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            vertical: AppSizes.padding / 4,
+            horizontal: AppSizes.padding / 2,
+          ),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainerLowest,
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.remove_circle,
+                color: Theme.of(context).colorScheme.outline,
+                size: 10,
+              ),
+              const SizedBox(width: 4),
+              Flexible(
+                child: Text(
+                  'Out of stock',
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.outline,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

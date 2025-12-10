@@ -12,27 +12,8 @@ import '../../../widgets/app_dialog.dart';
 import '../../../widgets/app_drop_down.dart';
 import '../../../widgets/app_text_field.dart';
 
-class CartPanelFooter extends StatefulWidget {
+class CartPanelFooter extends StatelessWidget {
   const CartPanelFooter({super.key});
-
-  @override
-  State<CartPanelFooter> createState() => _CartPanelFooterState();
-}
-
-class _CartPanelFooterState extends State<CartPanelFooter> {
-  final _homeProvider = di<HomeProvider>();
-
-  final _amountControlller = TextEditingController();
-  final _customerControlller = TextEditingController();
-  final _descriptionControlller = TextEditingController();
-
-  @override
-  void dispose() {
-    _amountControlller.dispose();
-    _customerControlller.dispose();
-    _descriptionControlller.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,35 +33,49 @@ class _CartPanelFooterState extends State<CartPanelFooter> {
                   scrollDirection: Axis.horizontal,
                   child: SizedBox(
                     width: AppSizes.screenWidth(context) / 3 - AppSizes.padding / 2,
-                    child: backButton(),
+                    child: _BackButton(),
                   ),
                 ),
               );
             },
           ),
-          Expanded(
+          const Expanded(
             flex: 2,
-            child: receiptButton(),
+            child: _PayButton(),
           ),
         ],
       ),
     );
   }
+}
 
-  Widget backButton() {
+class _BackButton extends StatelessWidget {
+  const _BackButton();
+
+  @override
+  Widget build(BuildContext context) {
+    final homeProvider = di<HomeProvider>();
+
     return AppButton(
       text: 'Back',
       buttonColor: Theme.of(context).colorScheme.surface,
       borderColor: Theme.of(context).colorScheme.primary,
       textColor: Theme.of(context).colorScheme.primary,
       onTap: () {
-        _homeProvider.onChangedIsPanelExpanded(false);
-        _homeProvider.panelController.close();
+        homeProvider.onChangedIsPanelExpanded(false);
+        homeProvider.panelController.close();
       },
     );
   }
+}
 
-  Widget receiptButton() {
+class _PayButton extends StatelessWidget {
+  const _PayButton();
+
+  @override
+  Widget build(BuildContext context) {
+    final homeProvider = di<HomeProvider>();
+
     return Consumer<HomeProvider>(
       builder: (context, provider, _) {
         return AppButton(
@@ -91,16 +86,19 @@ class _CartPanelFooterState extends State<CartPanelFooter> {
               : 'Pay',
           enabled: provider.orderedProducts.isNotEmpty,
           onTap: () {
-            if (_homeProvider.isPanelExpanded) {
-              AppDialog.show(child: additionalInfoDialog(), showButtons: false);
+            if (homeProvider.isPanelExpanded) {
+              AppDialog.show(
+                child: const _AdditionalInfoDialog(),
+                showButtons: false,
+              );
             } else {
               /// Expands cart panel
-              _homeProvider.onChangedIsPanelExpanded(!_homeProvider.isPanelExpanded);
+              homeProvider.onChangedIsPanelExpanded(!homeProvider.isPanelExpanded);
 
-              if (!_homeProvider.isPanelExpanded) {
-                _homeProvider.panelController.close();
+              if (!homeProvider.isPanelExpanded) {
+                homeProvider.panelController.close();
               } else {
-                _homeProvider.panelController.open();
+                homeProvider.panelController.open();
               }
             }
           },
@@ -108,8 +106,44 @@ class _CartPanelFooterState extends State<CartPanelFooter> {
       },
     );
   }
+}
 
-  Widget additionalInfoDialog() {
+class _AdditionalInfoDialog extends StatefulWidget {
+  const _AdditionalInfoDialog();
+
+  @override
+  State<_AdditionalInfoDialog> createState() => _AdditionalInfoDialogState();
+}
+
+class _AdditionalInfoDialogState extends State<_AdditionalInfoDialog> {
+  final homeProvider = di<HomeProvider>();
+
+  final _amountController = TextEditingController();
+  final _customerController = TextEditingController();
+  final _descriptionController = TextEditingController();
+
+  @override
+  void dispose() {
+    _amountController.dispose();
+    _customerController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  void onPay() async {
+    var res = await AppDialog.showProgress(() {
+      return homeProvider.createTransaction();
+    });
+
+    if (res.isSuccess) {
+      AppRoutes.instance.router.go('/transactions/transaction-detail/${res.data}');
+    } else {
+      AppDialog.showError(error: res.error?.toString());
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Consumer<HomeProvider>(
       builder: (context, provider, _) {
         return Column(
@@ -118,7 +152,7 @@ class _CartPanelFooterState extends State<CartPanelFooter> {
             AppTextField(
               autofocus: true,
               keyboardType: TextInputType.number,
-              controller: _amountControlller,
+              controller: _amountController,
               labelText: 'Received Amount',
               hintText: 'Received amount...',
               onChanged: (val) {
@@ -128,7 +162,7 @@ class _CartPanelFooterState extends State<CartPanelFooter> {
             const SizedBox(height: AppSizes.padding),
             AppDropDown(
               labelText: 'Payment Method',
-              selectedValue: _homeProvider.selectedPaymentMethod,
+              selectedValue: homeProvider.selectedPaymentMethod,
               dropdownItems: const [
                 DropdownMenuItem(
                   value: 'bank',
@@ -143,14 +177,14 @@ class _CartPanelFooterState extends State<CartPanelFooter> {
             ),
             const SizedBox(height: AppSizes.padding),
             AppTextField(
-              controller: _customerControlller,
+              controller: _customerController,
               labelText: 'Customer Name (Optional)',
               hintText: 'e.g. Jhone Doe',
               onChanged: provider.onChangedCustomerName,
             ),
             const SizedBox(height: AppSizes.padding),
             AppTextField(
-              controller: _descriptionControlller,
+              controller: _descriptionController,
               labelText: 'Description (Optional)',
               hintText: 'Description...',
               onChanged: provider.onChangedDescription,
@@ -174,7 +208,7 @@ class _CartPanelFooterState extends State<CartPanelFooter> {
                   flex: 2,
                   child: AppButton(
                     text: 'Pay',
-                    enabled: (int.tryParse(_amountControlller.text) ?? 0) >= provider.getTotalAmount(),
+                    enabled: (int.tryParse(_amountController.text) ?? 0) >= provider.getTotalAmount(),
                     onTap: () {
                       context.pop();
                       onPay();
@@ -187,17 +221,5 @@ class _CartPanelFooterState extends State<CartPanelFooter> {
         );
       },
     );
-  }
-
-  void onPay() async {
-    var res = await AppDialog.showProgress(() {
-      return _homeProvider.createTransaction();
-    });
-
-    if (res.isSuccess) {
-      AppRoutes.instance.router.go('/transactions/transaction-detail/${res.data}');
-    } else {
-      AppDialog.showError(error: res.error?.toString());
-    }
   }
 }

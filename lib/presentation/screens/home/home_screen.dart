@@ -36,7 +36,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final productProvider = di<ProductsProvider>();
 
   final scrollController = ScrollController();
-
   final searchFieldController = TextEditingController();
 
   @override
@@ -85,7 +84,11 @@ class _HomeScreenState extends State<HomeScreen> {
           topLeft: Radius.circular(AppSizes.radius * 2),
           topRight: Radius.circular(AppSizes.radius * 2),
         ),
-        body: body(),
+        body: _Body(
+          scrollController: scrollController,
+          searchFieldController: searchFieldController,
+          onRefresh: onRefresh,
+        ),
         header: const CartPanelHeader(),
         panel: const CartPanelBody(),
         footer: const CartPanelFooter(),
@@ -94,8 +97,118 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+}
 
-  Widget title() {
+class _Body extends StatelessWidget {
+  final ScrollController scrollController;
+  final TextEditingController searchFieldController;
+  final Future<void> Function() onRefresh;
+
+  const _Body({
+    required this.scrollController,
+    required this.searchFieldController,
+    required this.onRefresh,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const _Title(),
+        elevation: 0,
+        shadowColor: Colors.transparent,
+        actions: const [
+          _SyncButton(),
+          _NetworkInfo(),
+        ],
+      ),
+      body: Consumer<ProductsProvider>(
+        builder: (context, provider, _) {
+          return RefreshIndicator(
+            onRefresh: onRefresh,
+            child: Scrollbar(
+              child: CustomScrollView(
+                controller: scrollController,
+                // Disable scroll when data is null or empty
+                physics: (provider.allProducts?.isEmpty ?? true) ? const NeverScrollableScrollPhysics() : null,
+                slivers: [
+                  SliverAppBar(
+                    floating: true,
+                    snap: true,
+                    automaticallyImplyLeading: false,
+                    collapsedHeight: 70,
+                    titleSpacing: 0,
+                    title: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding),
+                      child: _SearchField(controller: searchFieldController),
+                    ),
+                  ),
+                  SliverLayoutBuilder(
+                    builder: (context, constraint) {
+                      if (provider.allProducts == null) {
+                        return const SliverFillRemaining(
+                          hasScrollBody: false,
+                          fillOverscroll: true,
+                          child: Padding(
+                            padding: EdgeInsets.only(bottom: 140),
+                            child: AppProgressIndicator(),
+                          ),
+                        );
+                      }
+
+                      if (provider.allProducts!.isEmpty) {
+                        return SliverFillRemaining(
+                          hasScrollBody: false,
+                          fillOverscroll: true,
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 140),
+                            child: AppEmptyState(
+                              subtitle: 'No products available, add product to continue',
+                              buttonText: 'Add Product',
+                              onTapButton: () => context.push('/products/product-create'),
+                            ),
+                          ),
+                        );
+                      }
+
+                      return SliverPadding(
+                        padding: const EdgeInsets.fromLTRB(AppSizes.padding, 2, AppSizes.padding, AppSizes.padding),
+                        sliver: SliverGrid.builder(
+                          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 200,
+                            childAspectRatio: 1 / 1.5,
+                            crossAxisSpacing: AppSizes.padding / 2,
+                            mainAxisSpacing: AppSizes.padding / 2,
+                          ),
+                          itemCount: provider.allProducts!.length,
+                          itemBuilder: (context, i) {
+                            return _ProductCard(product: provider.allProducts![i]);
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                  SliverPadding(
+                    padding: const EdgeInsets.only(bottom: 140),
+                    sliver: SliverToBoxAdapter(
+                      child: AppLoadingMoreIndicator(isLoading: provider.isLoadingMore),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _Title extends StatelessWidget {
+  const _Title();
+
+  @override
+  Widget build(BuildContext context) {
     return Consumer<MainProvider>(
       builder: (context, provider, _) {
         return Row(
@@ -136,8 +249,13 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
+}
 
-  Widget syncButton() {
+class _SyncButton extends StatelessWidget {
+  const _SyncButton();
+
+  @override
+  Widget build(BuildContext context) {
     return Consumer<MainProvider>(
       builder: (context, provider, _) {
         return Padding(
@@ -187,8 +305,13 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
+}
 
-  Widget networkInfo() {
+class _NetworkInfo extends StatelessWidget {
+  const _NetworkInfo();
+
+  @override
+  Widget build(BuildContext context) {
     return Selector<MainProvider, bool>(
       selector: (a, b) => b.isHasInternet,
       builder: (context, isHasInternet, _) {
@@ -214,121 +337,47 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
+}
 
-  Widget body() {
-    return Scaffold(
-      appBar: AppBar(
-        title: title(),
-        elevation: 0,
-        shadowColor: Colors.transparent,
-        actions: [
-          syncButton(),
-          networkInfo(),
-        ],
-      ),
-      body: Consumer<ProductsProvider>(
-        builder: (context, provider, _) {
-          return RefreshIndicator(
-            onRefresh: () => onRefresh(),
-            child: Scrollbar(
-              child: CustomScrollView(
-                controller: scrollController,
-                // Disable scroll when data is null or empty
-                physics: (provider.allProducts?.isEmpty ?? true) ? const NeverScrollableScrollPhysics() : null,
-                slivers: [
-                  SliverAppBar(
-                    floating: true,
-                    snap: true,
-                    automaticallyImplyLeading: false,
-                    collapsedHeight: 70,
-                    titleSpacing: 0,
-                    title: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding),
-                      child: searchField(),
-                    ),
-                  ),
-                  SliverLayoutBuilder(
-                    builder: (context, constraint) {
-                      if (provider.allProducts == null) {
-                        return const SliverFillRemaining(
-                          hasScrollBody: false,
-                          fillOverscroll: true,
-                          child: Padding(
-                            padding: EdgeInsets.only(bottom: 140),
-                            child: AppProgressIndicator(),
-                          ),
-                        );
-                      }
+class _SearchField extends StatelessWidget {
+  final TextEditingController controller;
 
-                      if (provider.allProducts!.isEmpty) {
-                        return SliverFillRemaining(
-                          hasScrollBody: false,
-                          fillOverscroll: true,
-                          child: Padding(
-                            padding: const EdgeInsets.only(bottom: 140),
-                            child: AppEmptyState(
-                              subtitle: 'No products available, add product to continue',
-                              buttonText: 'Add Product',
-                              onTapButton: () => context.push('/products/product-create'),
-                            ),
-                          ),
-                        );
-                      }
+  const _SearchField({required this.controller});
 
-                      return SliverPadding(
-                        padding: const EdgeInsets.fromLTRB(AppSizes.padding, 2, AppSizes.padding, AppSizes.padding),
-                        sliver: SliverGrid.builder(
-                          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                            maxCrossAxisExtent: 200,
-                            childAspectRatio: 1 / 1.5,
-                            crossAxisSpacing: AppSizes.padding / 2,
-                            mainAxisSpacing: AppSizes.padding / 2,
-                          ),
-                          itemCount: provider.allProducts!.length,
-                          itemBuilder: (context, i) {
-                            return productCard(provider.allProducts![i]);
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                  SliverPadding(
-                    padding: const EdgeInsets.only(bottom: 140),
-                    sliver: SliverToBoxAdapter(
-                      child: AppLoadingMoreIndicator(isLoading: provider.isLoadingMore),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
+  @override
+  Widget build(BuildContext context) {
+    final productProvider = di<ProductsProvider>();
 
-  Widget searchField() {
     return AppTextField(
-      controller: searchFieldController,
+      controller: controller,
       hintText: 'Search Products...',
       type: AppTextFieldType.search,
       textInputAction: TextInputAction.search,
       onEditingComplete: () {
         FocusScope.of(context).unfocus();
         productProvider.allProducts = null;
-        productProvider.getAllProducts(contains: searchFieldController.text);
+        productProvider.getAllProducts(contains: controller.text);
       },
       onTapClearButton: () {
-        productProvider.getAllProducts(contains: searchFieldController.text);
+        productProvider.getAllProducts(contains: controller.text);
       },
     );
   }
+}
 
-  Widget productCard(ProductEntity product) {
+class _ProductCard extends StatelessWidget {
+  final ProductEntity product;
+
+  const _ProductCard({required this.product});
+
+  @override
+  Widget build(BuildContext context) {
     return ProductsCard(
       product: product,
       enabled: product.stock > 0,
       onTap: () {
+        final homeProvider = di<HomeProvider>();
+
         int currentQty =
             homeProvider.orderedProducts.where((e) => e.productId == product.id).firstOrNull?.quantity ?? 0;
 

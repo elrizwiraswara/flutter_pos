@@ -21,7 +21,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   final transactionProvider = di<TransactionsProvider>();
 
   final scrollController = ScrollController();
-
   final searchFieldController = TextEditingController();
 
   @override
@@ -37,6 +36,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   void dispose() {
     scrollController.removeListener(scrollListener);
     scrollController.dispose();
+    searchFieldController.dispose();
     super.dispose();
   }
 
@@ -74,7 +74,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                     titleSpacing: 0,
                     title: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding),
-                      child: searchField(),
+                      child: _SearchField(controller: searchFieldController),
                     ),
                   ),
                   SliverLayoutBuilder(
@@ -119,20 +119,29 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       ),
     );
   }
+}
 
-  Widget searchField() {
+class _SearchField extends StatelessWidget {
+  final TextEditingController controller;
+
+  const _SearchField({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    final transactionProvider = di<TransactionsProvider>();
+
     return AppTextField(
-      controller: searchFieldController,
+      controller: controller,
       hintText: 'Search Transaction ID...',
       type: AppTextFieldType.search,
       textInputAction: TextInputAction.search,
       onEditingComplete: () {
         FocusScope.of(context).unfocus();
         transactionProvider.allTransactions = null;
-        transactionProvider.getAllTransactions(contains: searchFieldController.text);
+        transactionProvider.getAllTransactions(contains: controller.text);
       },
       onTapClearButton: () {
-        transactionProvider.getAllTransactions(contains: searchFieldController.text);
+        transactionProvider.getAllTransactions(contains: controller.text);
       },
     );
   }

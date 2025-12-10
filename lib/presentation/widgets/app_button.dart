@@ -16,7 +16,7 @@ class AppButton extends StatelessWidget {
   final Color? textColor;
   final Widget? child;
   final Alignment? alignment;
-  final Function()? onTap;
+  final VoidCallback? onTap;
 
   const AppButton({
     super.key,
@@ -65,16 +65,45 @@ class AppButton extends StatelessWidget {
             child: alignment != null
                 ? Align(
                     alignment: alignment!,
-                    child: buttonChild(context),
+                    child: _ButtonChild(
+                      text: text,
+                      fontSize: fontSize,
+                      enabled: enabled,
+                      textColor: textColor,
+                      child: child,
+                    ),
                   )
-                : buttonChild(context),
+                : _ButtonChild(
+                    text: text,
+                    fontSize: fontSize,
+                    enabled: enabled,
+                    textColor: textColor,
+                    child: child,
+                  ),
           ),
         ),
       ),
     );
   }
+}
 
-  Widget buttonChild(BuildContext context) {
+class _ButtonChild extends StatelessWidget {
+  final Widget? child;
+  final String? text;
+  final double? fontSize;
+  final bool enabled;
+  final Color? textColor;
+
+  const _ButtonChild({
+    required this.child,
+    required this.text,
+    required this.fontSize,
+    required this.enabled,
+    required this.textColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return child ??
         Text(
           text ?? '',

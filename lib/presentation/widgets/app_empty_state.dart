@@ -7,7 +7,7 @@ class AppEmptyState extends StatelessWidget {
   final String? title;
   final String? subtitle;
   final String? buttonText;
-  final Function()? onTapButton;
+  final VoidCallback? onTapButton;
 
   const AppEmptyState({
     super.key,

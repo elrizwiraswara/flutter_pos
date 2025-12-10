@@ -36,15 +36,17 @@ class TransactionDetailScreen extends StatelessWidget {
             return const AppEmptyState(title: 'Not Found');
           }
 
+          final transaction = snapshot.data!;
+
           return SingleChildScrollView(
             padding: const EdgeInsets.all(AppSizes.padding),
             child: Column(
               children: [
-                status(context),
+                const _StatusSection(),
                 const SizedBox(height: AppSizes.padding * 2),
-                transactionDetail(context, snapshot.data!),
+                _TransactionDetail(transaction: transaction),
                 const SizedBox(height: AppSizes.padding),
-                paymentDetail(context, snapshot.data!),
+                _PaymentDetail(transaction: transaction),
                 const SizedBox(height: AppSizes.padding),
               ],
             ),
@@ -53,8 +55,13 @@ class TransactionDetailScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget status(BuildContext context) {
+class _StatusSection extends StatelessWidget {
+  const _StatusSection();
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       children: [
         const Icon(
@@ -66,13 +73,22 @@ class TransactionDetailScreen extends StatelessWidget {
         Text(
           'Transaction Created',
           textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ],
     );
   }
+}
 
-  Widget transactionDetail(BuildContext context, TransactionEntity transaction) {
+class _TransactionDetail extends StatelessWidget {
+  final TransactionEntity transaction;
+
+  const _TransactionDetail({required this.transaction});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(AppSizes.padding),
       decoration: BoxDecoration(
@@ -87,11 +103,15 @@ class TransactionDetailScreen extends StatelessWidget {
             children: [
               Text(
                 'Transaction ID',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               Text(
                 '${transaction.id ?? '-'}',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
@@ -169,8 +189,15 @@ class TransactionDetailScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget paymentDetail(BuildContext context, TransactionEntity transaction) {
+class _PaymentDetail extends StatelessWidget {
+  final TransactionEntity transaction;
+
+  const _PaymentDetail({required this.transaction});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(AppSizes.padding),
       decoration: BoxDecoration(
@@ -185,11 +212,15 @@ class TransactionDetailScreen extends StatelessWidget {
             children: [
               Text(
                 'Ordered Products',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               Text(
                 '${transaction.orderedProducts?.length ?? '0'}',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
@@ -197,7 +228,7 @@ class TransactionDetailScreen extends StatelessWidget {
           ...List.generate(transaction.orderedProducts?.length ?? 0, (i) {
             return Padding(
               padding: EdgeInsets.only(top: i == 0 ? 0 : AppSizes.padding / 2),
-              child: product(context, transaction.orderedProducts![i]),
+              child: _ProductItem(order: transaction.orderedProducts![i]),
             );
           }),
           const Divider(height: AppSizes.padding * 2),
@@ -206,11 +237,15 @@ class TransactionDetailScreen extends StatelessWidget {
             children: [
               Text(
                 'Total',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               Text(
                 CurrencyFormatter.format(transaction.totalAmount),
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
@@ -246,14 +281,23 @@ class TransactionDetailScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget product(BuildContext context, OrderedProductEntity order) {
+class _ProductItem extends StatelessWidget {
+  final OrderedProductEntity order;
+
+  const _ProductItem({required this.order});
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           order.name,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: AppSizes.padding / 4),
         Row(

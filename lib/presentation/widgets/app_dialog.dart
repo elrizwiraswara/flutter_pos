@@ -219,9 +219,26 @@ class AppDialogWidget extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                dialogTitle(context),
-                dialogBody(context),
-                dialogButtons(context),
+                _DialogTitle(title: title),
+                _DialogBody(
+                  text: text,
+                  padding: padding,
+                  child: child,
+                ),
+                _DialogButtons(
+                  leftButtonText: leftButtonText,
+                  rightButtonText: rightButtonText,
+                  enableLeftButton: enableLeftButton,
+                  enableRightButton: enableRightButton,
+                  leftButtonColor: leftButtonColor,
+                  leftButtonTextColor: leftButtonTextColor,
+                  leftButtonBorderColor: leftButtonBorderColor,
+                  rightButtonColor: rightButtonColor,
+                  rightButtonTextColor: rightButtonTextColor,
+                  rightButtonBorderColor: rightButtonBorderColor,
+                  onTapLeftButton: onTapLeftButton,
+                  onTapRightButton: onTapRightButton,
+                ),
               ],
             ),
           ),
@@ -229,8 +246,15 @@ class AppDialogWidget extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget dialogTitle(BuildContext context) {
+class _DialogTitle extends StatelessWidget {
+  final String? title;
+
+  const _DialogTitle({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
     return title != null
         ? Padding(
             padding: const EdgeInsets.fromLTRB(
@@ -242,13 +266,28 @@ class AppDialogWidget extends StatelessWidget {
             child: Text(
               title!,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
           )
         : const SizedBox.shrink();
   }
+}
 
-  Widget dialogBody(BuildContext context) {
+class _DialogBody extends StatelessWidget {
+  final String? text;
+  final Widget? child;
+  final EdgeInsets? padding;
+
+  const _DialogBody({
+    required this.text,
+    required this.child,
+    required this.padding,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: padding ?? const EdgeInsets.all(AppSizes.padding),
       child: text != null
@@ -260,8 +299,39 @@ class AppDialogWidget extends StatelessWidget {
           : child ?? const SizedBox.shrink(),
     );
   }
+}
 
-  Widget dialogButtons(BuildContext context) {
+class _DialogButtons extends StatelessWidget {
+  final String? leftButtonText;
+  final String? rightButtonText;
+  final bool enableLeftButton;
+  final bool enableRightButton;
+  final Color? leftButtonColor;
+  final Color? leftButtonTextColor;
+  final Color? leftButtonBorderColor;
+  final Color? rightButtonColor;
+  final Color? rightButtonTextColor;
+  final Color? rightButtonBorderColor;
+  final Function(BuildContext)? onTapLeftButton;
+  final Function(BuildContext)? onTapRightButton;
+
+  const _DialogButtons({
+    required this.leftButtonText,
+    required this.rightButtonText,
+    required this.enableLeftButton,
+    required this.enableRightButton,
+    required this.leftButtonColor,
+    required this.leftButtonTextColor,
+    required this.leftButtonBorderColor,
+    required this.rightButtonColor,
+    required this.rightButtonTextColor,
+    required this.rightButtonBorderColor,
+    required this.onTapLeftButton,
+    required this.onTapRightButton,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return leftButtonText == null && rightButtonText == null
         ? const SizedBox.shrink()
         : Padding(

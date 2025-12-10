@@ -8,7 +8,7 @@ class AppIconButton extends StatelessWidget {
   final bool enabled;
   final double borderRadius;
   final IconData icon;
-  final Function() onTap;
+  final VoidCallback onTap;
 
   const AppIconButton({
     super.key,

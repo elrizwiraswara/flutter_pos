@@ -29,7 +29,7 @@ void main() async {
   await initializeDateFormatting();
 
   // Setup dependency injection
-  await  setupDependencyInjection();
+  await setupDependencyInjection();
 
   // Set/lock screen orientation
   await SystemChrome.setPreferredOrientations([]);

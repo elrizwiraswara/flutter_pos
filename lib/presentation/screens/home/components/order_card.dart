@@ -13,8 +13,8 @@ class OrderCard extends StatefulWidget {
   final int stock;
   final int price;
   final int initialQuantity;
-  final Function()? onTapCard;
-  final Function()? onTapRemove;
+  final VoidCallback? onTapCard;
+  final VoidCallback? onTapRemove;
   final Function(int) onChangedQuantity;
 
   const OrderCard({
@@ -100,7 +100,73 @@ class _OrderCardState extends State<OrderCard> {
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 10),
                         ),
                         const SizedBox(height: 6),
-                        qtyButtons(),
+                        Container(
+                          height: 36,
+                          constraints: const BoxConstraints(maxWidth: 112),
+                          child: Stack(
+                            children: [
+                              AppButton(
+                                width: double.infinity,
+                                height: 30,
+                                padding: EdgeInsets.zero,
+                                buttonColor: Theme.of(context).colorScheme.surfaceContainerLowest,
+                                borderColor: Theme.of(context).colorScheme.surfaceContainer,
+                                borderRadius: BorderRadius.circular(4),
+                                child: Text(
+                                  '$quantity',
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
+                              ),
+                              AppButton(
+                                width: 30,
+                                height: 30,
+                                padding: EdgeInsets.zero,
+                                buttonColor: Theme.of(context).colorScheme.surfaceContainer,
+                                borderRadius: BorderRadius.circular(4),
+                                child: Text(
+                                  '-',
+                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).colorScheme.primary,
+                                  ),
+                                ),
+                                onTap: () {
+                                  if (quantity > 1) {
+                                    quantity -= 1;
+                                    setState(() {});
+
+                                    widget.onChangedQuantity(quantity);
+                                  }
+                                },
+                              ),
+                              Positioned(
+                                right: 0,
+                                child: AppButton(
+                                  width: 30,
+                                  height: 30,
+                                  padding: EdgeInsets.zero,
+                                  buttonColor: Theme.of(context).colorScheme.surfaceContainer,
+                                  borderRadius: BorderRadius.circular(4),
+                                  child: Text(
+                                    '+',
+                                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context).colorScheme.primary,
+                                    ),
+                                  ),
+                                  onTap: () {
+                                    if (quantity < widget.stock) {
+                                      quantity += 1;
+                                      setState(() {});
+
+                                      widget.onChangedQuantity(quantity);
+                                    }
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -152,76 +218,6 @@ class _OrderCardState extends State<OrderCard> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget qtyButtons() {
-    return Container(
-      height: 36,
-      constraints: const BoxConstraints(maxWidth: 112),
-      child: Stack(
-        children: [
-          AppButton(
-            width: double.infinity,
-            height: 30,
-            padding: EdgeInsets.zero,
-            buttonColor: Theme.of(context).colorScheme.surfaceContainerLowest,
-            borderColor: Theme.of(context).colorScheme.surfaceContainer,
-            borderRadius: BorderRadius.circular(4),
-            child: Text(
-              '$quantity',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-          ),
-          AppButton(
-            width: 30,
-            height: 30,
-            padding: EdgeInsets.zero,
-            buttonColor: Theme.of(context).colorScheme.surfaceContainer,
-            borderRadius: BorderRadius.circular(4),
-            child: Text(
-              '-',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-            onTap: () {
-              if (quantity > 1) {
-                quantity -= 1;
-                setState(() {});
-
-                widget.onChangedQuantity(quantity);
-              }
-            },
-          ),
-          Positioned(
-            right: 0,
-            child: AppButton(
-              width: 30,
-              height: 30,
-              padding: EdgeInsets.zero,
-              buttonColor: Theme.of(context).colorScheme.surfaceContainer,
-              borderRadius: BorderRadius.circular(4),
-              child: Text(
-                '+',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-              onTap: () {
-                if (quantity < widget.stock) {
-                  quantity += 1;
-                  setState(() {});
-
-                  widget.onChangedQuantity(quantity);
-                }
-              },
-            ),
-          ),
-        ],
       ),
     );
   }

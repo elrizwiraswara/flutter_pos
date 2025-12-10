@@ -84,194 +84,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.id == null ? 'Create Product' : 'Edit Product'),
-        titleSpacing: 0,
-      ),
-      body: Selector<ProductFormProvider, bool>(
-        selector: (context, provider) => provider.isLoaded,
-        builder: (context, isLoaded, _) {
-          if (!isLoaded) {
-            return const AppProgressIndicator();
-          }
-
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(AppSizes.padding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                image(),
-                name(),
-                price(),
-                stock(),
-                description(),
-                createOrUpdateButton(),
-                deleteButton(),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget image() {
-    return Consumer<ProductFormProvider>(
-      builder: (context, provider, _) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Product Image',
-              style: Theme.of(
-                context,
-              ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: AppSizes.padding / 2),
-            Stack(
-              children: [
-                GestureDetector(
-                  onTap: onTapImage,
-                  child: AppImage(
-                    image: provider.imageFile?.path ?? provider.imageUrl ?? '',
-                    imgProvider: provider.imageFile != null ? ImgProvider.fileImage : ImgProvider.networkImage,
-                    width: 100,
-                    height: 100,
-                    borderRadius: BorderRadius.circular(AppSizes.radius),
-                    backgroundColor: Theme.of(context).colorScheme.surface,
-                    border: Border.all(width: 1, color: Theme.of(context).colorScheme.primaryContainer),
-                    errorWidget: Icon(
-                      Icons.image,
-                      color: Theme.of(context).colorScheme.surfaceDim,
-                      size: 32,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  right: 8,
-                  bottom: 8,
-                  child: AppIconButton(
-                    icon: Icons.camera_alt_rounded,
-                    iconSize: 14,
-                    borderRadius: 8,
-                    padding: const EdgeInsets.all(6),
-                    onTap: onTapImage,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget name() {
-    return Padding(
-      padding: const EdgeInsets.only(top: AppSizes.padding),
-      child: AppTextField(
-        controller: nameController,
-        labelText: 'Name',
-        hintText: 'Product name...',
-        onChanged: productFormProvider.onChangedName,
-      ),
-    );
-  }
-
-  Widget price() {
-    return Padding(
-      padding: const EdgeInsets.only(top: AppSizes.padding),
-      child: AppTextField(
-        controller: priceController,
-        labelText: 'Price',
-        hintText: 'Product price...',
-        type: AppTextFieldType.currency,
-        onChanged: productFormProvider.onChangedPrice,
-      ),
-    );
-  }
-
-  Widget stock() {
-    return Padding(
-      padding: const EdgeInsets.only(top: AppSizes.padding),
-      child: AppTextField(
-        controller: stockController,
-        labelText: 'Stock',
-        hintText: 'Product stock...',
-        keyboardType: TextInputType.number,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        onChanged: productFormProvider.onChangedStock,
-      ),
-    );
-  }
-
-  Widget description() {
-    return Padding(
-      padding: const EdgeInsets.only(top: AppSizes.padding),
-      child: AppTextField(
-        controller: descController,
-        labelText: 'Description',
-        hintText: 'Product description...',
-        maxLines: 4,
-        onChanged: productFormProvider.onChangedDesc,
-      ),
-    );
-  }
-
-  Widget createOrUpdateButton() {
-    return Consumer<ProductFormProvider>(
-      builder: (context, provider, _) {
-        return Padding(
-          padding: const EdgeInsets.only(top: AppSizes.padding * 1.5),
-          child: AppButton(
-            text: widget.id == null ? 'Add Product' : 'Update Product',
-            enabled: provider.isFormValid(),
-            onTap: () {
-              if (widget.id != null) {
-                updatedProduct();
-              } else {
-                createProduct();
-              }
-            },
-          ),
-        );
-      },
-    );
-  }
-
-  Widget deleteButton() {
-    if (widget.id == null) return const SizedBox(height: AppSizes.padding * 2);
-
-    return Padding(
-      padding: const EdgeInsets.only(
-        top: AppSizes.padding,
-        bottom: AppSizes.padding * 2,
-      ),
-      child: AppButton(
-        text: 'Delete',
-        textColor: Theme.of(context).colorScheme.error,
-        buttonColor: Theme.of(context).colorScheme.surfaceContainerLowest,
-        onTap: () {
-          AppDialog.show(
-            title: 'Confirm',
-            text: 'Are you sure want to delete this product?',
-            leftButtonText: 'Cancel',
-            rightButtonText: 'Delete',
-            rightButtonColor: Theme.of(context).colorScheme.errorContainer,
-            rightButtonTextColor: Theme.of(context).colorScheme.error,
-            onTapRightButton: (context) async {
-              context.pop();
-              deleteProduct();
-            },
-          );
-        },
-      ),
-    );
-  }
-
   void createProduct() async {
     var res = await AppDialog.showProgress(() {
       return productFormProvider.createProduct();
@@ -309,5 +121,290 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     } else {
       AppDialog.showError(error: res.error?.toString());
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.id == null ? 'Create Product' : 'Edit Product'),
+        titleSpacing: 0,
+      ),
+      body: Selector<ProductFormProvider, bool>(
+        selector: (context, provider) => provider.isLoaded,
+        builder: (context, isLoaded, _) {
+          if (!isLoaded) {
+            return const AppProgressIndicator();
+          }
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(AppSizes.padding),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _ImageSection(onTapImage: onTapImage),
+                _NameField(
+                  controller: nameController,
+                  productFormProvider: productFormProvider,
+                ),
+                _PriceField(
+                  controller: priceController,
+                  productFormProvider: productFormProvider,
+                ),
+                _StockField(
+                  controller: stockController,
+                  productFormProvider: productFormProvider,
+                ),
+                _DescriptionField(
+                  controller: descController,
+                  productFormProvider: productFormProvider,
+                ),
+                _CreateOrUpdateButton(
+                  id: widget.id,
+                  onCreateProduct: createProduct,
+                  onUpdatedProduct: updatedProduct,
+                ),
+                _DeleteButton(
+                  id: widget.id,
+                  onDeleteProduct: deleteProduct,
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _ImageSection extends StatelessWidget {
+  final VoidCallback onTapImage;
+
+  const _ImageSection({required this.onTapImage});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ProductFormProvider>(
+      builder: (context, provider, _) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Product Image',
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: AppSizes.padding / 2),
+            Stack(
+              children: [
+                GestureDetector(
+                  onTap: onTapImage,
+                  child: AppImage(
+                    image: provider.imageFile?.path ?? provider.imageUrl ?? '',
+                    imgProvider: provider.imageFile != null ? ImgProvider.fileImage : ImgProvider.networkImage,
+                    width: 100,
+                    height: 100,
+                    borderRadius: BorderRadius.circular(AppSizes.radius),
+                    backgroundColor: Theme.of(context).colorScheme.surface,
+                    border: Border.all(
+                      width: 1,
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                    ),
+                    errorWidget: Icon(
+                      Icons.image,
+                      color: Theme.of(context).colorScheme.surfaceDim,
+                      size: 32,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  right: 8,
+                  bottom: 8,
+                  child: AppIconButton(
+                    icon: Icons.camera_alt_rounded,
+                    iconSize: 14,
+                    borderRadius: 8,
+                    padding: const EdgeInsets.all(6),
+                    onTap: onTapImage,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _NameField extends StatelessWidget {
+  final TextEditingController controller;
+  final ProductFormProvider productFormProvider;
+
+  const _NameField({
+    required this.controller,
+    required this.productFormProvider,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSizes.padding),
+      child: AppTextField(
+        controller: controller,
+        labelText: 'Name',
+        hintText: 'Product name...',
+        onChanged: productFormProvider.onChangedName,
+      ),
+    );
+  }
+}
+
+class _PriceField extends StatelessWidget {
+  final TextEditingController controller;
+  final ProductFormProvider productFormProvider;
+
+  const _PriceField({
+    required this.controller,
+    required this.productFormProvider,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSizes.padding),
+      child: AppTextField(
+        controller: controller,
+        labelText: 'Price',
+        hintText: 'Product price...',
+        type: AppTextFieldType.currency,
+        onChanged: productFormProvider.onChangedPrice,
+      ),
+    );
+  }
+}
+
+class _StockField extends StatelessWidget {
+  final TextEditingController controller;
+  final ProductFormProvider productFormProvider;
+
+  const _StockField({
+    required this.controller,
+    required this.productFormProvider,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSizes.padding),
+      child: AppTextField(
+        controller: controller,
+        labelText: 'Stock',
+        hintText: 'Product stock...',
+        keyboardType: TextInputType.number,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        onChanged: productFormProvider.onChangedStock,
+      ),
+    );
+  }
+}
+
+class _DescriptionField extends StatelessWidget {
+  final TextEditingController controller;
+  final ProductFormProvider productFormProvider;
+
+  const _DescriptionField({
+    required this.controller,
+    required this.productFormProvider,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSizes.padding),
+      child: AppTextField(
+        controller: controller,
+        labelText: 'Description',
+        hintText: 'Product description...',
+        maxLines: 4,
+        onChanged: productFormProvider.onChangedDesc,
+      ),
+    );
+  }
+}
+
+class _CreateOrUpdateButton extends StatelessWidget {
+  final int? id;
+  final VoidCallback onCreateProduct;
+  final VoidCallback onUpdatedProduct;
+
+  const _CreateOrUpdateButton({
+    required this.id,
+    required this.onCreateProduct,
+    required this.onUpdatedProduct,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ProductFormProvider>(
+      builder: (context, provider, _) {
+        return Padding(
+          padding: const EdgeInsets.only(top: AppSizes.padding * 1.5),
+          child: AppButton(
+            text: id == null ? 'Add Product' : 'Update Product',
+            enabled: provider.isFormValid(),
+            onTap: () {
+              if (id != null) {
+                onUpdatedProduct();
+              } else {
+                onCreateProduct();
+              }
+            },
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _DeleteButton extends StatelessWidget {
+  final int? id;
+  final VoidCallback onDeleteProduct;
+
+  const _DeleteButton({
+    required this.id,
+    required this.onDeleteProduct,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (id == null) return const SizedBox(height: AppSizes.padding * 2);
+
+    return Padding(
+      padding: const EdgeInsets.only(
+        top: AppSizes.padding,
+        bottom: AppSizes.padding * 2,
+      ),
+      child: AppButton(
+        text: 'Delete',
+        textColor: Theme.of(context).colorScheme.error,
+        buttonColor: Theme.of(context).colorScheme.surfaceContainerLowest,
+        onTap: () {
+          AppDialog.show(
+            title: 'Confirm',
+            text: 'Are you sure want to delete this product?',
+            leftButtonText: 'Cancel',
+            rightButtonText: 'Delete',
+            rightButtonColor: Theme.of(context).colorScheme.errorContainer,
+            rightButtonTextColor: Theme.of(context).colorScheme.error,
+            onTapRightButton: (context) async {
+              context.pop();
+              onDeleteProduct();
+            },
+          );
+        },
+      ),
+    );
   }
 }

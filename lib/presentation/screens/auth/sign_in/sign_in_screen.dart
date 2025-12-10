@@ -14,20 +14,25 @@ class SignInScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(AppSizes.padding),
+        padding: EdgeInsets.all(AppSizes.padding),
         child: Column(
           children: [
-            welcomeMessage(context),
-            signInButton(),
+            _WelcomeMessage(),
+            _SignInButton(),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget welcomeMessage(BuildContext context) {
+class _WelcomeMessage extends StatelessWidget {
+  const _WelcomeMessage();
+
+  @override
+  Widget build(BuildContext context) {
     return Expanded(
       child: Container(
         constraints: const BoxConstraints(maxWidth: 270),
@@ -42,7 +47,9 @@ class SignInScreen extends StatelessWidget {
             const SizedBox(height: AppSizes.padding),
             Text(
               'Welcome!',
-              style: Theme.of(context).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
             Text(
               'Welcome to Flutter POS app',
@@ -54,8 +61,13 @@ class SignInScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget signInButton() {
+class _SignInButton extends StatelessWidget {
+  const _SignInButton();
+
+  @override
+  Widget build(BuildContext context) {
     return AppButton(
       text: 'Sign In With Google',
       onTap: () async {

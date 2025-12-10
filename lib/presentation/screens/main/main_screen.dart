@@ -23,10 +23,10 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   void initState() {
+    super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _mainProvider.initMainProvider();
     });
-    super.initState();
   }
 
   @override

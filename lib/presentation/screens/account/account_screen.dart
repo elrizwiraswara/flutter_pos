@@ -20,22 +20,27 @@ class AccountScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Account')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSizes.padding),
+      body: const SingleChildScrollView(
+        padding: EdgeInsets.all(AppSizes.padding),
         child: Column(
           children: [
-            user(context),
-            profilButton(context),
-            themeButton(context),
-            aboutButton(context),
-            signOutButton(context),
+            _UserInfo(),
+            _ProfileButton(),
+            _ThemeButton(),
+            _AboutButton(),
+            _SignOutButton(),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget user(BuildContext context) {
+class _UserInfo extends StatelessWidget {
+  const _UserInfo();
+
+  @override
+  Widget build(BuildContext context) {
     return Consumer<MainProvider>(
       builder: (context, provider, _) {
         return Padding(
@@ -67,8 +72,13 @@ class AccountScreen extends StatelessWidget {
       },
     );
   }
+}
 
-  Widget profilButton(BuildContext context) {
+class _ProfileButton extends StatelessWidget {
+  const _ProfileButton();
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: AppSizes.padding),
       child: AppButton(
@@ -104,8 +114,13 @@ class AccountScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget themeButton(BuildContext context) {
+class _ThemeButton extends StatelessWidget {
+  const _ThemeButton();
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: AppSizes.padding),
       child: AppButton(
@@ -165,8 +180,13 @@ class AccountScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget aboutButton(BuildContext context) {
+class _AboutButton extends StatelessWidget {
+  const _AboutButton();
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: AppSizes.padding),
       child: AppButton(
@@ -202,8 +222,13 @@ class AccountScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget signOutButton(BuildContext context) {
+class _SignOutButton extends StatelessWidget {
+  const _SignOutButton();
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: AppSizes.padding),
       child: AppButton(

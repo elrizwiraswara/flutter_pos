@@ -24,7 +24,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
   final productProvider = di<ProductsProvider>();
 
   final scrollController = ScrollController();
-
   final searchFieldController = TextEditingController();
 
   @override
@@ -61,7 +60,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
         title: const Text('Products'),
         elevation: 0,
         shadowColor: Colors.transparent,
-        actions: [addButton()],
+        actions: const [_AddButton()],
       ),
       body: Consumer<ProductsProvider>(
         builder: (context, provider, _) {
@@ -82,7 +81,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     titleSpacing: 0,
                     title: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding),
-                      child: searchField(),
+                      child: _SearchField(controller: searchFieldController),
                     ),
                   ),
                   SliverLayoutBuilder(
@@ -118,7 +117,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                           ),
                           itemCount: provider.allProducts!.length,
                           itemBuilder: (context, i) {
-                            return productCard(provider.allProducts![i]);
+                            return _ProductCard(product: provider.allProducts![i]);
                           },
                         ),
                       );
@@ -135,8 +134,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
       ),
     );
   }
+}
 
-  Widget addButton() {
+class _AddButton extends StatelessWidget {
+  const _AddButton();
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(right: AppSizes.padding),
       child: AppButton(
@@ -166,25 +170,41 @@ class _ProductsScreenState extends State<ProductsScreen> {
       ),
     );
   }
+}
 
-  Widget searchField() {
+class _SearchField extends StatelessWidget {
+  final TextEditingController controller;
+
+  const _SearchField({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    final productProvider = di<ProductsProvider>();
+
     return AppTextField(
-      controller: searchFieldController,
+      controller: controller,
       hintText: 'Search Products...',
       type: AppTextFieldType.search,
       textInputAction: TextInputAction.search,
       onEditingComplete: () {
         FocusScope.of(context).unfocus();
         productProvider.allProducts = null;
-        productProvider.getAllProducts(contains: searchFieldController.text);
+        productProvider.getAllProducts(contains: controller.text);
       },
       onTapClearButton: () {
-        productProvider.getAllProducts(contains: searchFieldController.text);
+        productProvider.getAllProducts(contains: controller.text);
       },
     );
   }
+}
 
-  Widget productCard(ProductEntity product) {
+class _ProductCard extends StatelessWidget {
+  final ProductEntity product;
+
+  const _ProductCard({required this.product});
+
+  @override
+  Widget build(BuildContext context) {
     return ProductsCard(
       product: product,
       onTap: () => context.go('/products/product-detail/${product.id}'),
