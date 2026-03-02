@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   file_selector_linux
+  flutter_libserialport
   url_launcher_linux
 )
 

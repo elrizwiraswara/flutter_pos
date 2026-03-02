@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../app/di/dependency_injection.dart';
 import '../../../core/extensions/string_casing_extension.dart';
+import '../../../core/services/printer/printer_service.dart';
 import '../../../core/themes/app_colors.dart';
 import '../../../core/themes/app_sizes.dart';
 import '../../../core/utilities/currency_formatter.dart';
@@ -11,16 +12,37 @@ import '../../../domain/entities/transaction_entity.dart';
 import '../../providers/transactions/transaction_detail_provider.dart';
 import '../../widgets/app_empty_state.dart';
 import '../../widgets/app_progress_indicator.dart';
+import '../../widgets/app_snack_bar.dart';
 
 class TransactionDetailScreen extends StatelessWidget {
   final int id;
 
   const TransactionDetailScreen({super.key, required this.id});
 
+  void _reprint() async {
+    final transaction = di<TransactionDetailProvider>().currentTransaction;
+    if (transaction == null) return;
+
+    final result = await di<PrinterService>().printTransaction(transaction);
+
+    if (result.isFailure) {
+      AppSnackBar.showError(result.error.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(elevation: 0),
+      appBar: AppBar(
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.print_outlined),
+            tooltip: 'Reprint',
+            onPressed: () => _reprint(),
+          ),
+        ],
+      ),
       body: FutureBuilder(
         future: di<TransactionDetailProvider>().getTransactionDetail(id),
         builder: (context, snapshot) {

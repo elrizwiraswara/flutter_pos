@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app/app.dart';
 import 'app/di/dependency_injection.dart';
@@ -28,8 +29,11 @@ void main() async {
   // Initialize date formatting
   await initializeDateFormatting();
 
+  // Initialize shared preferences
+  final sharedPreferences = await SharedPreferences.getInstance();
+
   // Setup dependency injection
-  await setupDependencyInjection();
+  await setupDependencyInjection(sharedPreferences: sharedPreferences);
 
   // Set/lock screen orientation
   await SystemChrome.setPreferredOrientations([]);

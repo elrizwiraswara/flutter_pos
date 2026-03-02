@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../presentation/providers/auth/auth_provider.dart';
 import '../../presentation/screens/account/about_screen.dart';
 import '../../presentation/screens/account/account_screen.dart';
+import '../../presentation/screens/account/printer_settings_screen.dart';
 import '../../presentation/screens/account/profile_form_screen.dart';
 import '../../presentation/screens/auth/sign_in/sign_in_screen.dart';
 import '../../presentation/screens/error/error_screen.dart';
@@ -161,6 +162,7 @@ class AppRoutes {
     routes: [
       _profileEdit,
       _about,
+      _printerSettings,
     ],
   );
 
@@ -222,6 +224,13 @@ class AppRoutes {
     path: 'about',
     builder: (context, state) {
       return const AboutScreen();
+    },
+  );
+
+  static final _printerSettings = GoRoute(
+    path: 'printer-settings',
+    builder: (context, state) {
+      return const PrinterSettingsScreen();
     },
   );
 }

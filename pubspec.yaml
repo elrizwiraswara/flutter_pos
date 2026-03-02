@@ -2,7 +2,7 @@ name: flutter_pos
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -33,41 +33,43 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: ^0.20.2
-  get_it: ^8.0.3
-  go_router: ^16.0.0
+  get_it: ^9.2.1
+  go_router: ^17.1.0
   equatable: ^2.0.5
   json_annotation: ^4.9.0
   dartz: ^0.10.1
   provider: ^6.0.5
   path_provider: ^2.1.2
   internet_connection_checker_plus: ^2.5.0
-  firebase_core: ^3.1.1
-  cloud_firestore: ^5.0.2
+  firebase_core: ^4.4.0
+  cloud_firestore: ^6.1.2
   sqflite: ^2.3.3+1
   logger: ^2.0.2+1
   cupertino_icons: ^1.0.6
-  google_fonts: ^6.2.1
-  material_color_utilities: ^0.11.1
+  google_fonts: ^8.0.2
+  material_color_utilities: ^0.13.0
   google_sign_in: ^7.1.1
-  firebase_auth: ^5.1.1
+  firebase_auth: ^6.1.4
   cached_network_image: ^3.3.1
   flutter_svg: ^2.0.10+1
   photo_view: ^0.15.0
   image_picker: ^1.1.2
-  image_cropper: ^9.1.0
+  image_cropper: ^11.0.0
   sliding_up_panel: ^2.0.0+1
-  firebase_storage: ^12.1.0
+  firebase_storage: ^13.0.6
   path: ^1.9.0
-  connectivity_plus: ^6.0.3
+  connectivity_plus: ^7.0.0
   http: ^1.2.1
-  package_info_plus: ^8.0.0
+  package_info_plus: ^9.0.0
   url_launcher: ^6.3.0
   app_image: ^1.0.13
-  firebase_crashlytics: ^4.3.10
+  firebase_crashlytics: ^5.0.7
   firebase_core_platform_interface: ^6.0.2
   device_info_plus: ^12.2.0
   sqflite_common_ffi: ^2.3.3
-
+  shared_preferences: ^2.3.5
+  permission_handler: ^12.0.1
+  unified_esc_pos_printer: ^1.0.2
 
 dev_dependencies:
   flutter_test:
@@ -77,8 +79,8 @@ dev_dependencies:
   mockito: ^5.4.4
   json_serializable: ^6.8.0
   build_runner: ^2.4.6
-  fake_cloud_firestore: ^3.0.1
-  firebase_storage_mocks: ^0.7.0
+  fake_cloud_firestore: ^4.0.1
+  firebase_storage_mocks: ^0.8.0+1
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -92,7 +94,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
