@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "WebFetch(domain:pub.dev)",
-      "Read(//c/Users/elriz/AppData/Local/Pub/Cache/hosted/pub.dev/unified_esc_pos_printer-1.0.2/lib/**)",
-      "Bash(flutter analyze)"
-    ]
-  }
-}

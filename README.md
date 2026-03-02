@@ -23,6 +23,7 @@ The app prioritizes local-first operations, storing all data in SQLite and autom
 ### Core Functionality
 - **Product Management**: Full CRUD operations for products with image upload support
 - **Sales Transactions**: POS interface with cart management and transaction history
+- **Thermal Receipt Printing**: Print transaction receipts via USB, Bluetooth, BLE, or network printers with configurable paper sizes (58mm, 72mm, 80mm)
 - **User Authentication**: Firebase Authentication with Google Sign-In integration
 - **Account Management**: User profile management and settings
 
@@ -63,7 +64,8 @@ flutter_pos/
 │   │   ├── services/                 # Core services
 │   │   │   ├── connectivity/         # Network connectivity checking
 │   │   │   ├── info/                 # Device info service
-│   │   │   └── logger/               # Error logging service
+│   │   │   ├── logger/               # Error logging service
+│   │   │   └── printer/              # Thermal printer service
 │   │   ├── themes/                   # App theming (colors, sizes, themes)
 │   │   ├── usecase/                  # Base usecase interface
 │   │   └── utilities/                # Helper utilities (formatters, loggers, etc.)
