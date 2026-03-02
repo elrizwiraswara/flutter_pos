@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter pub get)",
+      "Read(//d/Companies/Elriz Technology/Repositories/Packages/printer_esc_pos/**)",
+      "Bash(flutter analyze lib/core/services/printer/ lib/presentation/providers/account/printer_settings_provider.dart lib/presentation/screens/account/printer_settings_screen.dart)"
+    ]
+  }
+}

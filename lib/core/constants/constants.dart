@@ -4,6 +4,10 @@ class Constants {
 
   static const googleServerClientId = String.fromEnvironment('GOOGLE_SERVER_CLIENT_ID');
 
+  static const String selectedDeviceIdKey = 'selected_device_id';
+  static const String selectedConnectionTypeKey = 'selected_connection_type';
+  static const String selectedPaperSizeKey = 'selected_paper_size';
+
   static const int minSyncIntervalToleranceForCriticalInMinutes = 5;
   static const int minSyncIntervalToleranceForLessCriticalInMinutes = 100;
 

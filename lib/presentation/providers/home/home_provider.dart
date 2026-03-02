@@ -3,6 +3,7 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import '../../../app/di/dependency_injection.dart';
 import '../../../core/common/result.dart';
+import '../../../core/services/printer/printer_service.dart';
 import '../../../domain/entities/ordered_product_entity.dart';
 import '../../../domain/entities/product_entity.dart';
 import '../../../domain/entities/transaction_entity.dart';
@@ -14,10 +15,12 @@ import '../products/products_provider.dart';
 class HomeProvider extends ChangeNotifier {
   final AuthProvider authProvider;
   final TransactionRepository transactionRepository;
+  final PrinterService printerService;
 
   HomeProvider({
     required this.authProvider,
     required this.transactionRepository,
+    required this.printerService,
   });
 
   final panelController = PanelController();
@@ -58,6 +61,11 @@ class HomeProvider extends ChangeNotifier {
       );
 
       var res = await CreateTransactionUsecase(transactionRepository).call(transaction);
+
+      if (res.isSuccess) {
+        // Auto print receipt (fire-and-forget, ignore failure)
+        printerService.printTransaction(transaction);
+      }
 
       resetStates();
       panelController.close();
