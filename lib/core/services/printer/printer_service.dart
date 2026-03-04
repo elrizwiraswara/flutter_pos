@@ -144,17 +144,17 @@ class PrinterService {
 
       ticket.text(
         'FLUTTER POS',
+        align: PrintAlign.center,
         styles: const TextStyles(
           bold: true,
-          align: PrintAlign.center,
           height: TextSize.size2,
           width: TextSize.size2,
         ),
       );
       ticket.text(
         'https://github.com/elrizwiraswara/flutter_pos',
+        align: PrintAlign.center,
         styles: TextStyles(
-          align: PrintAlign.center,
           fontType: FontType.fontB,
         ),
       );
@@ -181,17 +181,20 @@ class PrinterService {
         PrintColumn(
           text: 'Qty',
           flex: 1,
-          styles: const TextStyles(bold: true, align: PrintAlign.center),
+          align: PrintAlign.center,
+          styles: const TextStyles(bold: true),
         ),
         PrintColumn(
           text: 'Price',
           flex: 2,
-          styles: const TextStyles(bold: true, align: PrintAlign.right),
+          align: PrintAlign.right,
+          styles: const TextStyles(bold: true),
         ),
         PrintColumn(
           text: 'Subtotal',
           flex: 2,
-          styles: const TextStyles(bold: true, align: PrintAlign.right),
+          align: PrintAlign.right,
+          styles: const TextStyles(bold: true),
         ),
       ]);
       ticket.separator();
@@ -206,17 +209,18 @@ class PrinterService {
             PrintColumn(
               text: '${product.quantity}',
               flex: 1,
-              styles: const TextStyles(align: PrintAlign.center),
+              align: PrintAlign.center,
+              styles: const TextStyles(),
             ),
             PrintColumn(
               text: CurrencyFormatter.format(product.price),
               flex: 2,
-              styles: const TextStyles(align: PrintAlign.right),
+              align: PrintAlign.right,
             ),
             PrintColumn(
               text: CurrencyFormatter.format(product.price * product.quantity),
               flex: 2,
-              styles: const TextStyles(align: PrintAlign.right),
+              align: PrintAlign.right,
             ),
           ]);
         }
@@ -233,7 +237,8 @@ class PrinterService {
         PrintColumn(
           text: CurrencyFormatter.format(transaction.totalAmount),
           flex: 1,
-          styles: const TextStyles(bold: true, align: PrintAlign.right),
+          align: PrintAlign.right,
+          styles: const TextStyles(bold: true),
         ),
       ]);
       ticket.row([
@@ -244,7 +249,7 @@ class PrinterService {
         PrintColumn(
           text: CurrencyFormatter.format(transaction.receivedAmount),
           flex: 1,
-          styles: const TextStyles(align: PrintAlign.right),
+          align: PrintAlign.right,
         ),
       ]);
       ticket.row([
@@ -255,15 +260,15 @@ class PrinterService {
         PrintColumn(
           text: CurrencyFormatter.format(transaction.returnAmount),
           flex: 1,
-          styles: const TextStyles(align: PrintAlign.right),
+          align: PrintAlign.right,
         ),
       ]);
 
       ticket.emptyLines();
       ticket.qrcode('${transaction.id}', size: QRSize.size3);
       ticket.emptyLines();
-      ticket.text('Thank you for your purchase!', styles: const TextStyles(align: PrintAlign.center));
-      ticket.text('Yatta!', styles: const TextStyles(align: PrintAlign.center));
+      ticket.text('Thank you for your purchase!', align: PrintAlign.center);
+      ticket.text('Yatta!', align: PrintAlign.center);
       ticket.cut(linesBefore: 2);
 
       return await printTicket(ticket);
@@ -284,7 +289,7 @@ class PrinterService {
         PrintColumn(
           text: 'top right',
           flex: 1,
-          styles: const TextStyles(align: PrintAlign.right),
+          align: PrintAlign.right,
         ),
       ]);
 
@@ -292,10 +297,8 @@ class PrinterService {
 
       ticket.text(
         'FLUTTER POS PRINT TEST OK',
-        styles: const TextStyles(
-          bold: true,
-          align: PrintAlign.center,
-        ),
+        align: PrintAlign.center,
+        styles: const TextStyles(bold: true),
       );
       await ticket.textRaster(
         'ありがとうございます',
@@ -312,7 +315,7 @@ class PrinterService {
         PrintColumn(
           text: 'bottom right',
           flex: 1,
-          styles: const TextStyles(align: PrintAlign.right),
+          align: PrintAlign.right,
         ),
       ]);
 
