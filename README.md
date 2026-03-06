@@ -1,4 +1,5 @@
 # Flutter POS
+
 [![License: MIT](https://img.shields.io/badge/license-MIT-orange)](./LICENSE)
 [![Made with Flutter](https://img.shields.io/badge/made%20with-Flutter-blue)](https://flutter.dev/)
 
@@ -16,11 +17,13 @@ The app prioritizes local-first operations, storing all data in SQLite and autom
 </p>
 
 ## Demo APK
+
 [Download Demo APK](https://github.com/elrizwiraswara/flutter_pos/releases)
 
 ## Features
 
 ### Core Functionality
+
 - **Product Management**: Full CRUD operations for products with image upload support
 - **Sales Transactions**: POS interface with cart management and transaction history
 - **Thermal Receipt Printing**: Print transaction receipts via USB, Bluetooth, BLE, or network printers with configurable paper sizes (58mm, 72mm, 80mm)
@@ -28,11 +31,12 @@ The app prioritizes local-first operations, storing all data in SQLite and autom
 - **Account Management**: User profile management and settings
 
 ### Technical Implementation
+
 - **Offline-First Architecture**: Works seamlessly without internet connection
 - **Automatic Data Sync**: SQLite ↔ Firestore bidirectional synchronization
 - **Queued Actions**: Automatic retry mechanism for offline operations (create, update, delete)
 - **Clean Architecture**: Separation between presentation, domain, and data layers
-- **State Management**: Provider pattern for state management
+- **State Management**: Riverpod (migrated from Provider) for safer, more testable state management
 - **Dependency Injection**: Centralized DI setup for better code organization
 - **Unit Testing**: Tests for datasources, repositories, and use cases
 - **Material Design 3**: Material design 3 and Dark & Light theme switching support
@@ -42,6 +46,7 @@ The app prioritizes local-first operations, storing all data in SQLite and autom
 - **Reusable Widgets**: Custom UI components for consistent design
 
 ## Architecture
+
 <img src="docs/architecture.png" alt="Architecture">
 
 ## Project Structure
@@ -84,7 +89,7 @@ flutter_pos/
 │   │   └── usecases/                 # Use cases (business logic operations)
 │   │
 │   ├── presentation/                 # Presentation layer (UI)
-│   │   ├── providers/                # State management (Provider)
+│   │   ├── providers/                # State management (Riverpod)
 │   │   │   ├── account/              # Account-related state
 │   │   │   ├── auth/                 # Authentication state
 │   │   │   ├── home/                 # Home screen state
@@ -137,71 +142,75 @@ flutter_pos/
 ### Installation
 
 1. **Clone the repository:**
-    ```sh
-    git clone https://github.com/elrizwiraswara/flutter_pos.git
-    cd flutter_pos
-    ```
+
+   ```sh
+   git clone https://github.com/elrizwiraswara/flutter_pos.git
+   cd flutter_pos
+   ```
 
 2. **Install dependencies:**
-    ```sh
-    flutter pub get
-    ```
+
+   ```sh
+   flutter pub get
+   ```
 
 3. **Set up Firebase:**
-    - Create a new project on [Firebase](https://firebase.google.com/).
-    - Follow the instructions to add Firebase to your Flutter app [here](https://firebase.google.com/docs/flutter/setup).
-    - Enable google authentication provider
-    - Update cloud firestore rules to allow read write operation
-    <br/>
+   - Create a new project on [Firebase](https://firebase.google.com/).
+   - Follow the instructions to add Firebase to your Flutter app [here](https://firebase.google.com/docs/flutter/setup).
+   - Enable google authentication provider
+   - Update cloud firestore rules to allow read write operation
+     <br/>
 
-    ```
-    service cloud.firestore {
-      match /databases/{database}/documents {
-        match /{document=**} {
-          allow read, write: if request.auth != null;
-        }
-      }
-    }
-    ```
-    - Add cloud firestore indexes to enable query
-    <br/>
-    <img src="docs/firestore_indexes.png" alt="Cloud Firestore Indexes" width=800px>
-    <br/>
-    <br/>
-    
-    - Update firebase storage rules to allow read write operation
-    <br/>
+   ```
+   service cloud.firestore {
+     match /databases/{database}/documents {
+       match /{document=**} {
+         allow read, write: if request.auth != null;
+       }
+     }
+   }
+   ```
 
-    ```
-    service firebase.storage {
-      match /b/{bucket}/o {
-        match /{allPaths=**} {
-          allow read, write: if request.auth != null;
-        }
-      }
-    }
-    ```
+   - Add cloud firestore indexes to enable query
+     <br/>
+     <img src="docs/firestore_indexes.png" alt="Cloud Firestore Indexes" width=800px>
+     <br/>
+     <br/>
+   - Update firebase storage rules to allow read write operation
+     <br/>
 
-5. **Set up your `config.json` file**
-    <br/> `GOOGLE_SERVER_CLIENT_ID` is `Web client ID` that you can get from your Firebase Google sign-in method provider 
+   ```
+   service firebase.storage {
+     match /b/{bucket}/o {
+       match /{allPaths=**} {
+         allow read, write: if request.auth != null;
+       }
+     }
+   }
+   ```
 
-    ```
-    {
-      "GOOGLE_SERVER_CLIENT_ID": "xxxxxxxxxxxxx.apps.googleusercontent.com"
-    }
-    ```
+4. **Set up your `config.json` file**
+   <br/> `GOOGLE_SERVER_CLIENT_ID` is `Web client ID` that you can get from your Firebase Google sign-in method provider
+
+   ```
+   {
+     "GOOGLE_SERVER_CLIENT_ID": "xxxxxxxxxxxxx.apps.googleusercontent.com"
+   }
+   ```
 
 5. **Run the application:**
-    ```sh
-    flutter run --dart-define-from-file config.json
-    ```
+   ```sh
+   flutter run --dart-define-from-file config.json
+   ```
 
 ### Test
 
 To test the application, run the following command:
+
 ```sh
 flutter test --coverage
 ```
+
 To view the test coverage you can use `genhtml` or [test_cov_console](https://pub.dev/packages/test_cov_console)
 
 ## Contributing
