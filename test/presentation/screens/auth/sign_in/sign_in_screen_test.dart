@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/app/di/dependency_injection.dart';
+import 'package:flutter_pos/app/di/app_providers.dart';
 import 'package:flutter_pos/app/routes/app_routes.dart';
 import 'package:flutter_pos/core/common/result.dart';
 import 'package:flutter_pos/domain/entities/user_entity.dart' hide AuthProvider;
 import 'package:flutter_pos/presentation/providers/auth/auth_provider.dart';
 import 'package:flutter_pos/presentation/providers/main/main_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:provider/provider.dart';
 
 import 'sign_in_screen_test.mocks.dart';
 
@@ -16,6 +16,7 @@ import 'sign_in_screen_test.mocks.dart';
 void main() {
   late MockAuthProvider mockAuthProvider;
   late MockMainProvider mockMainProvider;
+  late AppRoutes routes;
 
   setUpAll(() {
     provideDummy<Result<UserEntity?>>(Result<UserEntity?>.success(data: null));
@@ -24,24 +25,24 @@ void main() {
     mockAuthProvider = MockAuthProvider();
     mockMainProvider = MockMainProvider();
 
-    when(mockAuthProvider.isAuthenticated).thenReturn(ValueNotifier(false));
-    when(mockAuthProvider.isChecking).thenReturn(ValueNotifier(false));
+    when(mockAuthProvider.isAuthenticated).thenReturn(false);
+    when(mockAuthProvider.isChecking).thenReturn(false);
     when(mockMainProvider.isLoaded).thenReturn(false);
-
-    // Register mocks in dependency injection
-    di.registerSingleton<AuthProvider>(mockAuthProvider);
-    di.registerSingleton<MainProvider>(mockMainProvider);
-    di.registerSingleton<AppRoutes>(AppRoutes(mockAuthProvider));
+    when(mockMainProvider.isHasInternet).thenReturn(false);
+    when(mockMainProvider.user).thenReturn(UserEntity(id: ''));
   });
 
   Widget createTestWidget() {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => di<AuthProvider>()),
-        ChangeNotifierProvider(create: (_) => di<MainProvider>()),
+    routes = AppRoutes(mockAuthProvider);
+
+    return ProviderScope(
+      overrides: [
+        authControllerProvider.overrideWith((ref) => mockAuthProvider),
+        mainControllerProvider.overrideWith((ref) => mockMainProvider),
+        appRoutesProvider.overrideWithValue(routes),
       ],
       child: MaterialApp.router(
-        routerConfig: AppRoutes.instance.router,
+        routerConfig: routes.router,
       ),
     );
   }
@@ -184,11 +185,11 @@ void main() {
       );
       final successResult = Result<String>.success(data: user.id);
 
-      when(mockAuthProvider.isAuthenticated).thenReturn(ValueNotifier(false));
-      when(mockAuthProvider.isChecking).thenReturn(ValueNotifier(false));
+      when(mockAuthProvider.isAuthenticated).thenReturn(false);
+      when(mockAuthProvider.isChecking).thenReturn(false);
 
       when(mockAuthProvider.signIn()).thenAnswer((_) async {
-        when(mockAuthProvider.isAuthenticated).thenReturn(ValueNotifier(true));
+        when(mockAuthProvider.isAuthenticated).thenReturn(true);
         return successResult;
       });
 
@@ -201,7 +202,7 @@ void main() {
 
       // assert
       verify(mockAuthProvider.signIn()).called(1);
-      expect(AppRoutes.instance.router.routerDelegate.currentConfiguration.uri.path, '/home');
+      expect(routes.router.routeInformationProvider.value.uri.path, '/home');
     });
   });
 }

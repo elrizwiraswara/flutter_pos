@@ -1,11 +1,10 @@
 import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../app/di/dependency_injection.dart';
-import '../../../../app/routes/app_routes.dart';
+import '../../../../app/di/app_providers.dart';
 import '../../../../core/assets/assets.dart';
 import '../../../../core/themes/app_sizes.dart';
-import '../../../providers/auth/auth_provider.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_dialog.dart';
 
@@ -63,20 +62,20 @@ class _WelcomeMessage extends StatelessWidget {
   }
 }
 
-class _SignInButton extends StatelessWidget {
+class _SignInButton extends ConsumerWidget {
   const _SignInButton();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return AppButton(
       text: 'Sign In With Google',
       onTap: () async {
         var res = await AppDialog.showProgress(() async {
-          return await di<AuthProvider>().signIn();
+          return ref.read(authControllerProvider).signIn();
         });
 
         if (res.isSuccess) {
-          AppRoutes.instance.router.refresh();
+          ref.read(appRoutesProvider).router.refresh();
         } else {
           AppDialog.showError(error: res.error?.toString());
         }

@@ -3,15 +3,13 @@ import 'dart:io';
 import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
 
-import '../../../app/di/dependency_injection.dart';
-import '../../../app/routes/app_routes.dart';
+import '../../../app/di/app_providers.dart';
 import '../../../core/themes/app_sizes.dart';
-import '../../providers/products/product_form_provider.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
 import '../../widgets/app_icon_button.dart';
@@ -19,7 +17,7 @@ import '../../widgets/app_progress_indicator.dart';
 import '../../widgets/app_snack_bar.dart';
 import '../../widgets/app_text_field.dart';
 
-class ProductFormScreen extends StatefulWidget {
+class ProductFormScreen extends ConsumerStatefulWidget {
   final int? id;
 
   const ProductFormScreen({
@@ -28,12 +26,10 @@ class ProductFormScreen extends StatefulWidget {
   });
 
   @override
-  State<ProductFormScreen> createState() => _ProductFormScreenState();
+  ConsumerState<ProductFormScreen> createState() => _ProductFormScreenState();
 }
 
-class _ProductFormScreenState extends State<ProductFormScreen> {
-  final productFormProvider = di<ProductFormProvider>()..resetStates();
-
+class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
   final nameController = TextEditingController();
   final priceController = TextEditingController();
   final stockController = TextEditingController();
@@ -41,7 +37,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
   @override
   void initState() {
+    super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final productFormProvider = ref.read(productFormControllerProvider);
       await productFormProvider.initProductForm(widget.id);
 
       nameController.text = productFormProvider.name ?? '';
@@ -49,7 +47,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       stockController.text = productFormProvider.stock?.toString() ?? '';
       descController.text = productFormProvider.description ?? '';
     });
-    super.initState();
   }
 
   @override
@@ -80,17 +77,18 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
     if (croppedFile != null) {
       var file = File(croppedFile.path);
-      productFormProvider.onChangedImage(file);
+      ref.read(productFormControllerProvider).onChangedImage(file);
     }
   }
 
   void createProduct() async {
     var res = await AppDialog.showProgress(() {
-      return productFormProvider.createProduct();
+      return ref.read(productFormControllerProvider).createProduct();
     });
 
     if (res.isSuccess) {
-      AppRoutes.instance.router.go('/products');
+      if (!mounted) return;
+      context.go('/products');
       AppSnackBar.show('Product created');
     } else {
       AppDialog.showError(error: res.error?.toString());
@@ -99,11 +97,12 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
   void updatedProduct() async {
     var res = await AppDialog.showProgress(() {
-      return productFormProvider.updatedProduct(widget.id!);
+      return ref.read(productFormControllerProvider).updatedProduct(widget.id!);
     });
 
     if (res.isSuccess) {
-      AppRoutes.instance.router.pop();
+      if (!mounted) return;
+      context.pop();
       AppSnackBar.show('Product updated');
     } else {
       AppDialog.showError(error: res.error?.toString());
@@ -112,11 +111,12 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
   void deleteProduct() async {
     var res = await AppDialog.showProgress(() {
-      return productFormProvider.deleteProduct(widget.id!);
+      return ref.read(productFormControllerProvider).deleteProduct(widget.id!);
     });
 
     if (res.isSuccess) {
-      AppRoutes.instance.router.go('/products');
+      if (!mounted) return;
+      context.go('/products');
       AppSnackBar.show('Product deleted');
     } else {
       AppDialog.showError(error: res.error?.toString());
@@ -125,126 +125,122 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = ref.read(productFormControllerProvider);
+
+    final isLoaded = ref.watch(productFormControllerProvider.select((provider) => provider.isLoaded));
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.id == null ? 'Create Product' : 'Edit Product'),
         titleSpacing: 0,
       ),
-      body: Selector<ProductFormProvider, bool>(
-        selector: (context, provider) => provider.isLoaded,
-        builder: (context, isLoaded, _) {
-          if (!isLoaded) {
-            return const AppProgressIndicator();
-          }
-
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(AppSizes.padding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _ImageSection(onTapImage: onTapImage),
-                _NameField(
-                  controller: nameController,
-                  productFormProvider: productFormProvider,
-                ),
-                _PriceField(
-                  controller: priceController,
-                  productFormProvider: productFormProvider,
-                ),
-                _StockField(
-                  controller: stockController,
-                  productFormProvider: productFormProvider,
-                ),
-                _DescriptionField(
-                  controller: descController,
-                  productFormProvider: productFormProvider,
-                ),
-                _CreateOrUpdateButton(
-                  id: widget.id,
-                  onCreateProduct: createProduct,
-                  onUpdatedProduct: updatedProduct,
-                ),
-                _DeleteButton(
-                  id: widget.id,
-                  onDeleteProduct: deleteProduct,
-                ),
-              ],
+      body: !isLoaded
+          ? const AppProgressIndicator()
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(AppSizes.padding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _ImageSection(onTapImage: onTapImage),
+                  _NameField(
+                    controller: nameController,
+                    onChanged: provider.onChangedName,
+                  ),
+                  _PriceField(
+                    controller: priceController,
+                    onChanged: provider.onChangedPrice,
+                  ),
+                  _StockField(
+                    controller: stockController,
+                    onChanged: provider.onChangedStock,
+                  ),
+                  _DescriptionField(
+                    controller: descController,
+                    onChanged: provider.onChangedDesc,
+                  ),
+                  _CreateOrUpdateButton(
+                    id: widget.id,
+                    onCreateProduct: createProduct,
+                    onUpdatedProduct: updatedProduct,
+                  ),
+                  _DeleteButton(
+                    id: widget.id,
+                    onDeleteProduct: deleteProduct,
+                  ),
+                ],
+              ),
             ),
-          );
-        },
-      ),
     );
   }
 }
 
-class _ImageSection extends StatelessWidget {
+class _ImageSection extends ConsumerWidget {
   final VoidCallback onTapImage;
 
   const _ImageSection({required this.onTapImage});
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer<ProductFormProvider>(
-      builder: (context, provider, _) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final imageFile = ref.watch(productFormControllerProvider.select((p) => p.imageFile));
+    final imageUrl = ref.watch(productFormControllerProvider.select((p) => p.imageUrl));
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Product Image',
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: AppSizes.padding / 2),
+        Stack(
           children: [
-            Text(
-              'Product Image',
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                fontWeight: FontWeight.bold,
+            GestureDetector(
+              onTap: onTapImage,
+              child: AppImage(
+                image: imageFile?.path ?? imageUrl ?? '',
+                imgProvider: imageFile != null ? ImgProvider.fileImage : ImgProvider.networkImage,
+                width: 100,
+                height: 100,
+                borderRadius: BorderRadius.circular(AppSizes.radius),
+                backgroundColor: Theme.of(context).colorScheme.surface,
+                border: Border.all(
+                  width: 1,
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                ),
+                errorWidget: Icon(
+                  Icons.image,
+                  color: Theme.of(context).colorScheme.surfaceDim,
+                  size: 32,
+                ),
               ),
             ),
-            const SizedBox(height: AppSizes.padding / 2),
-            Stack(
-              children: [
-                GestureDetector(
-                  onTap: onTapImage,
-                  child: AppImage(
-                    image: provider.imageFile?.path ?? provider.imageUrl ?? '',
-                    imgProvider: provider.imageFile != null ? ImgProvider.fileImage : ImgProvider.networkImage,
-                    width: 100,
-                    height: 100,
-                    borderRadius: BorderRadius.circular(AppSizes.radius),
-                    backgroundColor: Theme.of(context).colorScheme.surface,
-                    border: Border.all(
-                      width: 1,
-                      color: Theme.of(context).colorScheme.primaryContainer,
-                    ),
-                    errorWidget: Icon(
-                      Icons.image,
-                      color: Theme.of(context).colorScheme.surfaceDim,
-                      size: 32,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  right: 8,
-                  bottom: 8,
-                  child: AppIconButton(
-                    icon: Icons.camera_alt_rounded,
-                    iconSize: 14,
-                    borderRadius: 8,
-                    padding: const EdgeInsets.all(6),
-                    onTap: onTapImage,
-                  ),
-                ),
-              ],
+            Positioned(
+              right: 8,
+              bottom: 8,
+              child: AppIconButton(
+                icon: Icons.camera_alt_rounded,
+                iconSize: 14,
+                borderRadius: 8,
+                padding: const EdgeInsets.all(6),
+                onTap: onTapImage,
+              ),
             ),
           ],
-        );
-      },
+        ),
+      ],
     );
   }
 }
 
 class _NameField extends StatelessWidget {
   final TextEditingController controller;
-  final ProductFormProvider productFormProvider;
+  final ValueChanged<String> onChanged;
 
   const _NameField({
     required this.controller,
-    required this.productFormProvider,
+    required this.onChanged,
   });
 
   @override
@@ -255,7 +251,7 @@ class _NameField extends StatelessWidget {
         controller: controller,
         labelText: 'Name',
         hintText: 'Product name...',
-        onChanged: productFormProvider.onChangedName,
+        onChanged: onChanged,
       ),
     );
   }
@@ -263,11 +259,11 @@ class _NameField extends StatelessWidget {
 
 class _PriceField extends StatelessWidget {
   final TextEditingController controller;
-  final ProductFormProvider productFormProvider;
+  final ValueChanged<String> onChanged;
 
   const _PriceField({
     required this.controller,
-    required this.productFormProvider,
+    required this.onChanged,
   });
 
   @override
@@ -279,7 +275,7 @@ class _PriceField extends StatelessWidget {
         labelText: 'Price',
         hintText: 'Product price...',
         type: AppTextFieldType.currency,
-        onChanged: productFormProvider.onChangedPrice,
+        onChanged: onChanged,
       ),
     );
   }
@@ -287,11 +283,11 @@ class _PriceField extends StatelessWidget {
 
 class _StockField extends StatelessWidget {
   final TextEditingController controller;
-  final ProductFormProvider productFormProvider;
+  final ValueChanged<String> onChanged;
 
   const _StockField({
     required this.controller,
-    required this.productFormProvider,
+    required this.onChanged,
   });
 
   @override
@@ -304,7 +300,7 @@ class _StockField extends StatelessWidget {
         hintText: 'Product stock...',
         keyboardType: TextInputType.number,
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        onChanged: productFormProvider.onChangedStock,
+        onChanged: onChanged,
       ),
     );
   }
@@ -312,11 +308,11 @@ class _StockField extends StatelessWidget {
 
 class _DescriptionField extends StatelessWidget {
   final TextEditingController controller;
-  final ProductFormProvider productFormProvider;
+  final ValueChanged<String> onChanged;
 
   const _DescriptionField({
     required this.controller,
-    required this.productFormProvider,
+    required this.onChanged,
   });
 
   @override
@@ -328,13 +324,13 @@ class _DescriptionField extends StatelessWidget {
         labelText: 'Description',
         hintText: 'Product description...',
         maxLines: 4,
-        onChanged: productFormProvider.onChangedDesc,
+        onChanged: onChanged,
       ),
     );
   }
 }
 
-class _CreateOrUpdateButton extends StatelessWidget {
+class _CreateOrUpdateButton extends ConsumerWidget {
   final int? id;
   final VoidCallback onCreateProduct;
   final VoidCallback onUpdatedProduct;
@@ -346,24 +342,22 @@ class _CreateOrUpdateButton extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer<ProductFormProvider>(
-      builder: (context, provider, _) {
-        return Padding(
-          padding: const EdgeInsets.only(top: AppSizes.padding * 1.5),
-          child: AppButton(
-            text: id == null ? 'Add Product' : 'Update Product',
-            enabled: provider.isFormValid(),
-            onTap: () {
-              if (id != null) {
-                onUpdatedProduct();
-              } else {
-                onCreateProduct();
-              }
-            },
-          ),
-        );
-      },
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isFormValid = ref.watch(productFormControllerProvider.select((p) => p.isFormValid()));
+
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSizes.padding * 1.5),
+      child: AppButton(
+        text: id == null ? 'Add Product' : 'Update Product',
+        enabled: isFormValid,
+        onTap: () {
+          if (id != null) {
+            onUpdatedProduct();
+          } else {
+            onCreateProduct();
+          }
+        },
+      ),
     );
   }
 }

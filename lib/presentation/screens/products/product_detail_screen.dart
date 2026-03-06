@@ -1,17 +1,17 @@
 import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../app/di/dependency_injection.dart';
+import '../../../app/di/app_providers.dart';
 import '../../../core/themes/app_sizes.dart';
 import '../../../core/utilities/currency_formatter.dart';
 import '../../../core/utilities/date_time_formatter.dart';
-import '../../providers/products/product_detail_provider.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_empty_state.dart';
 import '../../widgets/app_progress_indicator.dart';
 
-class ProductDetailScreen extends StatelessWidget {
+class ProductDetailScreen extends ConsumerWidget {
   final int id;
 
   const ProductDetailScreen({
@@ -20,7 +20,7 @@ class ProductDetailScreen extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Product Detail'),
@@ -28,7 +28,7 @@ class ProductDetailScreen extends StatelessWidget {
         actions: [_EditButton(id: id)],
       ),
       body: FutureBuilder(
-        future: di<ProductDetailProvider>().getProductDetail(id),
+        future: ref.read(productDetailControllerProvider).getProductDetail(id),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const AppProgressIndicator();

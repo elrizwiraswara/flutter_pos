@@ -1,14 +1,10 @@
 import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 
-import '../../../app/di/dependency_injection.dart';
-import '../../../app/routes/app_routes.dart';
+import '../../../app/di/app_providers.dart';
 import '../../../core/themes/app_sizes.dart';
-import '../../providers/auth/auth_provider.dart';
-import '../../providers/main/main_provider.dart';
-import '../../providers/theme/theme_provider.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
 import '../../widgets/app_snack_bar.dart';
@@ -37,40 +33,38 @@ class AccountScreen extends StatelessWidget {
   }
 }
 
-class _UserInfo extends StatelessWidget {
+class _UserInfo extends ConsumerWidget {
   const _UserInfo();
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer<MainProvider>(
-      builder: (context, provider, _) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: AppSizes.padding),
-          child: Column(
-            children: [
-              AppImage(
-                image: provider.user?.imageUrl ?? '',
-                width: 120,
-                height: 120,
-                borderRadius: BorderRadius.circular(100),
-                backgroundColor: Theme.of(context).colorScheme.surface,
-              ),
-              const SizedBox(height: AppSizes.padding),
-              Text(
-                provider.user?.name ?? '(No Name)',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: AppSizes.padding / 4),
-              Text(
-                provider.user?.email ?? '',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(mainControllerProvider.select((p) => p.user));
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSizes.padding),
+      child: Column(
+        children: [
+          AppImage(
+            image: user?.imageUrl ?? '',
+            width: 120,
+            height: 120,
+            borderRadius: BorderRadius.circular(100),
+            backgroundColor: Theme.of(context).colorScheme.surface,
           ),
-        );
-      },
+          const SizedBox(height: AppSizes.padding),
+          Text(
+            user?.name ?? '(No Name)',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: AppSizes.padding / 4),
+          Text(
+            user?.email ?? '',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -155,27 +149,7 @@ class _ThemeButton extends StatelessWidget {
           AppDialog.show(
             title: 'Theme',
             leftButtonText: 'Close',
-            child: Consumer<ThemeProvider>(
-              builder: (context, provider, _) {
-                return Row(
-                  children: [
-                    Switch(
-                      value: !provider.isLight(),
-                      onChanged: (val) {
-                        provider.changeBrightness(!val);
-                      },
-                    ),
-                    const SizedBox(width: AppSizes.padding),
-                    Text(
-                      'Dark Mode',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
+            child: const _ThemeDialogBody(),
           );
         },
       ),
@@ -267,11 +241,38 @@ class _AboutButton extends StatelessWidget {
   }
 }
 
-class _SignOutButton extends StatelessWidget {
+class _ThemeDialogBody extends ConsumerWidget {
+  const _ThemeDialogBody();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final provider = ref.watch(themeControllerProvider);
+
+    return Row(
+      children: [
+        Switch(
+          value: !provider.isLight(),
+          onChanged: (val) {
+            provider.changeBrightness(!val);
+          },
+        ),
+        const SizedBox(width: AppSizes.padding),
+        Text(
+          'Dark Mode',
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SignOutButton extends ConsumerWidget {
   const _SignOutButton();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.only(top: AppSizes.padding),
       child: AppButton(
@@ -310,7 +311,7 @@ class _SignOutButton extends StatelessWidget {
             onTapRightButton: (context) async {
               context.pop();
 
-              final isSyncronizing = di<MainProvider>().isSyncronizing;
+              final isSyncronizing = ref.read(mainControllerProvider).isSyncronizing;
 
               if (isSyncronizing) {
                 AppSnackBar.showError('Cannot sign out while synchronizing data is in progress. Please wait a moment.');
@@ -318,11 +319,12 @@ class _SignOutButton extends StatelessWidget {
               }
 
               final res = await AppDialog.showProgress(() async {
-                return await di<AuthProvider>().signOut();
+                return ref.read(authControllerProvider).signOut();
               });
 
               if (res.isSuccess) {
-                AppRoutes.instance.router.go('/sign-in');
+                if (!context.mounted) return;
+                context.go('/sign-in');
               } else {
                 AppSnackBar.showError(res.error.toString());
               }

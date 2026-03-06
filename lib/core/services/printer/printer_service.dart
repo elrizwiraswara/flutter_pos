@@ -15,7 +15,7 @@ class PrinterService {
   final PrinterManager _manager = PrinterManager();
   final SharedPreferences _sharedPreferences;
 
-  PrinterService({required SharedPreferences sharedPreferences}) : _sharedPreferences = sharedPreferences;
+  PrinterService(this._sharedPreferences);
 
   List<PrinterDevice> printers = [];
   PrinterDevice? selectedPrinter;
@@ -71,10 +71,13 @@ class PrinterService {
 
         onDeviceStream?.call(printers);
 
-        if (selectedDeviceId != null) {
+        if (selectedDeviceId != null && !(_manager.state == PrinterConnectionState.scanning)) {
           final match = printers.where((d) => getDeviceId(d) == selectedDeviceId).firstOrNull;
           if (match != null && selectedPrinter == null) {
-            await selectPrinter(match);
+            final result = await selectPrinter(match);
+            if (result.isFailure) {
+              return Result.failure(error: result.error!);
+            }
           } else if (match != null) {
             // Update reference to the new scan instance without reconnecting
             selectedPrinter = match;
@@ -88,15 +91,56 @@ class PrinterService {
     }
   }
 
-  Future<void> selectPrinter(PrinterDevice device) async {
-    selectedPrinter = device;
+  Future<Result<void>> selectPrinter(PrinterDevice device) async {
     cl('[PrinterService].selectPrinter: ${device.name} (${device.connectionType.name})');
 
     try {
-      if (_manager.isConnected) await _manager.disconnect();
+      final currentSelectedDeviceId = selectedPrinter == null ? null : getDeviceId(selectedPrinter!);
+      final nextSelectedDeviceId = getDeviceId(device);
+
+      if (_manager.isConnected && currentSelectedDeviceId == nextSelectedDeviceId) {
+        selectedPrinter = device;
+        return Result.success(data: null);
+      }
+
+      if (_manager.isConnected) {
+        await _manager.disconnect();
+      }
+
       await _manager.connect(device, timeout: const Duration(seconds: 10));
+      selectedPrinter = device;
+      return Result.success(data: null);
+    } on PrinterException catch (e) {
+      if (!_manager.isConnected) {
+        selectedPrinter = null;
+      }
+
+      cl('[PrinterService].selectPrinter connection error: ${e.message}');
+      return Result.failure(error: e.message);
     } catch (e) {
+      if (!_manager.isConnected) {
+        selectedPrinter = null;
+      }
+
       cl('[PrinterService].selectPrinter connection error: $e');
+      return Result.failure(error: e.toString());
+    }
+  }
+
+  Future<Result<void>> disconnectPrinter() async {
+    try {
+      if (_manager.isConnected) {
+        await _manager.disconnect();
+      }
+
+      selectedPrinter = null;
+      return Result.success(data: null);
+    } on PrinterException catch (e) {
+      cl('[PrinterService].disconnectPrinter error: ${e.message}');
+      return Result.failure(error: e.message);
+    } catch (e) {
+      cl('[PrinterService].disconnectPrinter error: $e');
+      return Result.failure(error: e.toString());
     }
   }
 

@@ -1,7 +1,4 @@
-import 'dart:async';
-
 import 'package:flutter/foundation.dart';
-import 'package:flutter_pos/core/utilities/console_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:unified_esc_pos_printer/unified_esc_pos_printer.dart';
 
@@ -12,18 +9,6 @@ import '../../widgets/app_snack_bar.dart';
 class PrinterSettingsProvider extends ChangeNotifier {
   final PrinterService printerService;
   final SharedPreferences sharedPreferences;
-
-  StreamSubscription<PrinterConnectionState>? _stateSubscription;
-
-  PrinterSettingsProvider({
-    required this.printerService,
-    required this.sharedPreferences,
-  }) {
-    _stateSubscription = printerService.stateStream.listen((_) {
-      notifyListeners();
-    });
-  }
-
   final Set<PrinterConnectionType> _selectedTypes = {
     PrinterConnectionType.usb,
     PrinterConnectionType.bluetooth,
@@ -31,23 +16,37 @@ class PrinterSettingsProvider extends ChangeNotifier {
     PrinterConnectionType.network,
   };
 
+  PrinterSettingsProvider({
+    required this.printerService,
+    required this.sharedPreferences,
+  }) : _paperSize = printerService.paperSize;
+
   bool _isScanning = false;
+  String? _connectingDeviceId;
+  bool _isDisconnecting = false;
+  List<PrinterDevice> _printers = const [];
+  PaperSize _paperSize;
 
-  List<PrinterDevice> get printers => printerService.printers;
+  List<PrinterDevice> get printers => _printers;
   bool get isScanning => _isScanning;
-  Set<PrinterConnectionType> get selectedTypes => _selectedTypes;
+  bool get isConnecting => _connectingDeviceId != null;
+  bool get isDisconnecting => _isDisconnecting;
+  Set<PrinterConnectionType> get selectedTypes => Set.unmodifiable(_selectedTypes);
 
-  PaperSize get paperSize => printerService.paperSize;
+  PaperSize get paperSize => _paperSize;
 
   void setPaperSize(PaperSize size) {
+    if (_paperSize == size) return;
+
     printerService.setPaperSize(size);
+    _paperSize = size;
     notifyListeners();
   }
 
   int get selectedPrinterIndex {
     if (printerService.selectedPrinter == null) return -1;
     final selectedId = printerService.getDeviceId(printerService.selectedPrinter!);
-    return printerService.printers.indexWhere(
+    return _printers.indexWhere(
       (p) => printerService.getDeviceId(p) == selectedId,
     );
   }
@@ -62,6 +61,8 @@ class PrinterSettingsProvider extends ChangeNotifier {
   }
 
   Future<void> getAndSelectPrinter() async {
+    if (_isScanning || _isDisconnecting) return;
+
     _isScanning = true;
     notifyListeners();
 
@@ -82,22 +83,56 @@ class PrinterSettingsProvider extends ChangeNotifier {
   }
 
   void _onDeviceStream(List<PrinterDevice> printers) {
-    cl("[PrinterSettingsProvider].onDeviceStream: ${printers.map((e) => e.name).toList()}");
+    if (_hasSamePrinters(printers)) return;
+
+    _printers = List.unmodifiable(printers);
     notifyListeners();
   }
 
   Future<void> onSelectPrinter(PrinterDevice printer) async {
     final deviceId = printerService.getDeviceId(printer);
-    await printerService.selectPrinter(printer);
+    if (_connectingDeviceId == deviceId || _isDisconnecting) return;
+
+    _connectingDeviceId = deviceId;
+    notifyListeners();
+
+    final result = await printerService.selectPrinter(printer);
+    _connectingDeviceId = null;
+
+    if (result.isFailure) {
+      notifyListeners();
+      AppSnackBar.showError(result.error.toString());
+      return;
+    }
+
     sharedPreferences.setString(Constants.selectedDeviceIdKey, deviceId);
     sharedPreferences.setString(Constants.selectedConnectionTypeKey, printer.connectionType.name);
     notifyListeners();
   }
 
-  @override
-  void dispose() {
-    _stateSubscription?.cancel();
-    super.dispose();
+  Future<void> disconnectPrinter() async {
+    if (_isDisconnecting || _connectingDeviceId != null) return;
+
+    _isDisconnecting = true;
+    notifyListeners();
+
+    final result = await printerService.disconnectPrinter();
+    _isDisconnecting = false;
+
+    if (result.isFailure) {
+      notifyListeners();
+      AppSnackBar.showError(result.error.toString());
+      return;
+    }
+
+    await sharedPreferences.remove(Constants.selectedDeviceIdKey);
+    await sharedPreferences.remove(Constants.selectedConnectionTypeKey);
+    notifyListeners();
+    AppSnackBar.show('Printer disconnected');
+  }
+
+  bool isConnectingPrinter(PrinterDevice device) {
+    return _connectingDeviceId == printerService.getDeviceId(device);
   }
 
   String getDeviceSubtitle(PrinterDevice device) {
@@ -108,5 +143,17 @@ class PrinterSettingsProvider extends ChangeNotifier {
       UsbPrinterDevice d => d.identifier,
       _ => device.connectionType.name,
     };
+  }
+
+  bool _hasSamePrinters(List<PrinterDevice> printers) {
+    if (_printers.length != printers.length) return false;
+
+    for (int i = 0; i < printers.length; i++) {
+      if (printerService.getDeviceId(_printers[i]) != printerService.getDeviceId(printers[i])) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }

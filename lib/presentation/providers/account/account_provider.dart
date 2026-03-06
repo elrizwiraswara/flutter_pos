@@ -32,15 +32,6 @@ class AccountProvider extends ChangeNotifier {
 
   bool isLoaded = false;
 
-  void resetStates() {
-    imageFile = null;
-    imageUrl = null;
-    name = null;
-    email = null;
-    phone = null;
-    isLoaded = false;
-  }
-
   Future<void> initProfileForm() async {
     var userId = authProvider.user?.id;
     if (userId == null) throw 'Unathenticated!';

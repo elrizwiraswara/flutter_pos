@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../app/di/dependency_injection.dart';
 import '../../../core/services/connectivity/ping_service.dart';
 import '../../../core/services/info/device_info_service.dart';
 import '../../../domain/entities/queued_action_entity.dart';
@@ -26,6 +25,7 @@ class MainProvider extends ChangeNotifier {
   final ProductRepository productRepository;
   final TransactionRepository transactionRepository;
   final QueuedActionRepository queuedActionRepository;
+  final ProductsProvider productsProvider;
 
   MainProvider({
     required this.pingService,
@@ -35,6 +35,7 @@ class MainProvider extends ChangeNotifier {
     required this.userRepository,
     required this.productRepository,
     required this.queuedActionRepository,
+    required this.productsProvider,
   });
 
   bool isLoaded = false;
@@ -43,14 +44,6 @@ class MainProvider extends ChangeNotifier {
   bool isSyncronizing = false;
 
   UserEntity? user;
-
-  void resetStates() {
-    isHasInternet = false;
-    isHasInternet = true;
-    isHasQueuedActions = false;
-    isSyncronizing = false;
-    user = null;
-  }
 
   Future<void> initMainProvider() async {
     await startPingService();
@@ -121,7 +114,7 @@ class MainProvider extends ChangeNotifier {
     if (res[2].isFailure) AppSnackBar.showError("Failed to sync transaction data");
 
     // Refresh products list
-    di<ProductsProvider>().getAllProducts();
+    productsProvider.getAllProducts();
 
     // Check queued actions
     checkIsHasQueuedActions();

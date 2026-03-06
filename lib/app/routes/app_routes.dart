@@ -16,7 +16,6 @@ import '../../presentation/screens/products/products_screen.dart';
 import '../../presentation/screens/transactions/transaction_detail_screen.dart';
 import '../../presentation/screens/transactions/transactions_screen.dart';
 import '../../presentation/screens/welcome/welcome_screen.dart';
-import '../di/dependency_injection.dart';
 import 'params/error_screen_param.dart';
 
 /// App routes
@@ -26,9 +25,6 @@ class AppRoutes {
   AppRoutes(this._authProvider) {
     _initialize();
   }
-
-  // Static convenience getter - returns the same instance from GetIt
-  static AppRoutes get instance => di<AppRoutes>();
 
   static final rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
   static final navNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'nav');
@@ -43,194 +39,217 @@ class AppRoutes {
     _router = GoRouter(
       initialLocation: '/',
       navigatorKey: rootNavigatorKey,
-      refreshListenable: _authProvider.isAuthenticated,
+      refreshListenable: _authProvider,
       errorBuilder: (context, state) => ErrorScreen(param: ErrorScreenParam(error: state.error)),
-      routes: [_splash],
+      redirect: (context, state) {
+        final isChecking = _authProvider.isChecking;
+        final isAuthenticated = _authProvider.isAuthenticated;
+        final isSplashRoute = state.fullPath == '/';
+        final isAuthRoute = state.fullPath?.startsWith('/sign-in') ?? false;
+
+        if (isChecking) {
+          return '/';
+        }
+
+        if (!isAuthenticated && !isAuthRoute) {
+          return '/sign-in';
+        }
+
+        if (isAuthenticated && isAuthRoute) {
+          return '/home';
+        }
+
+        return isSplashRoute ? '/home' : null;
+      },
+      routes: [
+        _splash(),
+        _main(),
+        _signIn(),
+        _error(),
+      ],
     );
   }
 
-  static final _splash = GoRoute(
-    path: '/',
-    builder: (context, state) => const WelcomeScreen(),
-    redirect: (context, state) {
-      final isChecking = instance._authProvider.isChecking.value;
-      final isAuthenticated = instance._authProvider.isAuthenticated.value;
-      final isSplashRoute = state.fullPath == '/';
-      final isAuthRoute = state.fullPath?.startsWith('/sign-in') ?? false;
+  GoRoute _splash() {
+    return GoRoute(
+      path: '/',
+      builder: (context, state) => const WelcomeScreen(),
+    );
+  }
 
-      print(
-        'state.fullPath: ${state.fullPath}',
-      );
-      print(
-        'isAuthenticated: $isAuthenticated, isChecking: $isChecking, isSplashRoute: $isSplashRoute, isAuthRoute: $isAuthRoute',
-      );
+  GoRoute _error() {
+    return GoRoute(
+      path: '/error',
+      builder: (context, state) {
+        if (state.extra == null || state.extra! is! ErrorScreenParam) {
+          throw 'Required ErrorScreenParam is not provided!';
+        }
 
-      if (isChecking) {
-        return '/';
-      }
+        return ErrorScreen(param: state.extra as ErrorScreenParam);
+      },
+    );
+  }
 
-      if (!isAuthenticated && !isAuthRoute) {
-        return '/sign-in';
-      }
+  GoRoute _signIn() {
+    return GoRoute(
+      path: '/sign-in',
+      builder: (context, state) {
+        return const SignInScreen();
+      },
+    );
+  }
 
-      if (isAuthenticated && isAuthRoute) {
-        return '/home';
-      }
+  ShellRoute _main() {
+    return ShellRoute(
+      navigatorKey: navNavigatorKey,
+      builder: (BuildContext context, GoRouterState state, Widget child) {
+        return MainScreen(child: child);
+      },
+      routes: [
+        _home(),
+        _products(),
+        _transactions(),
+        _account(),
+      ],
+    );
+  }
 
-      return isSplashRoute ? '/home' : null;
-    },
-    routes: [
-      _main,
-      _signIn,
-      _error,
-    ],
-  );
+  GoRoute _home() {
+    return GoRoute(
+      path: '/home',
+      pageBuilder: (context, state) {
+        return const NoTransitionPage<void>(
+          child: HomeScreen(),
+        );
+      },
+    );
+  }
 
-  static final _error = GoRoute(
-    path: '/error',
-    builder: (context, state) {
-      if (state.extra == null || state.extra! is! ErrorScreenParam) {
-        throw 'Required ErrorScreenParam is not provided!';
-      }
+  GoRoute _products() {
+    return GoRoute(
+      path: '/products',
+      pageBuilder: (context, state) {
+        return const NoTransitionPage<void>(
+          child: ProductsScreen(),
+        );
+      },
+      routes: [
+        _productCreate(),
+        _productEdit(),
+        _productDetail(),
+      ],
+    );
+  }
 
-      return ErrorScreen(param: state.extra as ErrorScreenParam);
-    },
-  );
+  GoRoute _transactions() {
+    return GoRoute(
+      path: '/transactions',
+      pageBuilder: (context, state) {
+        return const NoTransitionPage<void>(
+          child: TransactionsScreen(),
+        );
+      },
+      routes: [
+        _transactionDetail(),
+      ],
+    );
+  }
 
-  static final _signIn = GoRoute(
-    path: '/sign-in',
-    builder: (context, state) {
-      return const SignInScreen();
-    },
-  );
+  GoRoute _account() {
+    return GoRoute(
+      path: '/account',
+      pageBuilder: (context, state) {
+        return const NoTransitionPage<void>(
+          child: AccountScreen(),
+        );
+      },
+      routes: [
+        _profileEdit(),
+        _about(),
+        _printerSettings(),
+      ],
+    );
+  }
 
-  static final _main = ShellRoute(
-    navigatorKey: navNavigatorKey,
-    builder: (BuildContext context, GoRouterState state, Widget child) {
-      return MainScreen(child: child);
-    },
-    routes: [
-      _home,
-      _products,
-      _transactions,
-      _account,
-    ],
-  );
+  GoRoute _productCreate() {
+    return GoRoute(
+      path: 'product-create',
+      parentNavigatorKey: navNavigatorKey,
+      builder: (context, state) {
+        return const ProductFormScreen();
+      },
+    );
+  }
 
-  static final _home = GoRoute(
-    path: '/home',
-    pageBuilder: (context, state) {
-      return const NoTransitionPage<void>(
-        child: HomeScreen(),
-      );
-    },
-  );
+  GoRoute _productEdit() {
+    return GoRoute(
+      path: 'product-edit/:id',
+      builder: (context, state) {
+        int? id = int.tryParse(state.pathParameters["id"] ?? '');
 
-  static final _products = GoRoute(
-    path: '/products',
-    pageBuilder: (context, state) {
-      return const NoTransitionPage<void>(
-        child: ProductsScreen(),
-      );
-    },
-    routes: [
-      _productCreate,
-      _productEdit,
-      _productDetail,
-    ],
-  );
+        if (id == null) {
+          throw 'Required productId is not provided!';
+        }
 
-  static final _transactions = GoRoute(
-    path: '/transactions',
-    pageBuilder: (context, state) {
-      return const NoTransitionPage<void>(
-        child: TransactionsScreen(),
-      );
-    },
-    routes: [
-      _transactionDetail,
-    ],
-  );
+        return ProductFormScreen(id: id);
+      },
+    );
+  }
 
-  static final _account = GoRoute(
-    path: '/account',
-    pageBuilder: (context, state) {
-      return const NoTransitionPage<void>(
-        child: AccountScreen(),
-      );
-    },
-    routes: [
-      _profileEdit,
-      _about,
-      _printerSettings,
-    ],
-  );
+  GoRoute _productDetail() {
+    return GoRoute(
+      path: 'product-detail/:id',
+      builder: (context, state) {
+        int? id = int.tryParse(state.pathParameters["id"] ?? '');
 
-  static final _productCreate = GoRoute(
-    path: 'product-create',
-    parentNavigatorKey: navNavigatorKey,
-    builder: (context, state) {
-      return const ProductFormScreen();
-    },
-  );
+        if (id == null) {
+          throw 'Required productId is not provided!';
+        }
 
-  static final _productEdit = GoRoute(
-    path: 'product-edit/:id',
-    builder: (context, state) {
-      int? id = int.tryParse(state.pathParameters["id"] ?? '');
+        return ProductDetailScreen(id: id);
+      },
+    );
+  }
 
-      if (id == null) {
-        throw 'Required productId is not provided!';
-      }
+  GoRoute _transactionDetail() {
+    return GoRoute(
+      path: 'transaction-detail/:id',
+      builder: (context, state) {
+        int? id = int.tryParse(state.pathParameters["id"] ?? '');
 
-      return ProductFormScreen(id: id);
-    },
-  );
+        if (id == null) {
+          throw 'Required productId is not provided!';
+        }
 
-  static final _productDetail = GoRoute(
-    path: 'product-detail/:id',
-    builder: (context, state) {
-      int? id = int.tryParse(state.pathParameters["id"] ?? '');
+        return TransactionDetailScreen(id: id);
+      },
+    );
+  }
 
-      if (id == null) {
-        throw 'Required productId is not provided!';
-      }
+  GoRoute _profileEdit() {
+    return GoRoute(
+      path: 'profile',
+      builder: (context, state) {
+        return const ProfileFormScreen();
+      },
+    );
+  }
 
-      return ProductDetailScreen(id: id);
-    },
-  );
+  GoRoute _about() {
+    return GoRoute(
+      path: 'about',
+      builder: (context, state) {
+        return const AboutScreen();
+      },
+    );
+  }
 
-  static final _transactionDetail = GoRoute(
-    path: 'transaction-detail/:id',
-    builder: (context, state) {
-      int? id = int.tryParse(state.pathParameters["id"] ?? '');
-
-      if (id == null) {
-        throw 'Required productId is not provided!';
-      }
-
-      return TransactionDetailScreen(id: id);
-    },
-  );
-
-  static final _profileEdit = GoRoute(
-    path: 'profile',
-    builder: (context, state) {
-      return const ProfileFormScreen();
-    },
-  );
-
-  static final _about = GoRoute(
-    path: 'about',
-    builder: (context, state) {
-      return const AboutScreen();
-    },
-  );
-
-  static final _printerSettings = GoRoute(
-    path: 'printer-settings',
-    builder: (context, state) {
-      return const PrinterSettingsScreen();
-    },
-  );
+  GoRoute _printerSettings() {
+    return GoRoute(
+      path: 'printer-settings',
+      builder: (context, state) {
+        return const PrinterSettingsScreen();
+      },
+    );
+  }
 }

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../app/di/dependency_injection.dart';
-import '../../../app/routes/app_routes.dart';
-import '../../providers/main/main_provider.dart';
+import '../../../app/di/app_providers.dart';
 import '../welcome/welcome_screen.dart';
 
-class MainScreen extends StatefulWidget {
+class MainScreen extends ConsumerStatefulWidget {
   final Widget child;
 
   const MainScreen({
@@ -15,68 +13,67 @@ class MainScreen extends StatefulWidget {
   });
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  ConsumerState<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
-  final _mainProvider = di<MainProvider>()..resetStates();
-
+class _MainScreenState extends ConsumerState<MainScreen> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await _mainProvider.initMainProvider();
+      final mainProvider = ref.read(mainControllerProvider);
+      await mainProvider.initMainProvider();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<MainProvider>(
-      builder: (context, provider, _) {
-        // Display RootScreen when data is being load
-        if (!provider.isLoaded) {
-          return const WelcomeScreen();
-        }
+    final isLoaded = ref.watch(mainControllerProvider.select((p) => p.isLoaded));
+    final isHasInternet = ref.watch(mainControllerProvider.select((p) => p.isHasInternet));
+    final user = ref.watch(mainControllerProvider.select((p) => p.user));
 
-        // User data might still null for the first time app open or login without internet connection
-        // So, throw error with a first time internet error message then the [ErrorScreen] will be shown
-        if (provider.isLoaded && provider.user == null && !provider.isHasInternet) {
-          throw Exception(
-            'No Internet connection! Internet connection is required for the first time app open or user login',
-          );
-        }
+    // Display RootScreen when data is being load
+    if (!isLoaded) {
+      return const WelcomeScreen();
+    }
 
-        return Scaffold(
-          body: widget.child,
-          bottomNavigationBar: BottomNavigationBar(
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: Icon(Icons.maps_home_work_outlined),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.dashboard_customize_outlined),
-                label: 'Products',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.receipt_long_rounded),
-                label: 'Transactions',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.account_circle_outlined),
-                label: 'Account',
-              ),
-            ],
-            currentIndex: _calculateSelectedIndex(),
-            onTap: (int idx) => _onItemTapped(idx),
+    // User data might still null for the first time app open or login without internet connection
+    // So, throw error with a first time internet error message then the [ErrorScreen] will be shown
+    if (isLoaded && user == null && !isHasInternet) {
+      throw Exception(
+        'No Internet connection! Internet connection is required for the first time app open or user login',
+      );
+    }
+
+    return Scaffold(
+      body: widget.child,
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.maps_home_work_outlined),
+            label: 'Home',
           ),
-        );
-      },
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard_customize_outlined),
+            label: 'Products',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.receipt_long_rounded),
+            label: 'Transactions',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle_outlined),
+            label: 'Account',
+          ),
+        ],
+        currentIndex: _calculateSelectedIndex(),
+        onTap: (int idx) => _onItemTapped(idx),
+      ),
     );
   }
 
   int _calculateSelectedIndex() {
-    final String location = AppRoutes.instance.router.state.uri.path;
+    final String location = ref.read(appRoutesProvider).router.state.uri.path;
 
     if (location.startsWith('/home')) {
       return 0;
@@ -98,15 +95,17 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _onItemTapped(int index) {
+    final router = ref.read(appRoutesProvider).router;
+
     switch (index) {
       case 0:
-        AppRoutes.instance.router.go('/home');
+        router.go('/home');
       case 1:
-        AppRoutes.instance.router.go('/products');
+        router.go('/products');
       case 2:
-        AppRoutes.instance.router.go('/transactions');
+        router.go('/transactions');
       case 3:
-        AppRoutes.instance.router.go('/account');
+        router.go('/account');
     }
   }
 }

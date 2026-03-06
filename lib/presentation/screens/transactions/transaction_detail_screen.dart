@@ -1,29 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../app/di/dependency_injection.dart';
+import '../../../app/di/app_providers.dart';
 import '../../../core/extensions/string_casing_extension.dart';
-import '../../../core/services/printer/printer_service.dart';
 import '../../../core/themes/app_colors.dart';
 import '../../../core/themes/app_sizes.dart';
 import '../../../core/utilities/currency_formatter.dart';
 import '../../../core/utilities/date_time_formatter.dart';
 import '../../../domain/entities/ordered_product_entity.dart';
 import '../../../domain/entities/transaction_entity.dart';
-import '../../providers/transactions/transaction_detail_provider.dart';
 import '../../widgets/app_empty_state.dart';
 import '../../widgets/app_progress_indicator.dart';
 import '../../widgets/app_snack_bar.dart';
 
-class TransactionDetailScreen extends StatelessWidget {
+class TransactionDetailScreen extends ConsumerWidget {
   final int id;
 
   const TransactionDetailScreen({super.key, required this.id});
 
-  void _reprint() async {
-    final transaction = di<TransactionDetailProvider>().currentTransaction;
+  void _reprint(WidgetRef ref) async {
+    final transaction = ref.read(transactionDetailControllerProvider).currentTransaction;
     if (transaction == null) return;
 
-    final result = await di<PrinterService>().printTransaction(transaction);
+    final result = await ref.read(printerServiceProvider).printTransaction(transaction);
 
     if (result.isFailure) {
       AppSnackBar.showError(result.error.toString());
@@ -31,7 +30,7 @@ class TransactionDetailScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -39,12 +38,12 @@ class TransactionDetailScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.print_outlined),
             tooltip: 'Reprint',
-            onPressed: () => _reprint(),
+            onPressed: () => _reprint(ref),
           ),
         ],
       ),
       body: FutureBuilder(
-        future: di<TransactionDetailProvider>().getTransactionDetail(id),
+        future: ref.read(transactionDetailControllerProvider).getTransactionDetail(id),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const AppProgressIndicator();

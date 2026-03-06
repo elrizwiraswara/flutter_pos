@@ -1,35 +1,28 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/locale/app_locale.dart';
-import '../presentation/providers/theme/theme_provider.dart';
-import 'di/dependency_injection.dart';
+import 'di/app_providers.dart';
 import 'error/error_handler_builder.dart';
-import 'routes/app_routes.dart';
 
-class App extends StatelessWidget {
+class App extends ConsumerWidget {
   const App({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: providers,
-      child: Selector<ThemeProvider, ThemeData>(
-        selector: (context, provider) => provider.theme,
-        builder: (context, theme, _) {
-          return MaterialApp.router(
-            title: 'Flutter POS',
-            theme: theme,
-            debugShowCheckedModeBanner: kDebugMode,
-            routerConfig: AppRoutes.instance.router,
-            locale: AppLocale.defaultLocale,
-            supportedLocales: AppLocale.supportedLocales,
-            localizationsDelegates: AppLocale.localizationsDelegates,
-            builder: (context, child) => ErrorHandlerBuilder(child: child),
-          );
-        },
-      ),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = ref.watch(themeControllerProvider.select((provider) => provider.theme));
+    final router = ref.watch(appRoutesProvider).router;
+
+    return MaterialApp.router(
+      title: 'Flutter POS',
+      theme: theme,
+      debugShowCheckedModeBanner: kDebugMode,
+      routerConfig: router,
+      locale: AppLocale.defaultLocale,
+      supportedLocales: AppLocale.supportedLocales,
+      localizationsDelegates: AppLocale.localizationsDelegates,
+      builder: (context, child) => ErrorHandlerBuilder(child: child),
     );
   }
 }

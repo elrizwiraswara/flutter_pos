@@ -28,7 +28,7 @@ class AppDialog {
     Color? rightButtonBorderColor,
     double? elevation,
   }) async {
-    final context = AppRoutes.instance.router.configuration.navigatorKey.currentContext;
+    final context = AppRoutes.rootNavigatorKey.currentContext;
     if (context == null) throw Exception('No context available for dialog');
 
     return await showDialog(
@@ -69,7 +69,7 @@ class AppDialog {
     String buttonText = 'Close',
     Function(BuildContext)? onTapButton,
   }) async {
-    final context = AppRoutes.instance.router.configuration.navigatorKey.currentContext;
+    final context = AppRoutes.rootNavigatorKey.currentContext;
     if (context == null) throw Exception('No context available for dialog');
 
     return await showDialog(
@@ -113,7 +113,7 @@ class AppDialog {
     Future<T> Function() process, {
     bool dismissible = false,
   }) async {
-    final context = AppRoutes.instance.router.configuration.navigatorKey.currentContext;
+    final context = AppRoutes.rootNavigatorKey.currentContext;
     if (context == null) throw Exception('No context available for dialog');
 
     // Show the progress dialog
@@ -151,8 +151,8 @@ class AppDialog {
   }
 
   static void _closeDialog() {
-    if (AppRoutes.instance.router.configuration.navigatorKey.currentState?.canPop() ?? false) {
-      AppRoutes.instance.router.configuration.navigatorKey.currentState?.pop();
+    if (AppRoutes.rootNavigatorKey.currentState?.canPop() ?? false) {
+      AppRoutes.rootNavigatorKey.currentState?.pop();
     }
   }
 }

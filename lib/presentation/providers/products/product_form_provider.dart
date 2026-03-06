@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 
-import '../../../app/di/dependency_injection.dart';
 import '../../../core/common/result.dart';
 import '../../../core/utilities/console_logger.dart';
 import '../../../domain/entities/product_entity.dart';
@@ -17,11 +16,13 @@ class ProductFormProvider extends ChangeNotifier {
   final AuthProvider authProvider;
   final ProductRepository productRepository;
   final StorageRepository storageRepository;
+  final ProductsProvider productsProvider;
 
   ProductFormProvider({
     required this.authProvider,
     required this.productRepository,
     required this.storageRepository,
+    required this.productsProvider,
   });
 
   File? imageFile;
@@ -32,16 +33,6 @@ class ProductFormProvider extends ChangeNotifier {
   String? description;
 
   bool isLoaded = false;
-
-  void resetStates() {
-    imageFile = null;
-    imageUrl = null;
-    name = null;
-    price = null;
-    stock = null;
-    description = null;
-    isLoaded = false;
-  }
 
   Future<void> initProductForm(int? productId) async {
     if (productId == null) {
@@ -92,7 +83,7 @@ class ProductFormProvider extends ChangeNotifier {
       var res = await CreateProductUsecase(productRepository).call(product);
 
       // Refresh products
-      di<ProductsProvider>().getAllProducts();
+      productsProvider.getAllProducts();
 
       return res;
     } catch (e) {
@@ -125,7 +116,7 @@ class ProductFormProvider extends ChangeNotifier {
       var res = await UpdateProductUsecase(productRepository).call(product);
 
       // Refresh products
-      di<ProductsProvider>().getAllProducts();
+      productsProvider.getAllProducts();
 
       return res;
     } catch (e) {
@@ -138,7 +129,7 @@ class ProductFormProvider extends ChangeNotifier {
       var res = await DeleteProductUsecase(productRepository).call(id);
 
       // Refresh products
-      di<ProductsProvider>().getAllProducts();
+      productsProvider.getAllProducts();
 
       return res;
     } catch (e) {

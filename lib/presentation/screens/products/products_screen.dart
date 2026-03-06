@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 
-import '../../../app/di/dependency_injection.dart';
+import '../../../app/di/app_providers.dart';
 import '../../../core/themes/app_sizes.dart';
 import '../../../domain/entities/product_entity.dart';
-import '../../providers/products/products_provider.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_empty_state.dart';
 import '../../widgets/app_loading_more_indicator.dart';
@@ -13,16 +12,14 @@ import '../../widgets/app_progress_indicator.dart';
 import '../../widgets/app_text_field.dart';
 import 'components/products_card.dart';
 
-class ProductsScreen extends StatefulWidget {
+class ProductsScreen extends ConsumerStatefulWidget {
   const ProductsScreen({super.key});
 
   @override
-  State<ProductsScreen> createState() => _ProductsScreenState();
+  ConsumerState<ProductsScreen> createState() => _ProductsScreenState();
 }
 
-class _ProductsScreenState extends State<ProductsScreen> {
-  final productProvider = di<ProductsProvider>();
-
+class _ProductsScreenState extends ConsumerState<ProductsScreen> {
   final scrollController = ScrollController();
   final searchFieldController = TextEditingController();
 
@@ -30,7 +27,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
   void initState() {
     scrollController.addListener(scrollListener);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      productProvider.getAllProducts();
+      ref.read(productsControllerProvider).getAllProducts();
     });
     super.initState();
   }
@@ -44,6 +41,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
   }
 
   void scrollListener() async {
+    final productProvider = ref.read(productsControllerProvider);
+
     // Automatically load more data on end of scroll position
     if (scrollController.offset == scrollController.position.maxScrollExtent) {
       await productProvider.getAllProducts(
@@ -55,6 +54,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final allProducts = ref.watch(productsControllerProvider.select((p) => p.allProducts));
+    final isLoadingMore = ref.watch(productsControllerProvider.select((p) => p.isLoadingMore));
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Products'),
@@ -62,75 +64,71 @@ class _ProductsScreenState extends State<ProductsScreen> {
         shadowColor: Colors.transparent,
         actions: const [_AddButton()],
       ),
-      body: Consumer<ProductsProvider>(
-        builder: (context, provider, _) {
-          return RefreshIndicator(
-            onRefresh: () => productProvider.getAllProducts(),
-            displacement: 60,
-            child: Scrollbar(
-              child: CustomScrollView(
-                controller: scrollController,
-                // Disable scroll when data is null or empty
-                physics: (provider.allProducts?.isEmpty ?? true) ? const NeverScrollableScrollPhysics() : null,
-                slivers: [
-                  SliverAppBar(
-                    floating: true,
-                    snap: true,
-                    automaticallyImplyLeading: false,
-                    collapsedHeight: 70,
-                    titleSpacing: 0,
-                    title: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding),
-                      child: _SearchField(controller: searchFieldController),
-                    ),
-                  ),
-                  SliverLayoutBuilder(
-                    builder: (context, _) {
-                      if (provider.allProducts == null) {
-                        return const SliverFillRemaining(
-                          hasScrollBody: false,
-                          fillOverscroll: true,
-                          child: AppProgressIndicator(),
-                        );
-                      }
-
-                      if (provider.allProducts!.isEmpty) {
-                        return SliverFillRemaining(
-                          hasScrollBody: false,
-                          fillOverscroll: true,
-                          child: AppEmptyState(
-                            subtitle: 'No products available, add product to continue',
-                            buttonText: 'Add Product',
-                            onTapButton: () => context.push('/products/product-create'),
-                          ),
-                        );
-                      }
-
-                      return SliverPadding(
-                        padding: const EdgeInsets.fromLTRB(AppSizes.padding, 2, AppSizes.padding, AppSizes.padding),
-                        sliver: SliverGrid.builder(
-                          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                            maxCrossAxisExtent: 200,
-                            childAspectRatio: 1 / 1.5,
-                            crossAxisSpacing: AppSizes.padding / 2,
-                            mainAxisSpacing: AppSizes.padding / 2,
-                          ),
-                          itemCount: provider.allProducts!.length,
-                          itemBuilder: (context, i) {
-                            return _ProductCard(product: provider.allProducts![i]);
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                  SliverToBoxAdapter(
-                    child: AppLoadingMoreIndicator(isLoading: provider.isLoadingMore),
-                  ),
-                ],
+      body: RefreshIndicator(
+        onRefresh: () => ref.read(productsControllerProvider).getAllProducts(),
+        displacement: 60,
+        child: Scrollbar(
+          child: CustomScrollView(
+            controller: scrollController,
+            // Disable scroll when data is null or empty
+            physics: (allProducts?.isEmpty ?? true) ? const NeverScrollableScrollPhysics() : null,
+            slivers: [
+              SliverAppBar(
+                floating: true,
+                snap: true,
+                automaticallyImplyLeading: false,
+                collapsedHeight: 70,
+                titleSpacing: 0,
+                title: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding),
+                  child: _SearchField(controller: searchFieldController),
+                ),
               ),
-            ),
-          );
-        },
+              SliverLayoutBuilder(
+                builder: (context, _) {
+                  if (allProducts == null) {
+                    return const SliverFillRemaining(
+                      hasScrollBody: false,
+                      fillOverscroll: true,
+                      child: AppProgressIndicator(),
+                    );
+                  }
+
+                  if (allProducts.isEmpty) {
+                    return SliverFillRemaining(
+                      hasScrollBody: false,
+                      fillOverscroll: true,
+                      child: AppEmptyState(
+                        subtitle: 'No products available, add product to continue',
+                        buttonText: 'Add Product',
+                        onTapButton: () => context.push('/products/product-create'),
+                      ),
+                    );
+                  }
+
+                  return SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(AppSizes.padding, 2, AppSizes.padding, AppSizes.padding),
+                    sliver: SliverGrid.builder(
+                      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: 200,
+                        childAspectRatio: 1 / 1.5,
+                        crossAxisSpacing: AppSizes.padding / 2,
+                        mainAxisSpacing: AppSizes.padding / 2,
+                      ),
+                      itemCount: allProducts.length,
+                      itemBuilder: (context, i) {
+                        return _ProductCard(product: allProducts[i]);
+                      },
+                    ),
+                  );
+                },
+              ),
+              SliverToBoxAdapter(
+                child: AppLoadingMoreIndicator(isLoading: isLoadingMore),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -172,14 +170,14 @@ class _AddButton extends StatelessWidget {
   }
 }
 
-class _SearchField extends StatelessWidget {
+class _SearchField extends ConsumerWidget {
   final TextEditingController controller;
 
   const _SearchField({required this.controller});
 
   @override
-  Widget build(BuildContext context) {
-    final productProvider = di<ProductsProvider>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final productProvider = ref.read(productsControllerProvider);
 
     return AppTextField(
       controller: controller,
@@ -188,7 +186,7 @@ class _SearchField extends StatelessWidget {
       textInputAction: TextInputAction.search,
       onEditingComplete: () {
         FocusScope.of(context).unfocus();
-        productProvider.allProducts = null;
+        productProvider.resetProducts();
         productProvider.getAllProducts(contains: controller.text);
       },
       onTapClearButton: () {

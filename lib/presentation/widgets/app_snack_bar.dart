@@ -24,7 +24,7 @@ class AppSnackBar {
   }
 
   static (ScaffoldMessengerState, ThemeData) get _getMessengerAndTheme {
-    final context = AppRoutes.instance.router.configuration.navigatorKey.currentContext;
+    final context = AppRoutes.rootNavigatorKey.currentContext;
     if (context == null) throw Exception('No context available for snack bar');
 
     final theme = Theme.of(context);

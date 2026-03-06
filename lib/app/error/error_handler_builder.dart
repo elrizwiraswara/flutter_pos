@@ -1,14 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/services/logger/error_logger_service.dart';
 import '../../core/utilities/console_logger.dart';
 import '../../presentation/widgets/app_error_widget.dart';
-import '../di/dependency_injection.dart';
+import '../di/app_providers.dart';
 import '../routes/app_routes.dart';
 import '../routes/params/error_screen_param.dart';
 
-class ErrorHandlerBuilder extends StatefulWidget {
+class ErrorHandlerBuilder extends ConsumerStatefulWidget {
   final Widget? child;
 
   const ErrorHandlerBuilder({
@@ -20,8 +21,9 @@ class ErrorHandlerBuilder extends StatefulWidget {
   ErrorHandlerBuilderState createState() => ErrorHandlerBuilderState();
 }
 
-class ErrorHandlerBuilderState extends State<ErrorHandlerBuilder> {
-  final _errorLoggerService = di<ErrorLoggerService>();
+class ErrorHandlerBuilderState extends ConsumerState<ErrorHandlerBuilder> {
+  ErrorLoggerService get _errorLoggerService => ref.read(errorLoggerServiceProvider);
+  AppRoutes get _appRoutes => ref.read(appRoutesProvider);
 
   @override
   void initState() {
@@ -47,8 +49,8 @@ class ErrorHandlerBuilderState extends State<ErrorHandlerBuilder> {
     if (!mounted) return;
 
     // Prevent to push to ErrorScreen multiple times
-    if (AppRoutes.instance.router.routeInformationProvider.value.uri.path != '/error') {
-      AppRoutes.instance.router.go('/error', extra: ErrorScreenParam(flutterError: flutterError));
+    if (_appRoutes.router.routeInformationProvider.value.uri.path != '/error') {
+      _appRoutes.router.go('/error', extra: ErrorScreenParam(flutterError: flutterError));
     }
   }
 
@@ -61,8 +63,8 @@ class ErrorHandlerBuilderState extends State<ErrorHandlerBuilder> {
     if (!mounted) return false;
 
     // Prevent to push to ErrorScreen multiple times
-    if (AppRoutes.instance.router.routeInformationProvider.value.uri.path != '/error') {
-      AppRoutes.instance.router.go(
+    if (_appRoutes.router.routeInformationProvider.value.uri.path != '/error') {
+      _appRoutes.router.go(
         '/error',
         extra: ErrorScreenParam(error: error, stackTrace: stackTrace),
       );

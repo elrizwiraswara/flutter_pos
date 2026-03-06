@@ -3,15 +3,12 @@ import 'dart:io';
 import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
 
-import '../../../app/di/dependency_injection.dart';
-import '../../../app/routes/app_routes.dart';
+import '../../../app/di/app_providers.dart';
 import '../../../core/themes/app_sizes.dart';
-import '../../providers/account/account_provider.dart';
-import '../../providers/main/main_provider.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
 import '../../widgets/app_icon_button.dart';
@@ -19,31 +16,29 @@ import '../../widgets/app_progress_indicator.dart';
 import '../../widgets/app_snack_bar.dart';
 import '../../widgets/app_text_field.dart';
 
-class ProfileFormScreen extends StatefulWidget {
+class ProfileFormScreen extends ConsumerStatefulWidget {
   const ProfileFormScreen({super.key});
 
   @override
-  State<ProfileFormScreen> createState() => _ProfileFormScreenState();
+  ConsumerState<ProfileFormScreen> createState() => _ProfileFormScreenState();
 }
 
-class _ProfileFormScreenState extends State<ProfileFormScreen> {
-  final accountProvider = di<AccountProvider>()..resetStates();
-  final mainProvider = di<MainProvider>();
-
+class _ProfileFormScreenState extends ConsumerState<ProfileFormScreen> {
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final phoneController = TextEditingController();
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await accountProvider.initProfileForm();
-
-      nameController.text = accountProvider.name ?? '';
-      emailController.text = accountProvider.email ?? '';
-      phoneController.text = accountProvider.phone ?? '';
-    });
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final provider = ref.read(accountControllerProvider);
+      await provider.initProfileForm();
+
+      nameController.text = provider.name ?? '';
+      emailController.text = provider.email ?? '';
+      phoneController.text = provider.phone ?? '';
+    });
   }
 
   @override
@@ -73,21 +68,22 @@ class _ProfileFormScreenState extends State<ProfileFormScreen> {
 
     if (croppedFile != null) {
       var file = File(croppedFile.path);
-      accountProvider.onChangedImage(file);
+      ref.read(accountControllerProvider).onChangedImage(file);
     }
   }
 
   void updatedUser() async {
     var res = await AppDialog.showProgress(() {
-      return accountProvider.updatedUser();
+      return ref.read(accountControllerProvider).updatedUser();
     });
 
     if (res.isSuccess) {
-      AppRoutes.instance.router.pop();
+      if (!mounted) return;
+      Navigator.of(context).pop();
       AppSnackBar.show('Profile updated');
 
       // Refresh user data
-      mainProvider.getAndSyncAllUserData();
+      ref.read(mainControllerProvider).getAndSyncAllUserData();
     } else {
       AppDialog.showError(error: res.error.toString());
     }
@@ -95,44 +91,44 @@ class _ProfileFormScreenState extends State<ProfileFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final account = ref.read(accountControllerProvider);
+
+    final isLoaded = ref.watch(accountControllerProvider.select((p) => p.isLoaded));
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Profile'),
         titleSpacing: 0,
       ),
-      body: Selector<AccountProvider, bool>(
-        selector: (context, provider) => provider.isLoaded,
-        builder: (context, isLoaded, _) {
-          if (!isLoaded) {
-            return const AppProgressIndicator();
-          }
-
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(AppSizes.padding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _ImageSection(onTapImage: onTapImage),
-                _NameField(controller: nameController),
-                _EmailField(controller: emailController),
-                _PhoneField(controller: phoneController),
-                _UpdateButton(onTap: updatedUser),
-              ],
+      body: !isLoaded
+          ? const AppProgressIndicator()
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(AppSizes.padding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _ImageSection(onTapImage: onTapImage),
+                  _NameField(controller: nameController, onChanged: account.onChangedName),
+                  _EmailField(controller: emailController, onChanged: account.onChangedEmail),
+                  _PhoneField(controller: phoneController, onChanged: account.onChangedPhone),
+                  _UpdateButton(onTap: updatedUser),
+                ],
+              ),
             ),
-          );
-        },
-      ),
     );
   }
 }
 
-class _ImageSection extends StatelessWidget {
+class _ImageSection extends ConsumerWidget {
   final VoidCallback onTapImage;
 
   const _ImageSection({required this.onTapImage});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final imageFile = ref.watch(accountControllerProvider.select((p) => p.imageFile));
+    final imageUrl = ref.watch(accountControllerProvider.select((p) => p.imageUrl));
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -143,44 +139,40 @@ class _ImageSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSizes.padding / 2),
-        Consumer<AccountProvider>(
-          builder: (context, provider, _) {
-            return Stack(
-              children: [
-                GestureDetector(
-                  onTap: onTapImage,
-                  child: AppImage(
-                    image: provider.imageFile?.path ?? provider.imageUrl ?? '',
-                    imgProvider: provider.imageFile != null ? ImgProvider.fileImage : ImgProvider.networkImage,
-                    width: 100,
-                    height: 100,
-                    borderRadius: BorderRadius.circular(AppSizes.radius),
-                    backgroundColor: Theme.of(context).colorScheme.surface,
-                    border: Border.all(
-                      width: 1,
-                      color: Theme.of(context).colorScheme.primaryContainer,
-                    ),
-                    errorWidget: Icon(
-                      Icons.image,
-                      color: Theme.of(context).colorScheme.surfaceDim,
-                      size: 32,
-                    ),
-                  ),
+        Stack(
+          children: [
+            GestureDetector(
+              onTap: onTapImage,
+              child: AppImage(
+                image: imageFile?.path ?? imageUrl ?? '',
+                imgProvider: imageFile != null ? ImgProvider.fileImage : ImgProvider.networkImage,
+                width: 100,
+                height: 100,
+                borderRadius: BorderRadius.circular(AppSizes.radius),
+                backgroundColor: Theme.of(context).colorScheme.surface,
+                border: Border.all(
+                  width: 1,
+                  color: Theme.of(context).colorScheme.primaryContainer,
                 ),
-                Positioned(
-                  right: 8,
-                  bottom: 8,
-                  child: AppIconButton(
-                    icon: Icons.camera_alt_rounded,
-                    iconSize: 14,
-                    borderRadius: 8,
-                    padding: const EdgeInsets.all(6),
-                    onTap: onTapImage,
-                  ),
+                errorWidget: Icon(
+                  Icons.image,
+                  color: Theme.of(context).colorScheme.surfaceDim,
+                  size: 32,
                 ),
-              ],
-            );
-          },
+              ),
+            ),
+            Positioned(
+              right: 8,
+              bottom: 8,
+              child: AppIconButton(
+                icon: Icons.camera_alt_rounded,
+                iconSize: 14,
+                borderRadius: 8,
+                padding: const EdgeInsets.all(6),
+                onTap: onTapImage,
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -189,8 +181,12 @@ class _ImageSection extends StatelessWidget {
 
 class _NameField extends StatelessWidget {
   final TextEditingController controller;
+  final ValueChanged<String> onChanged;
 
-  const _NameField({required this.controller});
+  const _NameField({
+    required this.controller,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -200,7 +196,7 @@ class _NameField extends StatelessWidget {
         controller: controller,
         labelText: 'Name',
         hintText: 'Your name...',
-        onChanged: di<AccountProvider>().onChangedName,
+        onChanged: onChanged,
       ),
     );
   }
@@ -208,8 +204,12 @@ class _NameField extends StatelessWidget {
 
 class _EmailField extends StatelessWidget {
   final TextEditingController controller;
+  final ValueChanged<String> onChanged;
 
-  const _EmailField({required this.controller});
+  const _EmailField({
+    required this.controller,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -219,7 +219,7 @@ class _EmailField extends StatelessWidget {
         controller: controller,
         labelText: 'Email',
         hintText: 'Your email...',
-        onChanged: di<AccountProvider>().onChangedEmail,
+        onChanged: onChanged,
       ),
     );
   }
@@ -227,8 +227,12 @@ class _EmailField extends StatelessWidget {
 
 class _PhoneField extends StatelessWidget {
   final TextEditingController controller;
+  final ValueChanged<String> onChanged;
 
-  const _PhoneField({required this.controller});
+  const _PhoneField({
+    required this.controller,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -240,7 +244,7 @@ class _PhoneField extends StatelessWidget {
         hintText: 'Your phone number...',
         keyboardType: TextInputType.number,
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        onChanged: di<AccountProvider>().onChangedPhone,
+        onChanged: onChanged,
       ),
     );
   }

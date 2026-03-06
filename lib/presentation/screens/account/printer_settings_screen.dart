@@ -1,27 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/app/di/dependency_injection.dart';
-import 'package:flutter_pos/presentation/widgets/app_button.dart';
-import 'package:flutter_pos/presentation/widgets/app_icon_button.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:unified_esc_pos_printer/unified_esc_pos_printer.dart';
 
-import '../../../core/services/printer/printer_service.dart';
+import '../../../app/di/app_providers.dart';
 import '../../../core/themes/app_sizes.dart';
-import '../../providers/account/printer_settings_provider.dart';
+import '../../widgets/app_button.dart';
+import '../../widgets/app_drop_down.dart';
+import '../../widgets/app_icon_button.dart';
+import '../../widgets/app_snack_bar.dart';
 
-class PrinterSettingsScreen extends StatefulWidget {
+class PrinterSettingsScreen extends ConsumerStatefulWidget {
   const PrinterSettingsScreen({super.key});
 
   @override
-  State<PrinterSettingsScreen> createState() => _PrinterSettingsScreenState();
+  ConsumerState<PrinterSettingsScreen> createState() => _PrinterSettingsScreenState();
 }
 
-class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
+class _PrinterSettingsScreenState extends ConsumerState<PrinterSettingsScreen> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      di<PrinterSettingsProvider>().getAndSelectPrinter();
+      ref.read(printerSettingsControllerProvider).getAndSelectPrinter();
     });
   }
 
@@ -32,121 +32,74 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
         title: const Text('Printer Settings'),
         titleSpacing: 0,
       ),
-      body: Consumer<PrinterSettingsProvider>(
-        builder: (context, model, _) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(AppSizes.padding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _ConnectionTypeFilter(model: model),
-                const SizedBox(height: AppSizes.padding),
-                _PaperSizeSelector(model: model),
-                const SizedBox(height: AppSizes.padding),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          'Available Devices',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(width: AppSizes.padding / 1.5),
-                        if (model.isScanning)
-                          SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        AppIconButton(
-                          icon: Icons.refresh,
-                          iconSize: 18,
-                          enabled: !model.isScanning,
-                          onTap: () {
-                            di<PrinterSettingsProvider>().getAndSelectPrinter();
-                          },
-                        ),
-                        const SizedBox(width: 4),
-                        AppIconButton(
-                          icon: Icons.print_outlined,
-                          iconSize: 18,
-                          enabled: model.selectedPrinterIndex != -1,
-                          onTap: () {
-                            di<PrinterService>().testPrint();
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSizes.padding),
-                if (model.printers.isNotEmpty)
-                  Column(
-                    spacing: AppSizes.padding,
-                    children: List.generate(
-                      model.printers.length,
-                      (i) => _PrinterButton(
-                        printer: model.printers[i],
-                        isSelected: model.selectedPrinterIndex == i,
-                        subtitle: model.getDeviceSubtitle(model.printers[i]),
-                      ),
-                    ),
-                  )
-                else
-                  Padding(
-                    padding: const EdgeInsets.all(AppSizes.padding * 2),
-                    child: Center(
-                      child: Text(
-                        model.isScanning ? 'Scanning for printers...' : '(No printer detected)',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.outline,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          );
-        },
+      body: const _PrinterSettingsBody(),
+    );
+  }
+}
+
+class _PrinterSettingsBody extends StatelessWidget {
+  const _PrinterSettingsBody();
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(AppSizes.padding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          _SettingsRow(),
+          SizedBox(height: AppSizes.padding * 1.5),
+          _DevicesHeader(),
+          SizedBox(height: AppSizes.padding),
+          _PrinterList(),
+        ],
       ),
     );
   }
 }
 
-class _PaperSizeSelector extends StatelessWidget {
-  final PrinterSettingsProvider model;
-
-  const _PaperSizeSelector({required this.model});
+class _SettingsRow extends StatelessWidget {
+  const _SettingsRow();
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Paper Size',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: PaperSize.values.map((size) {
-            final isSelected = model.paperSize == size;
-            return ChoiceChip(
-              label: Text(_label(size)),
-              selected: isSelected,
-              onSelected: (_) => model.setPaperSize(size),
-            );
-          }).toList(),
-        ),
+        Expanded(child: _ConnectionTypeDropDown()),
+        SizedBox(width: AppSizes.padding),
+        Expanded(child: _PaperSizeSelector()),
       ],
+    );
+  }
+}
+
+class _PaperSizeSelector extends ConsumerWidget {
+  const _PaperSizeSelector();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final paperSize = ref.watch(printerSettingsControllerProvider.select((p) => p.paperSize));
+    final isScanning = ref.watch(printerSettingsControllerProvider.select((p) => p.isScanning));
+    final isConnecting = ref.watch(printerSettingsControllerProvider.select((p) => p.isConnecting));
+    final isDisconnecting = ref.watch(printerSettingsControllerProvider.select((p) => p.isDisconnecting));
+
+    final isBusy = isScanning || isConnecting || isDisconnecting;
+
+    return AppDropDown<PaperSize>(
+      labelText: 'Paper Size',
+      selectedValue: paperSize,
+      enabled: !isBusy,
+      dropdownItems: PaperSize.values.map((size) {
+        return DropdownMenuItem<PaperSize>(
+          value: size,
+          child: Text(_label(size)),
+        );
+      }).toList(),
+      onChanged: (value) {
+        if (value == null) return;
+        ref.read(printerSettingsControllerProvider).setPaperSize(value);
+      },
     );
   }
 
@@ -159,26 +112,40 @@ class _PaperSizeSelector extends StatelessWidget {
   }
 }
 
-class _ConnectionTypeFilter extends StatelessWidget {
-  final PrinterSettingsProvider model;
-
-  const _ConnectionTypeFilter({required this.model});
+class _ConnectionTypeDropDown extends ConsumerWidget {
+  const _ConnectionTypeDropDown();
 
   @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: PrinterConnectionType.values.map((type) {
-        final isSelected = model.selectedTypes.contains(type);
-        return FilterChip(
-          label: Text(_label(type)),
-          avatar: Icon(_icon(type), size: 18),
-          selected: isSelected,
-          showCheckmark: false,
-          onSelected: (_) => model.toggleConnectionType(type),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedTypes = ref.watch(printerSettingsControllerProvider.select((p) => p.selectedTypes));
+    final isScanning = ref.watch(printerSettingsControllerProvider.select((p) => p.isScanning));
+    final isConnecting = ref.watch(printerSettingsControllerProvider.select((p) => p.isConnecting));
+    final isDisconnecting = ref.watch(printerSettingsControllerProvider.select((p) => p.isDisconnecting));
+
+    final isBusy = isScanning || isConnecting || isDisconnecting;
+
+    return AppDropDown<PrinterConnectionType>.multi(
+      labelText: 'Connection Types',
+      hintText: 'Select connection types',
+      enabled: !isBusy,
+      selectedValues: selectedTypes,
+      dropdownItems: PrinterConnectionType.values.map((type) {
+        return DropdownMenuItem<PrinterConnectionType>(
+          value: type,
+          child: Row(
+            children: [
+              Icon(_icon(type), size: 18),
+              const SizedBox(width: 8),
+              Text(_label(type)),
+            ],
+          ),
         );
       }).toList(),
+      selectedValuesTextBuilder: _selectedLabel,
+      onChanged: (type) {
+        if (type == null) return;
+        ref.read(printerSettingsControllerProvider).toggleConnectionType(type);
+      },
     );
   }
 
@@ -199,17 +166,149 @@ class _ConnectionTypeFilter extends StatelessWidget {
       PrinterConnectionType.network => Icons.wifi,
     };
   }
+
+  String _selectedLabel(Set<PrinterConnectionType> selectedTypes) {
+    if (selectedTypes.length == PrinterConnectionType.values.length) {
+      return 'All connection types';
+    }
+
+    return selectedTypes.map(_label).join(', ');
+  }
+}
+
+class _DevicesHeader extends ConsumerWidget {
+  const _DevicesHeader();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isScanning = ref.watch(printerSettingsControllerProvider.select((p) => p.isScanning));
+    final isConnecting = ref.watch(printerSettingsControllerProvider.select((p) => p.isConnecting));
+    final isDisconnecting = ref.watch(printerSettingsControllerProvider.select((p) => p.isDisconnecting));
+    final hasSelectedPrinter = ref.watch(printerSettingsControllerProvider.select((p) => p.selectedPrinterIndex != -1));
+
+    final isBusy = isScanning || isConnecting || isDisconnecting;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            Text(
+              'Available Devices',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(width: AppSizes.padding / 1.5),
+            if (isScanning || isDisconnecting)
+              const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+          ],
+        ),
+        Row(
+          children: [
+            AppIconButton(
+              icon: Icons.refresh,
+              iconSize: 18,
+              enabled: !isBusy,
+              onTap: () {
+                ref.read(printerSettingsControllerProvider).getAndSelectPrinter();
+              },
+            ),
+            const SizedBox(width: 4),
+            AppIconButton(
+              icon: Icons.link_off,
+              iconSize: 18,
+              enabled: hasSelectedPrinter && !isBusy,
+              onTap: () {
+                ref.read(printerSettingsControllerProvider).disconnectPrinter();
+              },
+            ),
+            const SizedBox(width: 4),
+            AppIconButton(
+              icon: Icons.print_outlined,
+              iconSize: 18,
+              enabled: hasSelectedPrinter && !isConnecting,
+              onTap: () async {
+                final result = await ref.read(printerServiceProvider).testPrint();
+
+                if (result.isFailure) {
+                  AppSnackBar.showError(result.error.toString());
+                }
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _PrinterList extends ConsumerWidget {
+  const _PrinterList();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final provider = ref.read(printerSettingsControllerProvider);
+
+    final printers = ref.watch(printerSettingsControllerProvider.select((p) => p.printers));
+    final isScanning = ref.watch(printerSettingsControllerProvider.select((p) => p.isScanning));
+    final isConnecting = ref.watch(printerSettingsControllerProvider.select((p) => p.isConnecting));
+    final selectedPrinterIndex = ref.watch(printerSettingsControllerProvider.select((p) => p.selectedPrinterIndex));
+
+    if (printers.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(AppSizes.padding * 2),
+        child: Center(
+          child: Text(
+            isScanning ? 'Scanning for printers...' : '(No printer detected)',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.outline,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      spacing: AppSizes.padding,
+      children: List.generate(
+        printers.length,
+        (i) {
+          final printer = printers[i];
+          final isLoading = provider.isConnectingPrinter(printer);
+
+          return _PrinterButton(
+            printer: printer,
+            isSelected: selectedPrinterIndex == i || isLoading,
+            isLoading: isLoading,
+            enabled: !isConnecting || isLoading,
+            subtitle: provider.getDeviceSubtitle(printer),
+            onTap: () => provider.onSelectPrinter(printer),
+          );
+        },
+      ),
+    );
+  }
 }
 
 class _PrinterButton extends StatelessWidget {
   final PrinterDevice printer;
   final bool isSelected;
+  final bool isLoading;
+  final bool enabled;
   final String subtitle;
+  final VoidCallback onTap;
 
   const _PrinterButton({
     required this.printer,
     required this.isSelected,
+    required this.isLoading,
+    required this.enabled,
     required this.subtitle,
+    required this.onTap,
   });
 
   IconData _connectionIcon(PrinterConnectionType type) {
@@ -224,10 +323,12 @@ class _PrinterButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppButton(
+      enabled: enabled,
       buttonColor: isSelected
           ? Theme.of(context).colorScheme.surfaceContainer
           : Theme.of(context).colorScheme.surfaceContainerLowest,
       borderColor: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.outlineVariant,
+      onTap: onTap,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -255,7 +356,19 @@ class _PrinterButton extends StatelessWidget {
               ),
             ],
           ),
-          if (isSelected)
+          if (isLoading)
+            Padding(
+              padding: const EdgeInsets.only(right: 2.0),
+              child: SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            )
+          else if (isSelected)
             Icon(
               Icons.check_circle,
               size: 24,
@@ -263,9 +376,6 @@ class _PrinterButton extends StatelessWidget {
             ),
         ],
       ),
-      onTap: () {
-        di<PrinterSettingsProvider>().onSelectPrinter(printer);
-      },
     );
   }
 }

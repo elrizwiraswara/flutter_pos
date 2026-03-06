@@ -20,25 +20,25 @@ class AuthProvider extends ChangeNotifier {
     initialize();
   }
 
-  final isAuthenticated = ValueNotifier<bool>(false);
-  final isChecking = ValueNotifier<bool>(true);
+  bool isAuthenticated = false;
+  bool isChecking = true;
 
   UserEntity? _user;
   UserEntity? get user => _user;
 
   Future<void> initialize() async {
     try {
-      isChecking.value = true;
+      isChecking = true;
+      notifyListeners();
 
       final res = await GetCurrentUserUsecase(authRepository).call(NoParam());
 
       _user = res.data;
-      notifyListeners();
-
       cl('isAuthenticated: ${_user != null}');
     } finally {
-      isChecking.value = false;
-      isAuthenticated.value = user != null;
+      isChecking = false;
+      isAuthenticated = _user != null;
+      notifyListeners();
     }
   }
 
@@ -50,7 +50,7 @@ class AuthProvider extends ChangeNotifier {
     if (createRes.isFailure) return Result.failure(error: createRes.error!);
 
     _user = res.data;
-    isAuthenticated.value = true;
+    isAuthenticated = true;
     notifyListeners();
 
     return createRes;
@@ -61,7 +61,7 @@ class AuthProvider extends ChangeNotifier {
     if (res.isFailure) return Result.failure(error: res.error!);
 
     _user = null;
-    isAuthenticated.value = false;
+    isAuthenticated = false;
     notifyListeners();
 
     return Result.success(data: null);

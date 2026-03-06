@@ -2,11 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app/app.dart';
-import 'app/di/dependency_injection.dart';
+import 'app/di/app_providers.dart';
 import 'core/database/app_database.dart';
 import 'firebase_options.dart';
 
@@ -32,9 +33,6 @@ void main() async {
   // Initialize shared preferences
   final sharedPreferences = await SharedPreferences.getInstance();
 
-  // Setup dependency injection
-  await setupDependencyInjection(sharedPreferences: sharedPreferences);
-
   // Set/lock screen orientation
   await SystemChrome.setPreferredOrientations([]);
 
@@ -46,5 +44,10 @@ void main() async {
     ),
   );
 
-  runApp(const App());
+  runApp(
+    ProviderScope(
+      overrides: [sharedPreferencesProvider.overrideWithValue(sharedPreferences)],
+      child: const App(),
+    ),
+  );
 }
