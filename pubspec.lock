@@ -1501,10 +1501,10 @@ packages:
     dependency: "direct main"
     description:
       name: unified_esc_pos_printer
-      sha256: "115f1a96263bac6efb157617ed7e20bd15b6a418e3bc4312034437b3ae01e911"
+      sha256: "6c88c64cf03253cd9f7e5178a222047be9f2501cfe20ddde2790a00f4bde2ba4"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.0"
+    version: "3.0.0"
   url_launcher:
     dependency: "direct main"
     description:
