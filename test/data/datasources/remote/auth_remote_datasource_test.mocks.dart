@@ -52,49 +52,55 @@ class _FakeConfirmationResult_3 extends _i1.SmartFake
     : super(parent, parentInvocation);
 }
 
-class _FakeGoogleSignInAuthorizationClient_4 extends _i1.SmartFake
+class _FakePasswordValidationStatus_4 extends _i1.SmartFake
+    implements _i3.PasswordValidationStatus {
+  _FakePasswordValidationStatus_4(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeGoogleSignInAuthorizationClient_5 extends _i1.SmartFake
     implements _i5.GoogleSignInAuthorizationClient {
-  _FakeGoogleSignInAuthorizationClient_4(
+  _FakeGoogleSignInAuthorizationClient_5(
     Object parent,
     Invocation parentInvocation,
   ) : super(parent, parentInvocation);
 }
 
-class _FakeGoogleSignInAccount_5 extends _i1.SmartFake
+class _FakeGoogleSignInAccount_6 extends _i1.SmartFake
     implements _i5.GoogleSignInAccount {
-  _FakeGoogleSignInAccount_5(Object parent, Invocation parentInvocation)
+  _FakeGoogleSignInAccount_6(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeUserMetadata_6 extends _i1.SmartFake implements _i3.UserMetadata {
-  _FakeUserMetadata_6(Object parent, Invocation parentInvocation)
+class _FakeUserMetadata_7 extends _i1.SmartFake implements _i3.UserMetadata {
+  _FakeUserMetadata_7(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeMultiFactor_7 extends _i1.SmartFake implements _i4.MultiFactor {
-  _FakeMultiFactor_7(Object parent, Invocation parentInvocation)
+class _FakeMultiFactor_8 extends _i1.SmartFake implements _i4.MultiFactor {
+  _FakeMultiFactor_8(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeIdTokenResult_8 extends _i1.SmartFake implements _i3.IdTokenResult {
-  _FakeIdTokenResult_8(Object parent, Invocation parentInvocation)
+class _FakeIdTokenResult_9 extends _i1.SmartFake implements _i3.IdTokenResult {
+  _FakeIdTokenResult_9(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeUser_9 extends _i1.SmartFake implements _i4.User {
-  _FakeUser_9(Object parent, Invocation parentInvocation)
+class _FakeUser_10 extends _i1.SmartFake implements _i4.User {
+  _FakeUser_10(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeGoogleSignInAuthentication_10 extends _i1.SmartFake
+class _FakeGoogleSignInAuthentication_11 extends _i1.SmartFake
     implements _i6.GoogleSignInAuthentication {
-  _FakeGoogleSignInAuthentication_10(Object parent, Invocation parentInvocation)
+  _FakeGoogleSignInAuthentication_11(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeGoogleSignInClientAuthorization_11 extends _i1.SmartFake
+class _FakeGoogleSignInClientAuthorization_12 extends _i1.SmartFake
     implements _i6.GoogleSignInClientAuthorization {
-  _FakeGoogleSignInClientAuthorization_11(
+  _FakeGoogleSignInClientAuthorization_12(
     Object parent,
     Invocation parentInvocation,
   ) : super(parent, parentInvocation);
@@ -217,14 +223,6 @@ class MockFirebaseAuth extends _i1.Mock implements _i4.FirebaseAuth {
             ),
           )
           as _i7.Future<_i4.UserCredential>);
-
-  @override
-  _i7.Future<List<String>> fetchSignInMethodsForEmail(String? email) =>
-      (super.noSuchMethod(
-            Invocation.method(#fetchSignInMethodsForEmail, [email]),
-            returnValue: _i7.Future<List<String>>.value(<String>[]),
-          )
-          as _i7.Future<List<String>>);
 
   @override
   _i7.Future<_i4.UserCredential> getRedirectResult() =>
@@ -483,15 +481,6 @@ class MockFirebaseAuth extends _i1.Mock implements _i4.FirebaseAuth {
           as _i7.Future<void>);
 
   @override
-  _i7.Future<void> signOut() =>
-      (super.noSuchMethod(
-            Invocation.method(#signOut, []),
-            returnValue: _i7.Future<void>.value(),
-            returnValueForMissingStub: _i7.Future<void>.value(),
-          )
-          as _i7.Future<void>);
-
-  @override
   _i7.Future<String> verifyPasswordResetCode(String? code) =>
       (super.noSuchMethod(
             Invocation.method(#verifyPasswordResetCode, [code]),
@@ -549,6 +538,15 @@ class MockFirebaseAuth extends _i1.Mock implements _i4.FirebaseAuth {
           as _i7.Future<void>);
 
   @override
+  _i7.Future<void> signOut() =>
+      (super.noSuchMethod(
+            Invocation.method(#signOut, []),
+            returnValue: _i7.Future<void>.value(),
+            returnValueForMissingStub: _i7.Future<void>.value(),
+          )
+          as _i7.Future<void>);
+
+  @override
   _i7.Future<void> initializeRecaptchaConfig() =>
       (super.noSuchMethod(
             Invocation.method(#initializeRecaptchaConfig, []),
@@ -556,6 +554,22 @@ class MockFirebaseAuth extends _i1.Mock implements _i4.FirebaseAuth {
             returnValueForMissingStub: _i7.Future<void>.value(),
           )
           as _i7.Future<void>);
+
+  @override
+  _i7.Future<_i3.PasswordValidationStatus> validatePassword(
+    _i4.FirebaseAuth? auth,
+    String? password,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#validatePassword, [auth, password]),
+            returnValue: _i7.Future<_i3.PasswordValidationStatus>.value(
+              _FakePasswordValidationStatus_4(
+                this,
+                Invocation.method(#validatePassword, [auth, password]),
+              ),
+            ),
+          )
+          as _i7.Future<_i3.PasswordValidationStatus>);
 }
 
 /// A class which mocks [GoogleSignIn].
@@ -579,7 +593,7 @@ class MockGoogleSignIn extends _i1.Mock implements _i5.GoogleSignIn {
   _i5.GoogleSignInAuthorizationClient get authorizationClient =>
       (super.noSuchMethod(
             Invocation.getter(#authorizationClient),
-            returnValue: _FakeGoogleSignInAuthorizationClient_4(
+            returnValue: _FakeGoogleSignInAuthorizationClient_5(
               this,
               Invocation.getter(#authorizationClient),
             ),
@@ -639,7 +653,7 @@ class MockGoogleSignIn extends _i1.Mock implements _i5.GoogleSignIn {
       (super.noSuchMethod(
             Invocation.method(#authenticate, [], {#scopeHint: scopeHint}),
             returnValue: _i7.Future<_i5.GoogleSignInAccount>.value(
-              _FakeGoogleSignInAccount_5(
+              _FakeGoogleSignInAccount_6(
                 this,
                 Invocation.method(#authenticate, [], {#scopeHint: scopeHint}),
               ),
@@ -697,7 +711,7 @@ class MockUser extends _i1.Mock implements _i4.User {
   _i3.UserMetadata get metadata =>
       (super.noSuchMethod(
             Invocation.getter(#metadata),
-            returnValue: _FakeUserMetadata_6(
+            returnValue: _FakeUserMetadata_7(
               this,
               Invocation.getter(#metadata),
             ),
@@ -724,7 +738,7 @@ class MockUser extends _i1.Mock implements _i4.User {
   _i4.MultiFactor get multiFactor =>
       (super.noSuchMethod(
             Invocation.getter(#multiFactor),
-            returnValue: _FakeMultiFactor_7(
+            returnValue: _FakeMultiFactor_8(
               this,
               Invocation.getter(#multiFactor),
             ),
@@ -755,7 +769,7 @@ class MockUser extends _i1.Mock implements _i4.User {
       (super.noSuchMethod(
             Invocation.method(#getIdTokenResult, [forceRefresh]),
             returnValue: _i7.Future<_i3.IdTokenResult>.value(
-              _FakeIdTokenResult_8(
+              _FakeIdTokenResult_9(
                 this,
                 Invocation.method(#getIdTokenResult, [forceRefresh]),
               ),
@@ -911,19 +925,10 @@ class MockUser extends _i1.Mock implements _i4.User {
       (super.noSuchMethod(
             Invocation.method(#unlink, [providerId]),
             returnValue: _i7.Future<_i4.User>.value(
-              _FakeUser_9(this, Invocation.method(#unlink, [providerId])),
+              _FakeUser_10(this, Invocation.method(#unlink, [providerId])),
             ),
           )
           as _i7.Future<_i4.User>);
-
-  @override
-  _i7.Future<void> updateEmail(String? newEmail) =>
-      (super.noSuchMethod(
-            Invocation.method(#updateEmail, [newEmail]),
-            returnValue: _i7.Future<void>.value(),
-            returnValueForMissingStub: _i7.Future<void>.value(),
-          )
-          as _i7.Future<void>);
 
   @override
   _i7.Future<void> updatePassword(String? newPassword) =>
@@ -1024,7 +1029,7 @@ class MockGoogleSignInAccount extends _i1.Mock
   _i6.GoogleSignInAuthentication get authentication =>
       (super.noSuchMethod(
             Invocation.getter(#authentication),
-            returnValue: _FakeGoogleSignInAuthentication_10(
+            returnValue: _FakeGoogleSignInAuthentication_11(
               this,
               Invocation.getter(#authentication),
             ),
@@ -1035,7 +1040,7 @@ class MockGoogleSignInAccount extends _i1.Mock
   _i5.GoogleSignInAuthorizationClient get authorizationClient =>
       (super.noSuchMethod(
             Invocation.getter(#authorizationClient),
-            returnValue: _FakeGoogleSignInAuthorizationClient_4(
+            returnValue: _FakeGoogleSignInAuthorizationClient_5(
               this,
               Invocation.getter(#authorizationClient),
             ),
@@ -1081,7 +1086,7 @@ class MockGoogleSignInAuthorizationClient extends _i1.Mock
       (super.noSuchMethod(
             Invocation.method(#authorizeScopes, [scopes]),
             returnValue: _i7.Future<_i6.GoogleSignInClientAuthorization>.value(
-              _FakeGoogleSignInClientAuthorization_11(
+              _FakeGoogleSignInClientAuthorization_12(
                 this,
                 Invocation.method(#authorizeScopes, [scopes]),
               ),

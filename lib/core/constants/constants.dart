@@ -7,6 +7,7 @@ class Constants {
   static const String selectedDeviceIdKey = 'selected_device_id';
   static const String selectedConnectionTypeKey = 'selected_connection_type';
   static const String selectedPaperSizeKey = 'selected_paper_size';
+  static const String selectedBrightnessKey = 'selected_brightness';
 
   static const int minSyncIntervalToleranceForCriticalInMinutes = 5;
   static const int minSyncIntervalToleranceForLessCriticalInMinutes = 100;

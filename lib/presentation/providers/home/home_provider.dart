@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-import '../../../app/di/dependency_injection.dart';
 import '../../../core/common/result.dart';
 import '../../../core/services/printer/printer_service.dart';
 import '../../../domain/entities/ordered_product_entity.dart';
@@ -16,11 +15,13 @@ class HomeProvider extends ChangeNotifier {
   final AuthProvider authProvider;
   final TransactionRepository transactionRepository;
   final PrinterService printerService;
+  final ProductsProvider productsProvider;
 
   HomeProvider({
     required this.authProvider,
     required this.transactionRepository,
     required this.printerService,
+    required this.productsProvider,
   });
 
   final panelController = PanelController();
@@ -33,19 +34,10 @@ class HomeProvider extends ChangeNotifier {
   String? customerName;
   String? description;
 
-  void resetStates() {
-    isPanelExpanded = false;
-    orderedProducts = [];
-    receivedAmount = 0;
-    selectedPaymentMethod = 'cash';
-    customerName = null;
-    description = null;
-  }
-
   Future<Result<int>> createTransaction() async {
     try {
-      var userId = authProvider.user?.id;
-      if (userId == null) throw 'Unathenticated!';
+      var user = authProvider.user;
+      if (user?.id == null) throw 'Unathenticated!';
 
       var transaction = TransactionEntity(
         id: DateTime.now().millisecondsSinceEpoch,
@@ -53,7 +45,8 @@ class HomeProvider extends ChangeNotifier {
         customerName: customerName,
         description: description,
         orderedProducts: orderedProducts,
-        createdById: userId,
+        createdById: user!.id,
+        createdBy: user,
         receivedAmount: receivedAmount,
         returnAmount: receivedAmount - getTotalAmount(),
         totalOrderedProduct: orderedProducts.length,
@@ -67,11 +60,10 @@ class HomeProvider extends ChangeNotifier {
         printerService.printTransaction(transaction);
       }
 
-      resetStates();
       panelController.close();
 
       // Refresh products
-      di<ProductsProvider>().getAllProducts();
+      productsProvider.getAllProducts();
 
       return res;
     } catch (e) {

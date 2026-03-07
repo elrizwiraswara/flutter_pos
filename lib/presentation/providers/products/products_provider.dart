@@ -19,6 +19,11 @@ class ProductsProvider extends ChangeNotifier {
 
   bool isLoadingMore = false;
 
+  void resetProducts() {
+    allProducts = null;
+    notifyListeners();
+  }
+
   Future<void> getAllProducts({int? offset, String? contains}) async {
     var userId = authProvider.user?.id;
     if (userId == null) throw 'Unathenticated!';

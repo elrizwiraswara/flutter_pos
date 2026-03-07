@@ -6,24 +6,25 @@
 import 'dart:async' as _i11;
 import 'dart:ui' as _i14;
 
-import 'package:flutter/foundation.dart' as _i4;
 import 'package:flutter_pos/core/common/result.dart' as _i12;
 import 'package:flutter_pos/core/services/connectivity/ping_service.dart'
-    as _i5;
-import 'package:flutter_pos/core/services/info/device_info_service.dart' as _i6;
+    as _i4;
+import 'package:flutter_pos/core/services/info/device_info_service.dart' as _i5;
 import 'package:flutter_pos/domain/entities/queued_action_entity.dart' as _i17;
 import 'package:flutter_pos/domain/entities/user_entity.dart' as _i16;
 import 'package:flutter_pos/domain/repositories/auth_repository.dart' as _i3;
-import 'package:flutter_pos/domain/repositories/product_repository.dart' as _i8;
+import 'package:flutter_pos/domain/repositories/product_repository.dart' as _i7;
 import 'package:flutter_pos/domain/repositories/queued_action_repository.dart'
-    as _i10;
-import 'package:flutter_pos/domain/repositories/transaction_repository.dart'
     as _i9;
+import 'package:flutter_pos/domain/repositories/transaction_repository.dart'
+    as _i8;
 import 'package:flutter_pos/domain/repositories/user_repository.dart' as _i2;
 import 'package:flutter_pos/presentation/providers/auth/auth_provider.dart'
-    as _i7;
+    as _i6;
 import 'package:flutter_pos/presentation/providers/main/main_provider.dart'
     as _i15;
+import 'package:flutter_pos/presentation/providers/products/products_provider.dart'
+    as _i10;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i13;
 
@@ -53,50 +54,50 @@ class _FakeAuthRepository_1 extends _i1.SmartFake
     : super(parent, parentInvocation);
 }
 
-class _FakeValueNotifier_2<T> extends _i1.SmartFake
-    implements _i4.ValueNotifier<T> {
-  _FakeValueNotifier_2(Object parent, Invocation parentInvocation)
+class _FakePingService_2 extends _i1.SmartFake implements _i4.PingService {
+  _FakePingService_2(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakePingService_3 extends _i1.SmartFake implements _i5.PingService {
-  _FakePingService_3(Object parent, Invocation parentInvocation)
+class _FakeDeviceInfoService_3 extends _i1.SmartFake
+    implements _i5.DeviceInfoService {
+  _FakeDeviceInfoService_3(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeDeviceInfoService_4 extends _i1.SmartFake
-    implements _i6.DeviceInfoService {
-  _FakeDeviceInfoService_4(Object parent, Invocation parentInvocation)
+class _FakeAuthProvider_4 extends _i1.SmartFake implements _i6.AuthProvider {
+  _FakeAuthProvider_4(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeAuthProvider_5 extends _i1.SmartFake implements _i7.AuthProvider {
-  _FakeAuthProvider_5(Object parent, Invocation parentInvocation)
+class _FakeProductRepository_5 extends _i1.SmartFake
+    implements _i7.ProductRepository {
+  _FakeProductRepository_5(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeProductRepository_6 extends _i1.SmartFake
-    implements _i8.ProductRepository {
-  _FakeProductRepository_6(Object parent, Invocation parentInvocation)
+class _FakeTransactionRepository_6 extends _i1.SmartFake
+    implements _i8.TransactionRepository {
+  _FakeTransactionRepository_6(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeTransactionRepository_7 extends _i1.SmartFake
-    implements _i9.TransactionRepository {
-  _FakeTransactionRepository_7(Object parent, Invocation parentInvocation)
+class _FakeQueuedActionRepository_7 extends _i1.SmartFake
+    implements _i9.QueuedActionRepository {
+  _FakeQueuedActionRepository_7(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeQueuedActionRepository_8 extends _i1.SmartFake
-    implements _i10.QueuedActionRepository {
-  _FakeQueuedActionRepository_8(Object parent, Invocation parentInvocation)
+class _FakeProductsProvider_8 extends _i1.SmartFake
+    implements _i10.ProductsProvider {
+  _FakeProductsProvider_8(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
 /// A class which mocks [AuthProvider].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockAuthProvider extends _i1.Mock implements _i7.AuthProvider {
+class MockAuthProvider extends _i1.Mock implements _i6.AuthProvider {
   MockAuthProvider() {
     _i1.throwOnMissingStub(this);
   }
@@ -124,26 +125,29 @@ class MockAuthProvider extends _i1.Mock implements _i7.AuthProvider {
           as _i3.AuthRepository);
 
   @override
-  _i4.ValueNotifier<bool> get isAuthenticated =>
+  bool get isAuthenticated =>
       (super.noSuchMethod(
             Invocation.getter(#isAuthenticated),
-            returnValue: _FakeValueNotifier_2<bool>(
-              this,
-              Invocation.getter(#isAuthenticated),
-            ),
+            returnValue: false,
           )
-          as _i4.ValueNotifier<bool>);
+          as bool);
 
   @override
-  _i4.ValueNotifier<bool> get isChecking =>
-      (super.noSuchMethod(
-            Invocation.getter(#isChecking),
-            returnValue: _FakeValueNotifier_2<bool>(
-              this,
-              Invocation.getter(#isChecking),
-            ),
-          )
-          as _i4.ValueNotifier<bool>);
+  bool get isChecking =>
+      (super.noSuchMethod(Invocation.getter(#isChecking), returnValue: false)
+          as bool);
+
+  @override
+  set isAuthenticated(bool? _isAuthenticated) => super.noSuchMethod(
+    Invocation.setter(#isAuthenticated, _isAuthenticated),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  set isChecking(bool? _isChecking) => super.noSuchMethod(
+    Invocation.setter(#isChecking, _isChecking),
+    returnValueForMissingStub: null,
+  );
 
   @override
   bool get hasListeners =>
@@ -219,37 +223,37 @@ class MockMainProvider extends _i1.Mock implements _i15.MainProvider {
   }
 
   @override
-  _i5.PingService get pingService =>
+  _i4.PingService get pingService =>
       (super.noSuchMethod(
             Invocation.getter(#pingService),
-            returnValue: _FakePingService_3(
+            returnValue: _FakePingService_2(
               this,
               Invocation.getter(#pingService),
             ),
           )
-          as _i5.PingService);
+          as _i4.PingService);
 
   @override
-  _i6.DeviceInfoService get deviceInforService =>
+  _i5.DeviceInfoService get deviceInforService =>
       (super.noSuchMethod(
             Invocation.getter(#deviceInforService),
-            returnValue: _FakeDeviceInfoService_4(
+            returnValue: _FakeDeviceInfoService_3(
               this,
               Invocation.getter(#deviceInforService),
             ),
           )
-          as _i6.DeviceInfoService);
+          as _i5.DeviceInfoService);
 
   @override
-  _i7.AuthProvider get authProvider =>
+  _i6.AuthProvider get authProvider =>
       (super.noSuchMethod(
             Invocation.getter(#authProvider),
-            returnValue: _FakeAuthProvider_5(
+            returnValue: _FakeAuthProvider_4(
               this,
               Invocation.getter(#authProvider),
             ),
           )
-          as _i7.AuthProvider);
+          as _i6.AuthProvider);
 
   @override
   _i2.UserRepository get userRepository =>
@@ -263,37 +267,48 @@ class MockMainProvider extends _i1.Mock implements _i15.MainProvider {
           as _i2.UserRepository);
 
   @override
-  _i8.ProductRepository get productRepository =>
+  _i7.ProductRepository get productRepository =>
       (super.noSuchMethod(
             Invocation.getter(#productRepository),
-            returnValue: _FakeProductRepository_6(
+            returnValue: _FakeProductRepository_5(
               this,
               Invocation.getter(#productRepository),
             ),
           )
-          as _i8.ProductRepository);
+          as _i7.ProductRepository);
 
   @override
-  _i9.TransactionRepository get transactionRepository =>
+  _i8.TransactionRepository get transactionRepository =>
       (super.noSuchMethod(
             Invocation.getter(#transactionRepository),
-            returnValue: _FakeTransactionRepository_7(
+            returnValue: _FakeTransactionRepository_6(
               this,
               Invocation.getter(#transactionRepository),
             ),
           )
-          as _i9.TransactionRepository);
+          as _i8.TransactionRepository);
 
   @override
-  _i10.QueuedActionRepository get queuedActionRepository =>
+  _i9.QueuedActionRepository get queuedActionRepository =>
       (super.noSuchMethod(
             Invocation.getter(#queuedActionRepository),
-            returnValue: _FakeQueuedActionRepository_8(
+            returnValue: _FakeQueuedActionRepository_7(
               this,
               Invocation.getter(#queuedActionRepository),
             ),
           )
-          as _i10.QueuedActionRepository);
+          as _i9.QueuedActionRepository);
+
+  @override
+  _i10.ProductsProvider get productsProvider =>
+      (super.noSuchMethod(
+            Invocation.getter(#productsProvider),
+            returnValue: _FakeProductsProvider_8(
+              this,
+              Invocation.getter(#productsProvider),
+            ),
+          )
+          as _i10.ProductsProvider);
 
   @override
   bool get isLoaded =>
@@ -355,12 +370,6 @@ class MockMainProvider extends _i1.Mock implements _i15.MainProvider {
   bool get hasListeners =>
       (super.noSuchMethod(Invocation.getter(#hasListeners), returnValue: false)
           as bool);
-
-  @override
-  void resetStates() => super.noSuchMethod(
-    Invocation.method(#resetStates, []),
-    returnValueForMissingStub: null,
-  );
 
   @override
   _i11.Future<void> initMainProvider() =>
