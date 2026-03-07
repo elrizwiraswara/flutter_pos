@@ -32,8 +32,8 @@ android {
         applicationId = "com.elriztechnology.flutter_pos"
         minSdk = 24
         targetSdk = 36
-        versionCode = 9
-        versionName = "2.0.6"
+        versionCode = 10
+        versionName = "3.0.0"
         multiDexEnabled = true
     }
 
