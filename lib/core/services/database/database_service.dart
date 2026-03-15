@@ -5,15 +5,15 @@ import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-import '../utilities/console_logger.dart';
+import '../../utilities/console_logger.dart';
 import 'database_config.dart';
 
-class AppDatabase {
-  AppDatabase._internal();
+class DatabaseService {
+  DatabaseService._internal();
 
-  static final AppDatabase _instance = AppDatabase._internal();
+  static final DatabaseService _instance = DatabaseService._internal();
 
-  static AppDatabase get instance => _instance;
+  static DatabaseService get instance => _instance;
 
   late Database database;
 

@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../app/di/app_providers.dart';
 import '../../../core/themes/app_sizes.dart';
+import '../../providers/auth/auth_notifier.dart';
+import '../../providers/main/main_notifier.dart';
+import '../../providers/theme/theme_notifier.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
 import '../../widgets/app_snack_bar.dart';
@@ -38,7 +40,7 @@ class _UserInfo extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(mainControllerProvider.select((p) => p.user));
+    final user = ref.watch(mainNotifierProvider.select((p) => p.user));
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSizes.padding),
@@ -246,14 +248,14 @@ class _ThemeDialogBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final provider = ref.watch(themeControllerProvider);
+    final themeState = ref.watch(themeNotifierProvider);
 
     return Row(
       children: [
         Switch(
-          value: !provider.isLight(),
+          value: !themeState.isLight,
           onChanged: (val) {
-            provider.changeBrightness(!val);
+            ref.read(themeNotifierProvider.notifier).changeBrightness(!val);
           },
         ),
         const SizedBox(width: AppSizes.padding),
@@ -311,7 +313,7 @@ class _SignOutButton extends ConsumerWidget {
             onTapRightButton: (context) async {
               context.pop();
 
-              final isSyncronizing = ref.read(mainControllerProvider).isSyncronizing;
+              final isSyncronizing = ref.read(mainNotifierProvider).isSyncronizing;
 
               if (isSyncronizing) {
                 AppSnackBar.showError('Cannot sign out while synchronizing data is in progress. Please wait a moment.');
@@ -319,7 +321,7 @@ class _SignOutButton extends ConsumerWidget {
               }
 
               final res = await AppDialog.showProgress(() async {
-                return ref.read(authControllerProvider).signOut();
+                return ref.read(authNotifierProvider.notifier).signOut();
               });
 
               if (res.isSuccess) {

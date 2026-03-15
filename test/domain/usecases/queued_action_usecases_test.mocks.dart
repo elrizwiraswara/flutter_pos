@@ -7,8 +7,7 @@ import 'dart:async' as _i3;
 
 import 'package:flutter_pos/core/common/result.dart' as _i4;
 import 'package:flutter_pos/domain/entities/queued_action_entity.dart' as _i5;
-import 'package:flutter_pos/domain/repositories/queued_action_repository.dart'
-    as _i2;
+import 'package:flutter_pos/domain/repositories/queued_action_repository.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i6;
 
@@ -29,8 +28,7 @@ import 'package:mockito/src/dummies.dart' as _i6;
 /// A class which mocks [QueuedActionRepository].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockQueuedActionRepository extends _i1.Mock
-    implements _i2.QueuedActionRepository {
+class MockQueuedActionRepository extends _i1.Mock implements _i2.QueuedActionRepository {
   MockQueuedActionRepository() {
     _i1.throwOnMissingStub(this);
   }
@@ -39,13 +37,12 @@ class MockQueuedActionRepository extends _i1.Mock
   _i3.Future<_i4.Result<List<_i5.QueuedActionEntity>>> getAllQueuedAction() =>
       (super.noSuchMethod(
             Invocation.method(#getAllQueuedAction, []),
-            returnValue:
-                _i3.Future<_i4.Result<List<_i5.QueuedActionEntity>>>.value(
-                  _i6.dummyValue<_i4.Result<List<_i5.QueuedActionEntity>>>(
-                    this,
-                    Invocation.method(#getAllQueuedAction, []),
-                  ),
-                ),
+            returnValue: _i3.Future<_i4.Result<List<_i5.QueuedActionEntity>>>.value(
+              _i6.dummyValue<_i4.Result<List<_i5.QueuedActionEntity>>>(
+                this,
+                Invocation.method(#getAllQueuedAction, []),
+              ),
+            ),
           )
           as _i3.Future<_i4.Result<List<_i5.QueuedActionEntity>>>);
 

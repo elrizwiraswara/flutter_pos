@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../app/di/app_providers.dart';
 import '../../../core/themes/app_sizes.dart';
 import '../../../core/utilities/currency_formatter.dart';
 import '../../../core/utilities/date_time_formatter.dart';
+import '../../providers/products/product_detail_notifier.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_empty_state.dart';
 import '../../widgets/app_progress_indicator.dart';
@@ -28,7 +28,7 @@ class ProductDetailScreen extends ConsumerWidget {
         actions: [_EditButton(id: id)],
       ),
       body: FutureBuilder(
-        future: ref.read(productDetailControllerProvider).getProductDetail(id),
+        future: ref.read(productDetailNotifierProvider.notifier).getProductDetail(id),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const AppProgressIndicator();

@@ -63,11 +63,11 @@ flutter_pos/
 │   │   ├── assets/                   # Asset management
 │   │   ├── common/                   # Common utilities (Result wrapper)
 │   │   ├── constants/                # App constants
-│   │   ├── database/                 # Local database configuration (sqflite)
 │   │   ├── extensions/               # Dart extensions
 │   │   ├── locale/                   # Localization
 │   │   ├── services/                 # Core services
 │   │   │   ├── connectivity/         # Network connectivity checking
+│   │   │   ├── database/             # Local database service (sqflite)
 │   │   │   ├── info/                 # Device info service
 │   │   │   ├── logger/               # Error logging service
 │   │   │   └── printer/              # Thermal printer service

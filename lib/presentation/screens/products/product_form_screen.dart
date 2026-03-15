@@ -8,8 +8,8 @@ import 'package:go_router/go_router.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../../app/di/app_providers.dart';
 import '../../../core/themes/app_sizes.dart';
+import '../../providers/products/product_form_notifier.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
 import '../../widgets/app_icon_button.dart';
@@ -39,13 +39,13 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final productFormProvider = ref.read(productFormControllerProvider);
-      await productFormProvider.initProductForm(widget.id);
+      await ref.read(productFormNotifierProvider.notifier).initProductForm(widget.id);
 
-      nameController.text = productFormProvider.name ?? '';
-      priceController.text = productFormProvider.price?.toString() ?? '';
-      stockController.text = productFormProvider.stock?.toString() ?? '';
-      descController.text = productFormProvider.description ?? '';
+      final state = ref.read(productFormNotifierProvider);
+      nameController.text = state.name ?? '';
+      priceController.text = state.price?.toString() ?? '';
+      stockController.text = state.stock?.toString() ?? '';
+      descController.text = state.description ?? '';
     });
   }
 
@@ -77,13 +77,13 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
 
     if (croppedFile != null) {
       var file = File(croppedFile.path);
-      ref.read(productFormControllerProvider).onChangedImage(file);
+      ref.read(productFormNotifierProvider.notifier).onChangedImage(file);
     }
   }
 
   void createProduct() async {
     var res = await AppDialog.showProgress(() {
-      return ref.read(productFormControllerProvider).createProduct();
+      return ref.read(productFormNotifierProvider.notifier).createProduct();
     });
 
     if (res.isSuccess) {
@@ -97,7 +97,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
 
   void updatedProduct() async {
     var res = await AppDialog.showProgress(() {
-      return ref.read(productFormControllerProvider).updatedProduct(widget.id!);
+      return ref.read(productFormNotifierProvider.notifier).updatedProduct(widget.id!);
     });
 
     if (res.isSuccess) {
@@ -111,7 +111,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
 
   void deleteProduct() async {
     var res = await AppDialog.showProgress(() {
-      return ref.read(productFormControllerProvider).deleteProduct(widget.id!);
+      return ref.read(productFormNotifierProvider.notifier).deleteProduct(widget.id!);
     });
 
     if (res.isSuccess) {
@@ -125,9 +125,9 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = ref.read(productFormControllerProvider);
+    final notifier = ref.read(productFormNotifierProvider.notifier);
 
-    final isLoaded = ref.watch(productFormControllerProvider.select((provider) => provider.isLoaded));
+    final isLoaded = ref.watch(productFormNotifierProvider.select((s) => s.isLoaded));
 
     return Scaffold(
       appBar: AppBar(
@@ -144,19 +144,19 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                   _ImageSection(onTapImage: onTapImage),
                   _NameField(
                     controller: nameController,
-                    onChanged: provider.onChangedName,
+                    onChanged: notifier.onChangedName,
                   ),
                   _PriceField(
                     controller: priceController,
-                    onChanged: provider.onChangedPrice,
+                    onChanged: notifier.onChangedPrice,
                   ),
                   _StockField(
                     controller: stockController,
-                    onChanged: provider.onChangedStock,
+                    onChanged: notifier.onChangedStock,
                   ),
                   _DescriptionField(
                     controller: descController,
-                    onChanged: provider.onChangedDesc,
+                    onChanged: notifier.onChangedDesc,
                   ),
                   _CreateOrUpdateButton(
                     id: widget.id,
@@ -181,8 +181,8 @@ class _ImageSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final imageFile = ref.watch(productFormControllerProvider.select((p) => p.imageFile));
-    final imageUrl = ref.watch(productFormControllerProvider.select((p) => p.imageUrl));
+    final imageFile = ref.watch(productFormNotifierProvider.select((p) => p.imageFile));
+    final imageUrl = ref.watch(productFormNotifierProvider.select((p) => p.imageUrl));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -343,7 +343,11 @@ class _CreateOrUpdateButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isFormValid = ref.watch(productFormControllerProvider.select((p) => p.isFormValid()));
+    final isFormValid = ref.watch(
+      productFormNotifierProvider.select((s) {
+        return (s.name?.isNotEmpty ?? false) && (s.price ?? 0) > 0 && (s.stock ?? 0) > 0;
+      }),
+    );
 
     return Padding(
       padding: const EdgeInsets.only(top: AppSizes.padding * 1.5),

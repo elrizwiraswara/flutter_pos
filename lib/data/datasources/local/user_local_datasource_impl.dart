@@ -1,20 +1,20 @@
 import 'package:sqflite/sqflite.dart';
 
 import '../../../core/common/result.dart';
-import '../../../core/database/app_database.dart';
-import '../../../core/database/database_config.dart';
+import '../../../core/services/database/database_config.dart';
+import '../../../core/services/database/database_service.dart';
 import '../../models/user_model.dart';
 import '../interfaces/user_datasource.dart';
 
 class UserLocalDatasourceImpl extends UserDatasource {
-  final AppDatabase _appDatabase;
+  final DatabaseService _databaseService;
 
-  UserLocalDatasourceImpl(this._appDatabase);
+  UserLocalDatasourceImpl(this._databaseService);
 
   @override
   Future<Result<String>> createUser(UserModel user) async {
     try {
-      await _appDatabase.database.insert(
+      await _databaseService.database.insert(
         DatabaseConfig.userTableName,
         user.toJson(),
         conflictAlgorithm: ConflictAlgorithm.replace,
@@ -30,7 +30,7 @@ class UserLocalDatasourceImpl extends UserDatasource {
   @override
   Future<Result<void>> updateUser(UserModel user) async {
     try {
-      await _appDatabase.database.update(
+      await _databaseService.database.update(
         DatabaseConfig.userTableName,
         user.toJson(),
         where: 'id = ?',
@@ -47,7 +47,7 @@ class UserLocalDatasourceImpl extends UserDatasource {
   @override
   Future<Result<void>> deleteUser(String id) async {
     try {
-      await _appDatabase.database.delete(
+      await _databaseService.database.delete(
         DatabaseConfig.userTableName,
         where: 'id = ?',
         whereArgs: [id],
@@ -62,7 +62,7 @@ class UserLocalDatasourceImpl extends UserDatasource {
   @override
   Future<Result<UserModel?>> getUser(String id) async {
     try {
-      var res = await _appDatabase.database.query(
+      var res = await _databaseService.database.query(
         DatabaseConfig.userTableName,
         where: 'id = ?',
         whereArgs: [id],

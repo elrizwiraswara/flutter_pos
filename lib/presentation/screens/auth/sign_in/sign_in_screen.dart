@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/di/app_providers.dart';
 import '../../../../core/assets/assets.dart';
 import '../../../../core/themes/app_sizes.dart';
+import '../../../providers/auth/auth_notifier.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_dialog.dart';
 
@@ -71,7 +72,7 @@ class _SignInButton extends ConsumerWidget {
       text: 'Sign In With Google',
       onTap: () async {
         var res = await AppDialog.showProgress(() async {
-          return ref.read(authControllerProvider).signIn();
+          return ref.read(authNotifierProvider.notifier).signIn();
         });
 
         if (res.isSuccess) {

@@ -26,15 +26,13 @@ import 'package:mockito/mockito.dart' as _i1;
 // ignore_for_file: subtype_of_sealed_class
 
 class _FakeFirebaseApp_0 extends _i1.SmartFake implements _i2.FirebaseApp {
-  _FakeFirebaseApp_0(Object parent, Invocation parentInvocation)
-    : super(parent, parentInvocation);
+  _FakeFirebaseApp_0(Object parent, Invocation parentInvocation) : super(parent, parentInvocation);
 }
 
 /// A class which mocks [FirebaseCrashlytics].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockFirebaseCrashlytics extends _i1.Mock
-    implements _i3.FirebaseCrashlytics {
+class MockFirebaseCrashlytics extends _i1.Mock implements _i3.FirebaseCrashlytics {
   MockFirebaseCrashlytics() {
     _i1.throwOnMissingStub(this);
   }
@@ -207,9 +205,7 @@ class MockDebugModeWrapper extends _i1.Mock implements _i6.DebugModeWrapper {
   }
 
   @override
-  bool get isDebugMode =>
-      (super.noSuchMethod(Invocation.getter(#isDebugMode), returnValue: false)
-          as bool);
+  bool get isDebugMode => (super.noSuchMethod(Invocation.getter(#isDebugMode), returnValue: false) as bool);
 
   @override
   bool get isFlutterTestMode =>

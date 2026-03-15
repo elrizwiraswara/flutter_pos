@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/constants/constants.dart';
 import '../../core/services/logger/error_logger_service.dart';
 import '../../core/utilities/console_logger.dart';
 import '../../presentation/widgets/app_error_widget.dart';
@@ -47,6 +48,12 @@ class ErrorHandlerBuilderState extends ConsumerState<ErrorHandlerBuilder> {
     _errorLoggerService.log(error: flutterError);
 
     if (!mounted) return;
+
+    // Skip navigation to error screen for non-critical errors
+    final library = flutterError.library?.toLowerCase() ?? '';
+    if (Constants.nonCriticalErrorLibraries.any((lib) => library.contains(lib))) {
+      return;
+    }
 
     // Prevent to push to ErrorScreen multiple times
     if (_appRoutes.router.routeInformationProvider.value.uri.path != '/error') {

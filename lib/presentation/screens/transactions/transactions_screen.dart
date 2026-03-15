@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../app/di/app_providers.dart';
 import '../../../core/themes/app_sizes.dart';
+import '../../providers/transactions/transactions_notifier.dart';
 import '../../widgets/app_empty_state.dart';
 import '../../widgets/app_loading_more_indicator.dart';
 import '../../widgets/app_progress_indicator.dart';
@@ -24,7 +24,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
   void initState() {
     scrollController.addListener(scrollListener);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(transactionsControllerProvider).getAllTransactions();
+      ref.read(transactionsNotifierProvider.notifier).getAllTransactions();
     });
     super.initState();
   }
@@ -38,18 +38,22 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
   }
 
   void scrollListener() async {
-    final transactionProvider = ref.read(transactionsControllerProvider);
+    final transactionsState = ref.read(transactionsNotifierProvider);
 
     // Automatically load more data on end of scroll position
     if (scrollController.offset == scrollController.position.maxScrollExtent) {
-      await transactionProvider.getAllTransactions(offset: transactionProvider.allTransactions?.length);
+      await ref
+          .read(transactionsNotifierProvider.notifier)
+          .getAllTransactions(
+            offset: transactionsState.allTransactions?.length,
+          );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final allTransactions = ref.watch(transactionsControllerProvider.select((p) => p.allTransactions));
-    final isLoadingMore = ref.watch(transactionsControllerProvider.select((p) => p.isLoadingMore));
+    final allTransactions = ref.watch(transactionsNotifierProvider.select((s) => s.allTransactions));
+    final isLoadingMore = ref.watch(transactionsNotifierProvider.select((s) => s.isLoadingMore));
 
     return Scaffold(
       appBar: AppBar(
@@ -58,7 +62,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
         shadowColor: Colors.transparent,
       ),
       body: RefreshIndicator(
-        onRefresh: () => ref.read(transactionsControllerProvider).getAllTransactions(),
+        onRefresh: () => ref.read(transactionsNotifierProvider.notifier).getAllTransactions(),
         displacement: 60,
         child: Scrollbar(
           child: CustomScrollView(
@@ -126,8 +130,6 @@ class _SearchField extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final transactionProvider = ref.read(transactionsControllerProvider);
-
     return AppTextField(
       controller: controller,
       hintText: 'Search Transaction ID...',
@@ -135,11 +137,11 @@ class _SearchField extends ConsumerWidget {
       textInputAction: TextInputAction.search,
       onEditingComplete: () {
         FocusScope.of(context).unfocus();
-        transactionProvider.resetTransactions();
-        transactionProvider.getAllTransactions(contains: controller.text);
+        ref.read(transactionsNotifierProvider.notifier).resetTransactions();
+        ref.read(transactionsNotifierProvider.notifier).getAllTransactions(contains: controller.text);
       },
       onTapClearButton: () {
-        transactionProvider.getAllTransactions(contains: controller.text);
+        ref.read(transactionsNotifierProvider.notifier).getAllTransactions(contains: controller.text);
       },
     );
   }

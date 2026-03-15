@@ -9,6 +9,7 @@ import '../../../core/utilities/currency_formatter.dart';
 import '../../../core/utilities/date_time_formatter.dart';
 import '../../../domain/entities/ordered_product_entity.dart';
 import '../../../domain/entities/transaction_entity.dart';
+import '../../providers/transactions/transaction_detail_notifier.dart';
 import '../../widgets/app_empty_state.dart';
 import '../../widgets/app_progress_indicator.dart';
 import '../../widgets/app_snack_bar.dart';
@@ -19,7 +20,7 @@ class TransactionDetailScreen extends ConsumerWidget {
   const TransactionDetailScreen({super.key, required this.id});
 
   void _reprint(WidgetRef ref) async {
-    final transaction = ref.read(transactionDetailControllerProvider).currentTransaction;
+    final transaction = ref.read(transactionDetailNotifierProvider);
     if (transaction == null) return;
 
     final result = await ref.read(printerServiceProvider).printTransaction(transaction);
@@ -43,7 +44,7 @@ class TransactionDetailScreen extends ConsumerWidget {
         ],
       ),
       body: FutureBuilder(
-        future: ref.read(transactionDetailControllerProvider).getTransactionDetail(id),
+        future: ref.read(transactionDetailNotifierProvider.notifier).getTransactionDetail(id),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const AppProgressIndicator();

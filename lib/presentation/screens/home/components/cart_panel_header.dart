@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-import '../../../../app/di/app_providers.dart';
 import '../../../../core/themes/app_sizes.dart';
+import '../../../providers/home/home_notifier.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_dialog.dart';
 
 class CartPanelHeader extends ConsumerWidget {
-  const CartPanelHeader({super.key});
+  final PanelController panelController;
+
+  const CartPanelHeader({super.key, required this.panelController});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final provider = ref.watch(homeControllerProvider);
+    final homeState = ref.watch(homeNotifierProvider);
 
     return Container(
       width: AppSizes.screenWidth(context),
@@ -53,7 +56,7 @@ class CartPanelHeader extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '${provider.orderedProducts.length} Products',
+                '${homeState.orderedProducts.length} Products',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -63,7 +66,7 @@ class CartPanelHeader extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(4),
                 padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding / 2),
                 buttonColor: Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.32),
-                enabled: provider.orderedProducts.isNotEmpty,
+                enabled: homeState.orderedProducts.isNotEmpty,
                 onTap: () {
                   AppDialog.show(
                     title: 'Confirm',
@@ -71,7 +74,8 @@ class CartPanelHeader extends ConsumerWidget {
                     rightButtonText: 'Remove',
                     leftButtonText: 'Cancel',
                     onTapRightButton: (context) {
-                      ref.read(homeControllerProvider).onRemoveAllOrderedProduct();
+                      ref.read(homeNotifierProvider.notifier).onRemoveAllOrderedProduct();
+                      panelController.close();
                       context.pop();
                     },
                   );

@@ -6,14 +6,10 @@
 import 'dart:async' as _i3;
 
 import 'package:flutter_pos/core/common/result.dart' as _i5;
-import 'package:flutter_pos/core/services/connectivity/ping_service.dart'
-    as _i2;
-import 'package:flutter_pos/data/datasources/local/product_local_datasource_impl.dart'
-    as _i4;
-import 'package:flutter_pos/data/datasources/local/queued_action_local_datasource_impl.dart'
-    as _i9;
-import 'package:flutter_pos/data/datasources/remote/product_remote_datasource_impl.dart'
-    as _i8;
+import 'package:flutter_pos/core/services/connectivity/ping_service.dart' as _i2;
+import 'package:flutter_pos/data/datasources/local/product_local_datasource_impl.dart' as _i4;
+import 'package:flutter_pos/data/datasources/local/queued_action_local_datasource_impl.dart' as _i9;
+import 'package:flutter_pos/data/datasources/remote/product_remote_datasource_impl.dart' as _i8;
 import 'package:flutter_pos/data/models/product_model.dart' as _i6;
 import 'package:flutter_pos/data/models/queued_action_model.dart' as _i10;
 import 'package:mockito/mockito.dart' as _i1;
@@ -34,8 +30,7 @@ import 'package:mockito/src/dummies.dart' as _i7;
 // ignore_for_file: subtype_of_sealed_class
 
 class _FakePingData_0 extends _i1.SmartFake implements _i2.PingData {
-  _FakePingData_0(Object parent, Invocation parentInvocation)
-    : super(parent, parentInvocation);
+  _FakePingData_0(Object parent, Invocation parentInvocation) : super(parent, parentInvocation);
 }
 
 /// A class which mocks [PingService].
@@ -47,9 +42,7 @@ class MockPingService extends _i1.Mock implements _i2.PingService {
   }
 
   @override
-  bool get isConnected =>
-      (super.noSuchMethod(Invocation.getter(#isConnected), returnValue: false)
-          as bool);
+  bool get isConnected => (super.noSuchMethod(Invocation.getter(#isConnected), returnValue: false) as bool);
 
   @override
   _i3.Future<void> startPing({
@@ -75,18 +68,16 @@ class MockPingService extends _i1.Mock implements _i2.PingService {
           as _i3.Future<void>);
 
   @override
-  void addListener(dynamic Function(List<int>, List<String>)? listener) =>
-      super.noSuchMethod(
-        Invocation.method(#addListener, [listener]),
-        returnValueForMissingStub: null,
-      );
+  void addListener(dynamic Function(List<int>, List<String>)? listener) => super.noSuchMethod(
+    Invocation.method(#addListener, [listener]),
+    returnValueForMissingStub: null,
+  );
 
   @override
-  void removeListener(dynamic Function(List<int>, List<String>)? listener) =>
-      super.noSuchMethod(
-        Invocation.method(#removeListener, [listener]),
-        returnValueForMissingStub: null,
-      );
+  void removeListener(dynamic Function(List<int>, List<String>)? listener) => super.noSuchMethod(
+    Invocation.method(#removeListener, [listener]),
+    returnValueForMissingStub: null,
+  );
 
   @override
   void clearListeners() => super.noSuchMethod(
@@ -95,18 +86,16 @@ class MockPingService extends _i1.Mock implements _i2.PingService {
   );
 
   @override
-  void addConnectionStatusListener(dynamic Function(bool)? listener) =>
-      super.noSuchMethod(
-        Invocation.method(#addConnectionStatusListener, [listener]),
-        returnValueForMissingStub: null,
-      );
+  void addConnectionStatusListener(dynamic Function(bool)? listener) => super.noSuchMethod(
+    Invocation.method(#addConnectionStatusListener, [listener]),
+    returnValueForMissingStub: null,
+  );
 
   @override
-  void removeConnectionStatusListener(dynamic Function(bool)? listener) =>
-      super.noSuchMethod(
-        Invocation.method(#removeConnectionStatusListener, [listener]),
-        returnValueForMissingStub: null,
-      );
+  void removeConnectionStatusListener(dynamic Function(bool)? listener) => super.noSuchMethod(
+    Invocation.method(#removeConnectionStatusListener, [listener]),
+    returnValueForMissingStub: null,
+  );
 
   @override
   void clearConnectionStatusListeners() => super.noSuchMethod(
@@ -141,8 +130,7 @@ class MockPingService extends _i1.Mock implements _i2.PingService {
 /// A class which mocks [ProductLocalDatasourceImpl].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockProductLocalDatasourceImpl extends _i1.Mock
-    implements _i4.ProductLocalDatasourceImpl {
+class MockProductLocalDatasourceImpl extends _i1.Mock implements _i4.ProductLocalDatasourceImpl {
   MockProductLocalDatasourceImpl() {
     _i1.throwOnMissingStub(this);
   }
@@ -258,8 +246,7 @@ class MockProductLocalDatasourceImpl extends _i1.Mock
 /// A class which mocks [ProductRemoteDatasourceImpl].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockProductRemoteDatasourceImpl extends _i1.Mock
-    implements _i8.ProductRemoteDatasourceImpl {
+class MockProductRemoteDatasourceImpl extends _i1.Mock implements _i8.ProductRemoteDatasourceImpl {
   MockProductRemoteDatasourceImpl() {
     _i1.throwOnMissingStub(this);
   }
@@ -375,8 +362,7 @@ class MockProductRemoteDatasourceImpl extends _i1.Mock
 /// A class which mocks [QueuedActionLocalDatasourceImpl].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockQueuedActionLocalDatasourceImpl extends _i1.Mock
-    implements _i9.QueuedActionLocalDatasourceImpl {
+class MockQueuedActionLocalDatasourceImpl extends _i1.Mock implements _i9.QueuedActionLocalDatasourceImpl {
   MockQueuedActionLocalDatasourceImpl() {
     _i1.throwOnMissingStub(this);
   }
@@ -423,17 +409,15 @@ class MockQueuedActionLocalDatasourceImpl extends _i1.Mock
           as _i3.Future<_i5.Result<_i10.QueuedActionModel?>>);
 
   @override
-  _i3.Future<_i5.Result<List<_i10.QueuedActionModel>>>
-  getAllUserQueuedAction() =>
+  _i3.Future<_i5.Result<List<_i10.QueuedActionModel>>> getAllUserQueuedAction() =>
       (super.noSuchMethod(
             Invocation.method(#getAllUserQueuedAction, []),
-            returnValue:
-                _i3.Future<_i5.Result<List<_i10.QueuedActionModel>>>.value(
-                  _i7.dummyValue<_i5.Result<List<_i10.QueuedActionModel>>>(
-                    this,
-                    Invocation.method(#getAllUserQueuedAction, []),
-                  ),
-                ),
+            returnValue: _i3.Future<_i5.Result<List<_i10.QueuedActionModel>>>.value(
+              _i7.dummyValue<_i5.Result<List<_i10.QueuedActionModel>>>(
+                this,
+                Invocation.method(#getAllUserQueuedAction, []),
+              ),
+            ),
           )
           as _i3.Future<_i5.Result<List<_i10.QueuedActionModel>>>);
 }
