@@ -213,6 +213,15 @@ flutter test --coverage
 
 To view the test coverage you can use `genhtml` or [test_cov_console](https://pub.dev/packages/test_cov_console)
 
+## AI Agent Guidelines
+
+This project includes documentation files designed for AI coding agents (e.g., Claude Code) to keep code consistent when modifying the project:
+
+- [`CLAUDE.md`](CLAUDE.md) — Project conventions (architecture, naming, code style)
+- [`UI.md`](UI.md) — UI reference (layouts, components, design specs)
+- [`DATABASE.md`](DATABASE.md) — Database schema reference (tables, columns)
+- [`WORKFLOW.md`](WORKFLOW.md) — Git workflow (commits, branches, PRs)
+
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request for any bugs, feature requests, or improvements.
