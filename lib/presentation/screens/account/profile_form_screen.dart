@@ -7,8 +7,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../../app/di/app_providers.dart';
 import '../../../core/themes/app_sizes.dart';
+import '../../providers/account/account_notifier.dart';
+import '../../providers/main/main_notifier.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
 import '../../widgets/app_icon_button.dart';
@@ -32,12 +33,12 @@ class _ProfileFormScreenState extends ConsumerState<ProfileFormScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final provider = ref.read(accountControllerProvider);
-      await provider.initProfileForm();
+      await ref.read(accountNotifierProvider.notifier).initProfileForm();
 
-      nameController.text = provider.name ?? '';
-      emailController.text = provider.email ?? '';
-      phoneController.text = provider.phone ?? '';
+      final state = ref.read(accountNotifierProvider);
+      nameController.text = state.name ?? '';
+      emailController.text = state.email ?? '';
+      phoneController.text = state.phone ?? '';
     });
   }
 
@@ -68,13 +69,13 @@ class _ProfileFormScreenState extends ConsumerState<ProfileFormScreen> {
 
     if (croppedFile != null) {
       var file = File(croppedFile.path);
-      ref.read(accountControllerProvider).onChangedImage(file);
+      ref.read(accountNotifierProvider.notifier).onChangedImage(file);
     }
   }
 
   void updatedUser() async {
     var res = await AppDialog.showProgress(() {
-      return ref.read(accountControllerProvider).updatedUser();
+      return ref.read(accountNotifierProvider.notifier).updatedUser();
     });
 
     if (res.isSuccess) {
@@ -83,7 +84,7 @@ class _ProfileFormScreenState extends ConsumerState<ProfileFormScreen> {
       AppSnackBar.show('Profile updated');
 
       // Refresh user data
-      ref.read(mainControllerProvider).getAndSyncAllUserData();
+      ref.read(mainNotifierProvider.notifier).getAndSyncAllUserData();
     } else {
       AppDialog.showError(error: res.error.toString());
     }
@@ -91,9 +92,9 @@ class _ProfileFormScreenState extends ConsumerState<ProfileFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final account = ref.read(accountControllerProvider);
+    final account = ref.read(accountNotifierProvider.notifier);
 
-    final isLoaded = ref.watch(accountControllerProvider.select((p) => p.isLoaded));
+    final isLoaded = ref.watch(accountNotifierProvider.select((s) => s.isLoaded));
 
     return Scaffold(
       appBar: AppBar(
@@ -126,8 +127,8 @@ class _ImageSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final imageFile = ref.watch(accountControllerProvider.select((p) => p.imageFile));
-    final imageUrl = ref.watch(accountControllerProvider.select((p) => p.imageUrl));
+    final imageFile = ref.watch(accountNotifierProvider.select((s) => s.imageFile));
+    final imageUrl = ref.watch(accountNotifierProvider.select((s) => s.imageUrl));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

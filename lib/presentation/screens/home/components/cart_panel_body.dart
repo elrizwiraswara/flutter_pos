@@ -1,25 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-import '../../../../app/di/app_providers.dart';
 import '../../../../core/themes/app_sizes.dart';
 import '../../../../core/utilities/currency_formatter.dart';
+import '../../../providers/home/home_notifier.dart';
 import '../../../widgets/app_empty_state.dart';
 import 'order_card.dart';
 
 class CartPanelBody extends StatelessWidget {
-  const CartPanelBody({super.key});
+  final PanelController panelController;
+
+  const CartPanelBody({super.key, required this.panelController});
 
   @override
   Widget build(BuildContext context) {
-    return const SingleChildScrollView(
-      padding: EdgeInsets.symmetric(vertical: 62),
-      physics: NeverScrollableScrollPhysics(),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(vertical: 62),
+      physics: const NeverScrollableScrollPhysics(),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _OrderList(),
-          _OrderTotal(),
+          _OrderList(panelController: panelController),
+          const _OrderTotal(),
         ],
       ),
     );
@@ -27,13 +30,15 @@ class CartPanelBody extends StatelessWidget {
 }
 
 class _OrderList extends ConsumerWidget {
-  const _OrderList();
+  final PanelController panelController;
+
+  const _OrderList({required this.panelController});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final provider = ref.watch(homeControllerProvider);
+    final homeState = ref.watch(homeNotifierProvider);
 
-    if (provider.orderedProducts.isEmpty) {
+    if (homeState.orderedProducts.isEmpty) {
       return SizedBox(
         height: AppSizes.screenHeight(context) - 272,
         child: const AppEmptyState(
@@ -47,22 +52,24 @@ class _OrderList extends ConsumerWidget {
       height: AppSizes.screenHeight(context) - 272,
       child: Scrollbar(
         child: ListView.builder(
-          itemCount: provider.orderedProducts.length,
+          itemCount: homeState.orderedProducts.length,
           padding: const EdgeInsets.all(AppSizes.padding),
           itemBuilder: (context, i) {
             return Padding(
               padding: const EdgeInsets.only(bottom: AppSizes.padding),
               child: OrderCard(
-                name: provider.orderedProducts[i].name,
-                imageUrl: provider.orderedProducts[i].imageUrl,
-                stock: provider.orderedProducts[i].stock,
-                price: provider.orderedProducts[i].price,
-                initialQuantity: provider.orderedProducts[i].quantity,
+                name: homeState.orderedProducts[i].name,
+                imageUrl: homeState.orderedProducts[i].imageUrl,
+                stock: homeState.orderedProducts[i].stock,
+                price: homeState.orderedProducts[i].price,
+                initialQuantity: homeState.orderedProducts[i].quantity,
                 onChangedQuantity: (val) {
-                  provider.onChangedOrderedProductQuantity(i, val);
+                  ref.read(homeNotifierProvider.notifier).onChangedOrderedProductQuantity(i, val);
                 },
                 onTapRemove: () {
-                  provider.onRemoveOrderedProduct(provider.orderedProducts[i]);
+                  final isLast = homeState.orderedProducts.length == 1;
+                  ref.read(homeNotifierProvider.notifier).onRemoveOrderedProduct(homeState.orderedProducts[i]);
+                  if (isLast) panelController.close();
                 },
               ),
             );
@@ -78,7 +85,7 @@ class _OrderTotal extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final provider = ref.watch(homeControllerProvider);
+    final homeState = ref.watch(homeNotifierProvider);
 
     return Container(
       padding: const EdgeInsets.all(AppSizes.padding),
@@ -94,13 +101,13 @@ class _OrderTotal extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            'Total (${provider.orderedProducts.length})',
+            'Total (${homeState.orderedProducts.length})',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
           Text(
-            CurrencyFormatter.format(provider.getTotalAmount()),
+            CurrencyFormatter.format(ref.read(homeNotifierProvider.notifier).getTotalAmount()),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),

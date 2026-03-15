@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../app/di/app_providers.dart';
 import '../../../core/themes/app_sizes.dart';
 import '../../../domain/entities/product_entity.dart';
+import '../../providers/products/products_notifier.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_empty_state.dart';
 import '../../widgets/app_loading_more_indicator.dart';
@@ -27,7 +27,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
   void initState() {
     scrollController.addListener(scrollListener);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(productsControllerProvider).getAllProducts();
+      ref.read(productsNotifierProvider.notifier).getAllProducts();
     });
     super.initState();
   }
@@ -41,21 +41,23 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
   }
 
   void scrollListener() async {
-    final productProvider = ref.read(productsControllerProvider);
+    final productsState = ref.read(productsNotifierProvider);
 
     // Automatically load more data on end of scroll position
     if (scrollController.offset == scrollController.position.maxScrollExtent) {
-      await productProvider.getAllProducts(
-        offset: productProvider.allProducts?.length,
-        contains: searchFieldController.text,
-      );
+      await ref
+          .read(productsNotifierProvider.notifier)
+          .getAllProducts(
+            offset: productsState.allProducts?.length,
+            contains: searchFieldController.text,
+          );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final allProducts = ref.watch(productsControllerProvider.select((p) => p.allProducts));
-    final isLoadingMore = ref.watch(productsControllerProvider.select((p) => p.isLoadingMore));
+    final allProducts = ref.watch(productsNotifierProvider.select((s) => s.allProducts));
+    final isLoadingMore = ref.watch(productsNotifierProvider.select((s) => s.isLoadingMore));
 
     return Scaffold(
       appBar: AppBar(
@@ -65,7 +67,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
         actions: const [_AddButton()],
       ),
       body: RefreshIndicator(
-        onRefresh: () => ref.read(productsControllerProvider).getAllProducts(),
+        onRefresh: () => ref.read(productsNotifierProvider.notifier).getAllProducts(),
         displacement: 60,
         child: Scrollbar(
           child: CustomScrollView(
@@ -177,8 +179,6 @@ class _SearchField extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final productProvider = ref.read(productsControllerProvider);
-
     return AppTextField(
       controller: controller,
       hintText: 'Search Products...',
@@ -186,11 +186,11 @@ class _SearchField extends ConsumerWidget {
       textInputAction: TextInputAction.search,
       onEditingComplete: () {
         FocusScope.of(context).unfocus();
-        productProvider.resetProducts();
-        productProvider.getAllProducts(contains: controller.text);
+        ref.read(productsNotifierProvider.notifier).resetProducts();
+        ref.read(productsNotifierProvider.notifier).getAllProducts(contains: controller.text);
       },
       onTapClearButton: () {
-        productProvider.getAllProducts(contains: controller.text);
+        ref.read(productsNotifierProvider.notifier).getAllProducts(contains: controller.text);
       },
     );
   }

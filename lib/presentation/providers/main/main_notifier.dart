@@ -1,49 +1,33 @@
-import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/services/connectivity/ping_service.dart';
-import '../../../core/services/info/device_info_service.dart';
+import '../../../app/di/app_providers.dart';
 import '../../../domain/entities/queued_action_entity.dart';
 import '../../../domain/entities/user_entity.dart' hide AuthProvider;
-import '../../../domain/repositories/product_repository.dart';
-import '../../../domain/repositories/queued_action_repository.dart';
-import '../../../domain/repositories/transaction_repository.dart';
-import '../../../domain/repositories/user_repository.dart';
 import '../../../domain/usecases/params/no_param.dart';
 import '../../../domain/usecases/product_usecases.dart';
 import '../../../domain/usecases/queued_action_usecases.dart';
 import '../../../domain/usecases/transaction_usecases.dart';
 import '../../../domain/usecases/user_usecases.dart';
 import '../../widgets/app_snack_bar.dart';
-import '../auth/auth_provider.dart';
-import '../products/products_provider.dart';
+import '../auth/auth_notifier.dart';
+import '../products/products_notifier.dart';
+import 'main_state.dart';
 
-class MainProvider extends ChangeNotifier {
-  final PingService pingService;
-  final DeviceInfoService deviceInforService;
-  final AuthProvider authProvider;
-  final UserRepository userRepository;
-  final ProductRepository productRepository;
-  final TransactionRepository transactionRepository;
-  final QueuedActionRepository queuedActionRepository;
-  final ProductsProvider productsProvider;
+final mainNotifierProvider = NotifierProvider<MainNotifier, MainState>(
+  MainNotifier.new,
+);
 
-  MainProvider({
-    required this.pingService,
-    required this.deviceInforService,
-    required this.authProvider,
-    required this.transactionRepository,
-    required this.userRepository,
-    required this.productRepository,
-    required this.queuedActionRepository,
-    required this.productsProvider,
-  });
+class MainNotifier extends Notifier<MainState> {
+  @override
+  MainState build() {
+    return const MainState();
+  }
 
-  bool isLoaded = false;
-  bool isHasInternet = true;
-  bool isHasQueuedActions = false;
-  bool isSyncronizing = false;
-
-  UserEntity? user;
+  String _requireUserId() {
+    final authState = ref.read(authNotifierProvider);
+    if (authState.isAuthenticated) return authState.user!.id;
+    throw 'Unauthenticated!';
+  }
 
   Future<void> initMainProvider() async {
     await startPingService();
@@ -51,8 +35,11 @@ class MainProvider extends ChangeNotifier {
   }
 
   Future<void> startPingService() async {
+    final deviceInfoService = ref.read(deviceInfoServiceProvider);
+    final pingService = ref.read(pingServiceProvider);
+
     // Note: The ICMP protocol may not work on virtual devices
-    final isPhysicalDevice = await deviceInforService.checkDeviceType();
+    final isPhysicalDevice = await deviceInfoService.checkDeviceType();
 
     pingService.startPing(host: isPhysicalDevice ? '8.8.8.8' : '127.0.0.1');
     pingService.addConnectionStatusListener(
@@ -61,12 +48,13 @@ class MainProvider extends ChangeNotifier {
   }
 
   Future<void> checkAndSyncAllData() async {
+    final pingService = ref.read(pingServiceProvider);
+
     // Prevent sync during first time app open
-    if (!isLoaded || !pingService.isConnected) return;
+    if (!state.isLoaded || !pingService.isConnected) return;
 
     try {
-      isSyncronizing = true;
-      notifyListeners();
+      state = state.copyWith(isSyncronizing: true);
 
       // Execute all queued actions
       int queueExecutedCount = await executeAllQueuedActions();
@@ -81,23 +69,20 @@ class MainProvider extends ChangeNotifier {
       // Re-check queued actions
       checkIsHasQueuedActions();
 
-      isSyncronizing = false;
-      notifyListeners();
+      state = state.copyWith(isSyncronizing: false);
     } catch (e) {
-      isSyncronizing = false;
-      notifyListeners();
-
+      state = state.copyWith(isSyncronizing: false);
       AppSnackBar.showError('Failed to sync data\n\n${e.toString()}');
     }
   }
 
   Future<void> getAndSyncAllUserData() async {
-    var userId = authProvider.user?.id;
-    if (userId == null) throw 'Unathenticated!';
+    final userId = _requireUserId();
+    final userRepository = ref.read(userRepositoryProvider);
+    final productRepository = ref.read(productRepositoryProvider);
+    final transactionRepository = ref.read(transactionRepositoryProvider);
 
-    // Run multiple futures simultaneusly
-    // Because each repository has beed added data checker method
-    // The local db will automatically sync with cloud db or vice versa
+    // Run multiple futures simultaneously
     var res = await Future.wait([
       GetUserUsecase(userRepository).call(userId),
       SyncAllUserProductsUsecase(productRepository).call(userId),
@@ -106,28 +91,27 @@ class MainProvider extends ChangeNotifier {
 
     // Set and notify user state
     if (res.first.isSuccess) {
-      user = res.first.data as UserEntity?;
-      notifyListeners();
+      state = state.copyWith(user: res.first.data as UserEntity?);
     }
 
     if (res[1].isFailure) AppSnackBar.showError("Failed to sync product data");
     if (res[2].isFailure) AppSnackBar.showError("Failed to sync transaction data");
 
     // Refresh products list
-    productsProvider.getAllProducts();
+    ref.read(productsNotifierProvider.notifier).getAllProducts();
 
     // Check queued actions
     checkIsHasQueuedActions();
 
     // Notify to MainScreen
-    isLoaded = true;
-    notifyListeners();
+    state = state.copyWith(isLoaded: true);
   }
 
   Future<int> executeAllQueuedActions() async {
     var queuedActions = await getQueuedActions();
 
     if (queuedActions.isNotEmpty) {
+      final queuedActionRepository = ref.read(queuedActionRepositoryProvider);
       var res = await ExecuteAllQueuedActionUsecase(queuedActionRepository).call(queuedActions);
 
       int executedCount = res.data?.where((e) => e).length ?? 0;
@@ -138,19 +122,18 @@ class MainProvider extends ChangeNotifier {
   }
 
   Future<List<QueuedActionEntity>> getQueuedActions() async {
+    final queuedActionRepository = ref.read(queuedActionRepositoryProvider);
     var res = await GetAllQueuedActionUsecase(queuedActionRepository).call(NoParam());
     return res.data ?? [];
   }
 
   Future<void> onHasInternet(bool value) async {
-    isHasInternet = value;
-    notifyListeners();
-
-    if (isHasInternet) checkAndSyncAllData();
+    state = state.copyWith(isHasInternet: value);
+    if (value) checkAndSyncAllData();
   }
 
   Future<void> checkIsHasQueuedActions() async {
-    isHasQueuedActions = (await getQueuedActions()).isEmpty;
-    notifyListeners();
+    final isEmpty = (await getQueuedActions()).isEmpty;
+    state = state.copyWith(isHasQueuedActions: isEmpty);
   }
 }

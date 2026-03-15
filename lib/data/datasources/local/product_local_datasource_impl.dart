@@ -1,20 +1,20 @@
 import 'package:sqflite/sqflite.dart';
 
 import '../../../core/common/result.dart';
-import '../../../core/database/app_database.dart';
-import '../../../core/database/database_config.dart';
+import '../../../core/services/database/database_config.dart';
+import '../../../core/services/database/database_service.dart';
 import '../../models/product_model.dart';
 import '../interfaces/product_datasource.dart';
 
 class ProductLocalDatasourceImpl extends ProductDatasource {
-  final AppDatabase _appDatabase;
+  final DatabaseService _databaseService;
 
-  ProductLocalDatasourceImpl(this._appDatabase);
+  ProductLocalDatasourceImpl(this._databaseService);
 
   @override
   Future<Result<int>> createProduct(ProductModel product) async {
     try {
-      await _appDatabase.database.insert(
+      await _databaseService.database.insert(
         DatabaseConfig.productTableName,
         product.toJson(),
         conflictAlgorithm: ConflictAlgorithm.replace,
@@ -30,7 +30,7 @@ class ProductLocalDatasourceImpl extends ProductDatasource {
   @override
   Future<Result<void>> updateProduct(ProductModel product) async {
     try {
-      await _appDatabase.database.update(
+      await _databaseService.database.update(
         DatabaseConfig.productTableName,
         product.toJson(),
         where: 'id = ?',
@@ -47,7 +47,7 @@ class ProductLocalDatasourceImpl extends ProductDatasource {
   @override
   Future<Result<void>> deleteProduct(int id) async {
     try {
-      await _appDatabase.database.delete(
+      await _databaseService.database.delete(
         DatabaseConfig.productTableName,
         where: 'id = ?',
         whereArgs: [id],
@@ -62,7 +62,7 @@ class ProductLocalDatasourceImpl extends ProductDatasource {
   @override
   Future<Result<ProductModel?>> getProduct(int id) async {
     try {
-      var res = await _appDatabase.database.query(
+      var res = await _databaseService.database.query(
         DatabaseConfig.productTableName,
         where: 'id = ?',
         whereArgs: [id],
@@ -79,7 +79,7 @@ class ProductLocalDatasourceImpl extends ProductDatasource {
   @override
   Future<Result<List<ProductModel>>> getAllUserProducts(String userId) async {
     try {
-      var res = await _appDatabase.database.query(
+      var res = await _databaseService.database.query(
         DatabaseConfig.productTableName,
         where: 'createdById = ?',
         whereArgs: [userId],
@@ -103,7 +103,7 @@ class ProductLocalDatasourceImpl extends ProductDatasource {
     String? contains,
   }) async {
     try {
-      var res = await _appDatabase.database.query(
+      var res = await _databaseService.database.query(
         DatabaseConfig.productTableName,
         where: 'createdById = ? AND name LIKE ?',
         whereArgs: [userId, "%${contains ?? ''}%"],

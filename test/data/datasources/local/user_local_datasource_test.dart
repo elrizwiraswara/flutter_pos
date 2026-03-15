@@ -1,11 +1,11 @@
-import 'package:flutter_pos/core/database/app_database.dart';
+import 'package:flutter_pos/core/services/database/database_service.dart';
 import 'package:flutter_pos/data/datasources/local/user_local_datasource_impl.dart';
 import 'package:flutter_pos/data/models/user_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
-  late AppDatabase appDatabase;
+  late DatabaseService appDatabase;
   late UserLocalDatasourceImpl datasource;
   late Database testDatabase;
 
@@ -17,7 +17,7 @@ void main() {
     // Open an in-memory database for testing
     testDatabase = await openDatabase(inMemoryDatabasePath, version: 1);
 
-    appDatabase = AppDatabase.instance;
+    appDatabase = DatabaseService.instance;
     await appDatabase.initTestDatabase(testDatabase: testDatabase);
 
     datasource = UserLocalDatasourceImpl(appDatabase);

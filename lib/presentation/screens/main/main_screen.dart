@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/di/app_providers.dart';
+import '../../providers/main/main_notifier.dart';
 import '../welcome/welcome_screen.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
@@ -21,16 +22,15 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final mainProvider = ref.read(mainControllerProvider);
-      await mainProvider.initMainProvider();
+      await ref.read(mainNotifierProvider.notifier).initMainProvider();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final isLoaded = ref.watch(mainControllerProvider.select((p) => p.isLoaded));
-    final isHasInternet = ref.watch(mainControllerProvider.select((p) => p.isHasInternet));
-    final user = ref.watch(mainControllerProvider.select((p) => p.user));
+    final isLoaded = ref.watch(mainNotifierProvider.select((p) => p.isLoaded));
+    final isHasInternet = ref.watch(mainNotifierProvider.select((p) => p.isHasInternet));
+    final user = ref.watch(mainNotifierProvider.select((p) => p.user));
 
     // Display RootScreen when data is being load
     if (!isLoaded) {

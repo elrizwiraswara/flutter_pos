@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app/app.dart';
 import 'app/di/app_providers.dart';
-import 'core/database/app_database.dart';
+import 'core/services/database/database_service.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -22,7 +22,7 @@ void main() async {
   );
 
   // Initialize app local db
-  await AppDatabase.instance.init();
+  await DatabaseService.instance.init();
 
   // Ensure persistence is cleared
   await FirebaseFirestore.instance.clearPersistence();

@@ -4,6 +4,7 @@ import 'package:unified_esc_pos_printer/unified_esc_pos_printer.dart';
 
 import '../../../app/di/app_providers.dart';
 import '../../../core/themes/app_sizes.dart';
+import '../../providers/account/printer_settings_notifier.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_drop_down.dart';
 import '../../widgets/app_icon_button.dart';
@@ -21,7 +22,7 @@ class _PrinterSettingsScreenState extends ConsumerState<PrinterSettingsScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(printerSettingsControllerProvider).getAndSelectPrinter();
+      ref.read(printerSettingsNotifierProvider.notifier).getAndSelectPrinter();
     });
   }
 
@@ -79,10 +80,10 @@ class _PaperSizeSelector extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final paperSize = ref.watch(printerSettingsControllerProvider.select((p) => p.paperSize));
-    final isScanning = ref.watch(printerSettingsControllerProvider.select((p) => p.isScanning));
-    final isConnecting = ref.watch(printerSettingsControllerProvider.select((p) => p.isConnecting));
-    final isDisconnecting = ref.watch(printerSettingsControllerProvider.select((p) => p.isDisconnecting));
+    final paperSize = ref.watch(printerSettingsNotifierProvider.select((p) => p.paperSize));
+    final isScanning = ref.watch(printerSettingsNotifierProvider.select((p) => p.isScanning));
+    final isConnecting = ref.watch(printerSettingsNotifierProvider.select((s) => s.connectingDeviceId != null));
+    final isDisconnecting = ref.watch(printerSettingsNotifierProvider.select((p) => p.isDisconnecting));
 
     final isBusy = isScanning || isConnecting || isDisconnecting;
 
@@ -98,7 +99,7 @@ class _PaperSizeSelector extends ConsumerWidget {
       }).toList(),
       onChanged: (value) {
         if (value == null) return;
-        ref.read(printerSettingsControllerProvider).setPaperSize(value);
+        ref.read(printerSettingsNotifierProvider.notifier).setPaperSize(value);
       },
     );
   }
@@ -117,10 +118,10 @@ class _ConnectionTypeDropDown extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedTypes = ref.watch(printerSettingsControllerProvider.select((p) => p.selectedTypes));
-    final isScanning = ref.watch(printerSettingsControllerProvider.select((p) => p.isScanning));
-    final isConnecting = ref.watch(printerSettingsControllerProvider.select((p) => p.isConnecting));
-    final isDisconnecting = ref.watch(printerSettingsControllerProvider.select((p) => p.isDisconnecting));
+    final selectedTypes = ref.watch(printerSettingsNotifierProvider.select((p) => p.selectedTypes));
+    final isScanning = ref.watch(printerSettingsNotifierProvider.select((p) => p.isScanning));
+    final isConnecting = ref.watch(printerSettingsNotifierProvider.select((s) => s.connectingDeviceId != null));
+    final isDisconnecting = ref.watch(printerSettingsNotifierProvider.select((p) => p.isDisconnecting));
 
     final isBusy = isScanning || isConnecting || isDisconnecting;
 
@@ -144,7 +145,7 @@ class _ConnectionTypeDropDown extends ConsumerWidget {
       selectedValuesTextBuilder: _selectedLabel,
       onChanged: (type) {
         if (type == null) return;
-        ref.read(printerSettingsControllerProvider).toggleConnectionType(type);
+        ref.read(printerSettingsNotifierProvider.notifier).toggleConnectionType(type);
       },
     );
   }
@@ -181,10 +182,10 @@ class _DevicesHeader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isScanning = ref.watch(printerSettingsControllerProvider.select((p) => p.isScanning));
-    final isConnecting = ref.watch(printerSettingsControllerProvider.select((p) => p.isConnecting));
-    final isDisconnecting = ref.watch(printerSettingsControllerProvider.select((p) => p.isDisconnecting));
-    final hasSelectedPrinter = ref.watch(printerSettingsControllerProvider.select((p) => p.selectedPrinterIndex != -1));
+    final isScanning = ref.watch(printerSettingsNotifierProvider.select((p) => p.isScanning));
+    final isConnecting = ref.watch(printerSettingsNotifierProvider.select((s) => s.connectingDeviceId != null));
+    final isDisconnecting = ref.watch(printerSettingsNotifierProvider.select((p) => p.isDisconnecting));
+    final hasSelectedPrinter = ref.read(printerSettingsNotifierProvider.notifier).selectedPrinterIndex != -1;
 
     final isBusy = isScanning || isConnecting || isDisconnecting;
 
@@ -213,7 +214,7 @@ class _DevicesHeader extends ConsumerWidget {
               iconSize: 18,
               enabled: !isBusy,
               onTap: () {
-                ref.read(printerSettingsControllerProvider).getAndSelectPrinter();
+                ref.read(printerSettingsNotifierProvider.notifier).getAndSelectPrinter();
               },
             ),
             const SizedBox(width: 4),
@@ -222,7 +223,7 @@ class _DevicesHeader extends ConsumerWidget {
               iconSize: 18,
               enabled: hasSelectedPrinter && !isBusy,
               onTap: () {
-                ref.read(printerSettingsControllerProvider).disconnectPrinter();
+                ref.read(printerSettingsNotifierProvider.notifier).disconnectPrinter();
               },
             ),
             const SizedBox(width: 4),
@@ -250,12 +251,12 @@ class _PrinterList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final provider = ref.read(printerSettingsControllerProvider);
+    final notifier = ref.read(printerSettingsNotifierProvider.notifier);
 
-    final printers = ref.watch(printerSettingsControllerProvider.select((p) => p.printers));
-    final isScanning = ref.watch(printerSettingsControllerProvider.select((p) => p.isScanning));
-    final isConnecting = ref.watch(printerSettingsControllerProvider.select((p) => p.isConnecting));
-    final selectedPrinterIndex = ref.watch(printerSettingsControllerProvider.select((p) => p.selectedPrinterIndex));
+    final printers = ref.watch(printerSettingsNotifierProvider.select((s) => s.printers));
+    final isScanning = ref.watch(printerSettingsNotifierProvider.select((s) => s.isScanning));
+    final isConnecting = ref.watch(printerSettingsNotifierProvider.select((s) => s.connectingDeviceId != null));
+    final selectedPrinterIndex = notifier.selectedPrinterIndex;
 
     if (printers.isEmpty) {
       return Padding(
@@ -278,15 +279,15 @@ class _PrinterList extends ConsumerWidget {
         printers.length,
         (i) {
           final printer = printers[i];
-          final isLoading = provider.isConnectingPrinter(printer);
+          final isLoading = notifier.isConnectingPrinter(printer);
 
           return _PrinterButton(
             printer: printer,
             isSelected: selectedPrinterIndex == i || isLoading,
             isLoading: isLoading,
             enabled: !isConnecting || isLoading,
-            subtitle: provider.getDeviceSubtitle(printer),
-            onTap: () => provider.onSelectPrinter(printer),
+            subtitle: notifier.getDeviceSubtitle(printer),
+            onTap: () => notifier.onSelectPrinter(printer),
           );
         },
       ),

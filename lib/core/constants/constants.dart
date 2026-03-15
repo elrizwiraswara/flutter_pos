@@ -12,8 +12,14 @@ class Constants {
   static const int minSyncIntervalToleranceForCriticalInMinutes = 5;
   static const int minSyncIntervalToleranceForLessCriticalInMinutes = 100;
 
+  // Google OAuth scopes required for user authentication
   static const List<String> authScopes = [
     'https://www.googleapis.com/auth/userinfo.profile',
     'https://www.googleapis.com/auth/userinfo.email',
   ];
+
+  // Non-critical error libraries that should be logged but not navigate to error screen
+  static const nonCriticalErrorLibraries = {
+    'image resource service',
+  };
 }

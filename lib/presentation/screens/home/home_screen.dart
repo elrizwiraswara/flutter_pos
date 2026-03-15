@@ -4,9 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-import '../../../app/di/app_providers.dart';
 import '../../../core/themes/app_sizes.dart';
 import '../../../domain/entities/product_entity.dart';
+import '../../providers/home/home_notifier.dart';
+import '../../providers/main/main_notifier.dart';
+import '../../providers/products/products_notifier.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
 import '../../widgets/app_empty_state.dart';
@@ -30,6 +32,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final scrollController = ScrollController();
   final searchFieldController = TextEditingController();
+  final panelController = PanelController();
 
   @override
   void initState() {
@@ -47,29 +50,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void scrollListener() async {
-    final productProvider = ref.read(productsControllerProvider);
+    final productsState = ref.read(productsNotifierProvider);
 
     // Automatically load more data on end of scroll position
     if (scrollController.offset == scrollController.position.maxScrollExtent) {
-      await productProvider.getAllProducts(offset: productProvider.allProducts?.length);
+      await ref
+          .read(productsNotifierProvider.notifier)
+          .getAllProducts(
+            offset: productsState.allProducts?.length,
+          );
     }
   }
 
   Future<void> onRefresh() async {
-    final productProvider = ref.read(productsControllerProvider);
-    final mainProvider = ref.read(mainControllerProvider);
-
-    await productProvider.getAllProducts();
-    await mainProvider.checkIsHasQueuedActions();
+    await ref.read(productsNotifierProvider.notifier).getAllProducts();
+    await ref.read(mainNotifierProvider.notifier).checkIsHasQueuedActions();
   }
 
   @override
   Widget build(BuildContext context) {
-    final homeProvider = ref.read(homeControllerProvider);
+    final homeNotifier = ref.read(homeNotifierProvider.notifier);
 
     return Scaffold(
       body: SlidingUpPanel(
-        controller: homeProvider.panelController,
+        controller: panelController,
         minHeight: 88,
         maxHeight: AppSizes.screenHeight(context) - AppSizes.appBarHeight() - AppSizes.viewPadding(context).top,
         color: Theme.of(context).colorScheme.surfaceContainerLowest,
@@ -89,11 +93,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           searchFieldController: searchFieldController,
           onRefresh: onRefresh,
         ),
-        header: const CartPanelHeader(),
-        panel: const CartPanelBody(),
-        footer: const CartPanelFooter(),
-        onPanelOpened: () => homeProvider.onChangedIsPanelExpanded(true),
-        onPanelClosed: () => homeProvider.onChangedIsPanelExpanded(false),
+        header: CartPanelHeader(panelController: panelController),
+        panel: CartPanelBody(panelController: panelController),
+        footer: CartPanelFooter(panelController: panelController),
+        onPanelOpened: () => homeNotifier.onChangedIsPanelExpanded(true),
+        onPanelClosed: () => homeNotifier.onChangedIsPanelExpanded(false),
       ),
     );
   }
@@ -112,8 +116,8 @@ class _Body extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final allProducts = ref.watch(productsControllerProvider.select((p) => p.allProducts));
-    final isLoadingMore = ref.watch(productsControllerProvider.select((p) => p.isLoadingMore));
+    final allProducts = ref.watch(productsNotifierProvider.select((p) => p.allProducts));
+    final isLoadingMore = ref.watch(productsNotifierProvider.select((p) => p.isLoadingMore));
 
     return Scaffold(
       appBar: AppBar(
@@ -208,7 +212,7 @@ class _Title extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(mainControllerProvider.select((p) => p.user));
+    final user = ref.watch(mainNotifierProvider.select((p) => p.user));
 
     return Row(
       children: [
@@ -253,8 +257,8 @@ class _SyncButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isHasQueuedActions = ref.watch(mainControllerProvider.select((p) => p.isHasQueuedActions));
-    final isSyncronizing = ref.watch(mainControllerProvider.select((p) => p.isSyncronizing));
+    final isHasQueuedActions = ref.watch(mainNotifierProvider.select((p) => p.isHasQueuedActions));
+    final isSyncronizing = ref.watch(mainNotifierProvider.select((p) => p.isSyncronizing));
 
     return Padding(
       padding: const EdgeInsets.only(right: AppSizes.padding / 4),
@@ -296,7 +300,7 @@ class _SyncButton extends ConsumerWidget {
           ],
         ),
         onTap: () {
-          ref.read(mainControllerProvider).checkAndSyncAllData();
+          ref.read(mainNotifierProvider.notifier).checkAndSyncAllData();
         },
       ),
     );
@@ -308,7 +312,7 @@ class _NetworkInfo extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isHasInternet = ref.watch(mainControllerProvider.select((provider) => provider.isHasInternet));
+    final isHasInternet = ref.watch(mainNotifierProvider.select((provider) => provider.isHasInternet));
 
     return Padding(
       padding: const EdgeInsets.only(right: AppSizes.padding),
@@ -339,8 +343,6 @@ class _SearchField extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final productProvider = ref.read(productsControllerProvider);
-
     return AppTextField(
       controller: controller,
       hintText: 'Search Products...',
@@ -348,11 +350,11 @@ class _SearchField extends ConsumerWidget {
       textInputAction: TextInputAction.search,
       onEditingComplete: () {
         FocusScope.of(context).unfocus();
-        productProvider.resetProducts();
-        productProvider.getAllProducts(contains: controller.text);
+        ref.read(productsNotifierProvider.notifier).resetProducts();
+        ref.read(productsNotifierProvider.notifier).getAllProducts(contains: controller.text);
       },
       onTapClearButton: () {
-        productProvider.getAllProducts(contains: controller.text);
+        ref.read(productsNotifierProvider.notifier).getAllProducts(contains: controller.text);
       },
     );
   }
@@ -369,10 +371,9 @@ class _ProductCard extends ConsumerWidget {
       product: product,
       enabled: product.stock > 0,
       onTap: () {
-        final homeProvider = ref.read(homeControllerProvider);
+        final homeState = ref.read(homeNotifierProvider);
 
-        int currentQty =
-            homeProvider.orderedProducts.where((e) => e.productId == product.id).firstOrNull?.quantity ?? 0;
+        int currentQty = homeState.orderedProducts.where((e) => e.productId == product.id).firstOrNull?.quantity ?? 0;
 
         AppDialog.show(
           title: 'Enter Amount',
@@ -392,7 +393,7 @@ class _ProductCard extends ConsumerWidget {
             context.pop();
           },
           onTapRightButton: (context) {
-            homeProvider.onAddOrderedProduct(product, currentQty == 0 ? 1 : currentQty);
+            ref.read(homeNotifierProvider.notifier).onAddOrderedProduct(product, currentQty == 0 ? 1 : currentQty);
             context.pop();
           },
         );

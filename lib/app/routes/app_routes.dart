@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../presentation/providers/auth/auth_provider.dart';
+import '../../presentation/providers/auth/auth_notifier.dart';
 import '../../presentation/screens/account/about_screen.dart';
 import '../../presentation/screens/account/account_screen.dart';
 import '../../presentation/screens/account/printer_settings_screen.dart';
@@ -20,9 +21,9 @@ import 'params/error_screen_param.dart';
 
 /// App routes
 class AppRoutes {
-  final AuthProvider _authProvider;
+  final Ref _ref;
 
-  AppRoutes(this._authProvider) {
+  AppRoutes(this._ref) {
     _initialize();
   }
 
@@ -36,14 +37,24 @@ class AppRoutes {
   }
 
   void _initialize() {
+    final authNotifier = _ref.read(authNotifierProvider);
+    final authStateNotifier = ValueNotifier(authNotifier);
+
+    // Dispose the notifier when the provider is disposed
+    _ref.onDispose(authStateNotifier.dispose);
+
+    // Listen to the auth state and update the ValueNotifier
+    _ref.listen(authNotifierProvider, (_, value) => authStateNotifier.value = value);
+
     _router = GoRouter(
       initialLocation: '/',
       navigatorKey: rootNavigatorKey,
-      refreshListenable: _authProvider,
+      refreshListenable: authStateNotifier,
       errorBuilder: (context, state) => ErrorScreen(param: ErrorScreenParam(error: state.error)),
       redirect: (context, state) {
-        final isChecking = _authProvider.isChecking;
-        final isAuthenticated = _authProvider.isAuthenticated;
+        final authState = _ref.read(authNotifierProvider);
+        final isChecking = authState.isChecking;
+        final isAuthenticated = authState.isAuthenticated;
         final isSplashRoute = state.fullPath == '/';
         final isAuthRoute = state.fullPath?.startsWith('/sign-in') ?? false;
 

@@ -7,8 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../core/database/app_database.dart';
 import '../../core/services/connectivity/ping_service.dart';
+import '../../core/services/database/database_service.dart';
 import '../../core/services/info/device_info_service.dart';
 import '../../core/services/logger/error_logger_service.dart';
 import '../../core/services/printer/printer_service.dart';
@@ -33,17 +33,6 @@ import '../../domain/repositories/queued_action_repository.dart';
 import '../../domain/repositories/storage_repository.dart';
 import '../../domain/repositories/transaction_repository.dart';
 import '../../domain/repositories/user_repository.dart';
-import '../../presentation/providers/account/account_provider.dart';
-import '../../presentation/providers/account/printer_settings_provider.dart';
-import '../../presentation/providers/auth/auth_provider.dart';
-import '../../presentation/providers/home/home_provider.dart';
-import '../../presentation/providers/main/main_provider.dart';
-import '../../presentation/providers/products/product_detail_provider.dart';
-import '../../presentation/providers/products/product_form_provider.dart';
-import '../../presentation/providers/products/products_provider.dart';
-import '../../presentation/providers/theme/theme_provider.dart';
-import '../../presentation/providers/transactions/transaction_detail_provider.dart';
-import '../../presentation/providers/transactions/transactions_provider.dart';
 import '../routes/app_routes.dart';
 
 // Startup overrides
@@ -59,10 +48,11 @@ final firebaseAuthProvider = Provider<FirebaseAuth>((ref) => FirebaseAuth.instan
 final googleSignInProvider = Provider<GoogleSignIn>((ref) => GoogleSignIn.instance);
 final deviceInfoPluginProvider = Provider<DeviceInfoPlugin>((ref) => DeviceInfoPlugin());
 
-// Database
-final appDatabaseProvider = Provider<AppDatabase>((ref) => AppDatabase.instance);
+// Routes
+final appRoutesProvider = Provider<AppRoutes>((ref) => AppRoutes(ref));
 
 // Services
+final databaseServiceProvider = Provider<DatabaseService>((ref) => DatabaseService.instance);
 final pingServiceProvider = Provider<PingService>((ref) => PingService());
 final deviceInfoServiceProvider = Provider<DeviceInfoService>(
   (ref) => DeviceInfoService(ref.watch(deviceInfoPluginProvider)),
@@ -77,16 +67,16 @@ final printerServiceProvider = Provider<PrinterService>(
 // Datasources
 // Local Datasources
 final productLocalDatasourceProvider = Provider<ProductLocalDatasourceImpl>(
-  (ref) => ProductLocalDatasourceImpl(ref.watch(appDatabaseProvider)),
+  (ref) => ProductLocalDatasourceImpl(ref.watch(databaseServiceProvider)),
 );
 final transactionLocalDatasourceProvider = Provider<TransactionLocalDatasourceImpl>(
-  (ref) => TransactionLocalDatasourceImpl(ref.watch(appDatabaseProvider)),
+  (ref) => TransactionLocalDatasourceImpl(ref.watch(databaseServiceProvider)),
 );
 final userLocalDatasourceProvider = Provider<UserLocalDatasourceImpl>(
-  (ref) => UserLocalDatasourceImpl(ref.watch(appDatabaseProvider)),
+  (ref) => UserLocalDatasourceImpl(ref.watch(databaseServiceProvider)),
 );
 final queuedActionLocalDatasourceProvider = Provider<QueuedActionLocalDatasourceImpl>(
-  (ref) => QueuedActionLocalDatasourceImpl(ref.watch(appDatabaseProvider)),
+  (ref) => QueuedActionLocalDatasourceImpl(ref.watch(databaseServiceProvider)),
 );
 
 // Remote Datasources
@@ -153,84 +143,4 @@ final queuedActionRepositoryProvider = Provider<QueuedActionRepository>(
     transactionRemoteDatasource: ref.watch(transactionRemoteDatasourceProvider),
     productRemoteDatasource: ref.watch(productRemoteDatasourceProvider),
   ),
-);
-
-// Providers
-final authControllerProvider = ChangeNotifierProvider<AuthProvider>(
-  (ref) => AuthProvider(
-    userRepository: ref.watch(userRepositoryProvider),
-    authRepository: ref.watch(authRepositoryProvider),
-  ),
-);
-final productsControllerProvider = ChangeNotifierProvider<ProductsProvider>(
-  (ref) => ProductsProvider(
-    authProvider: ref.read(authControllerProvider),
-    productRepository: ref.watch(productRepositoryProvider),
-  ),
-);
-final transactionsControllerProvider = ChangeNotifierProvider<TransactionsProvider>(
-  (ref) => TransactionsProvider(
-    authProvider: ref.read(authControllerProvider),
-    transactionRepository: ref.watch(transactionRepositoryProvider),
-  ),
-);
-final mainControllerProvider = ChangeNotifierProvider<MainProvider>(
-  (ref) => MainProvider(
-    deviceInforService: ref.watch(deviceInfoServiceProvider),
-    pingService: ref.watch(pingServiceProvider),
-    authProvider: ref.read(authControllerProvider),
-    userRepository: ref.watch(userRepositoryProvider),
-    productRepository: ref.watch(productRepositoryProvider),
-    transactionRepository: ref.watch(transactionRepositoryProvider),
-    queuedActionRepository: ref.watch(queuedActionRepositoryProvider),
-    productsProvider: ref.read(productsControllerProvider),
-  ),
-);
-final homeControllerProvider = ChangeNotifierProvider.autoDispose<HomeProvider>(
-  (ref) => HomeProvider(
-    authProvider: ref.read(authControllerProvider),
-    transactionRepository: ref.watch(transactionRepositoryProvider),
-    printerService: ref.watch(printerServiceProvider),
-    productsProvider: ref.read(productsControllerProvider),
-  ),
-);
-final accountControllerProvider = ChangeNotifierProvider.autoDispose<AccountProvider>(
-  (ref) => AccountProvider(
-    authProvider: ref.read(authControllerProvider),
-    authRepository: ref.watch(authRepositoryProvider),
-    userRepository: ref.watch(userRepositoryProvider),
-    storageRepository: ref.watch(storageRepositoryProvider),
-  ),
-);
-final productFormControllerProvider = ChangeNotifierProvider.autoDispose<ProductFormProvider>(
-  (ref) => ProductFormProvider(
-    authProvider: ref.read(authControllerProvider),
-    productRepository: ref.watch(productRepositoryProvider),
-    storageRepository: ref.watch(storageRepositoryProvider),
-    productsProvider: ref.read(productsControllerProvider),
-  ),
-);
-final productDetailControllerProvider = ChangeNotifierProvider.autoDispose<ProductDetailProvider>(
-  (ref) => ProductDetailProvider(
-    productRepository: ref.watch(productRepositoryProvider),
-  ),
-);
-final transactionDetailControllerProvider = ChangeNotifierProvider.autoDispose<TransactionDetailProvider>(
-  (ref) => TransactionDetailProvider(
-    transactionRepository: ref.watch(transactionRepositoryProvider),
-  ),
-);
-final themeControllerProvider = ChangeNotifierProvider<ThemeProvider>(
-  (ref) => ThemeProvider(ref.watch(sharedPreferencesProvider)),
-);
-final printerSettingsControllerProvider = ChangeNotifierProvider.autoDispose<PrinterSettingsProvider>(
-  (ref) => PrinterSettingsProvider(
-    printerService: ref.watch(printerServiceProvider),
-    sharedPreferences: ref.watch(sharedPreferencesProvider),
-  ),
-);
-
-// Routes
-final appRoutesProvider = Provider<AppRoutes>(
-  (ref) => AppRoutes(ref.read(authControllerProvider)),
 );

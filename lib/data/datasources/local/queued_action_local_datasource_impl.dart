@@ -1,20 +1,20 @@
 import 'package:sqflite/sqflite.dart';
 
 import '../../../core/common/result.dart';
-import '../../../core/database/app_database.dart';
-import '../../../core/database/database_config.dart';
+import '../../../core/services/database/database_config.dart';
+import '../../../core/services/database/database_service.dart';
 import '../../models/queued_action_model.dart';
 import '../interfaces/queued_action_datasource.dart';
 
 class QueuedActionLocalDatasourceImpl extends QueuedActionDatasource {
-  final AppDatabase _appDatabase;
+  final DatabaseService _databaseService;
 
-  QueuedActionLocalDatasourceImpl(this._appDatabase);
+  QueuedActionLocalDatasourceImpl(this._databaseService);
 
   @override
   Future<Result<int>> createQueuedAction(QueuedActionModel queue) async {
     try {
-      await _appDatabase.database.insert(
+      await _databaseService.database.insert(
         DatabaseConfig.queuedActionTableName,
         queue.toJson(),
         conflictAlgorithm: ConflictAlgorithm.replace,
@@ -30,7 +30,7 @@ class QueuedActionLocalDatasourceImpl extends QueuedActionDatasource {
   @override
   Future<Result<void>> deleteQueuedAction(int id) async {
     try {
-      await _appDatabase.database.delete(
+      await _databaseService.database.delete(
         DatabaseConfig.queuedActionTableName,
         where: 'id = ?',
         whereArgs: [id],
@@ -45,7 +45,7 @@ class QueuedActionLocalDatasourceImpl extends QueuedActionDatasource {
   @override
   Future<Result<QueuedActionModel?>> getQueuedAction(int id) async {
     try {
-      var res = await _appDatabase.database.query(
+      var res = await _databaseService.database.query(
         DatabaseConfig.queuedActionTableName,
         where: 'id = ?',
         whereArgs: [id],
@@ -62,7 +62,7 @@ class QueuedActionLocalDatasourceImpl extends QueuedActionDatasource {
   @override
   Future<Result<List<QueuedActionModel>>> getAllUserQueuedAction() async {
     try {
-      var res = await _appDatabase.database.query(
+      var res = await _databaseService.database.query(
         DatabaseConfig.queuedActionTableName,
       );
 

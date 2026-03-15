@@ -12,8 +12,7 @@ import 'package:device_info_plus/src/model/linux_device_info.dart' as _i4;
 import 'package:device_info_plus/src/model/macos_device_info.dart' as _i6;
 import 'package:device_info_plus/src/model/web_browser_info.dart' as _i5;
 import 'package:device_info_plus/src/model/windows_device_info.dart' as _i7;
-import 'package:device_info_plus_platform_interface/device_info_plus_platform_interface.dart'
-    as _i8;
+import 'package:device_info_plus_platform_interface/device_info_plus_platform_interface.dart' as _i8;
 import 'package:flutter_pos/core/utilities/platform_wrapper.dart' as _i12;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i11;
@@ -32,56 +31,40 @@ import 'package:mockito/src/dummies.dart' as _i11;
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
-class _FakeAndroidDeviceInfo_0 extends _i1.SmartFake
-    implements _i2.AndroidDeviceInfo {
-  _FakeAndroidDeviceInfo_0(Object parent, Invocation parentInvocation)
-    : super(parent, parentInvocation);
+class _FakeAndroidDeviceInfo_0 extends _i1.SmartFake implements _i2.AndroidDeviceInfo {
+  _FakeAndroidDeviceInfo_0(Object parent, Invocation parentInvocation) : super(parent, parentInvocation);
 }
 
 class _FakeIosDeviceInfo_1 extends _i1.SmartFake implements _i3.IosDeviceInfo {
-  _FakeIosDeviceInfo_1(Object parent, Invocation parentInvocation)
-    : super(parent, parentInvocation);
+  _FakeIosDeviceInfo_1(Object parent, Invocation parentInvocation) : super(parent, parentInvocation);
 }
 
-class _FakeLinuxDeviceInfo_2 extends _i1.SmartFake
-    implements _i4.LinuxDeviceInfo {
-  _FakeLinuxDeviceInfo_2(Object parent, Invocation parentInvocation)
-    : super(parent, parentInvocation);
+class _FakeLinuxDeviceInfo_2 extends _i1.SmartFake implements _i4.LinuxDeviceInfo {
+  _FakeLinuxDeviceInfo_2(Object parent, Invocation parentInvocation) : super(parent, parentInvocation);
 }
 
-class _FakeWebBrowserInfo_3 extends _i1.SmartFake
-    implements _i5.WebBrowserInfo {
-  _FakeWebBrowserInfo_3(Object parent, Invocation parentInvocation)
-    : super(parent, parentInvocation);
+class _FakeWebBrowserInfo_3 extends _i1.SmartFake implements _i5.WebBrowserInfo {
+  _FakeWebBrowserInfo_3(Object parent, Invocation parentInvocation) : super(parent, parentInvocation);
 }
 
-class _FakeMacOsDeviceInfo_4 extends _i1.SmartFake
-    implements _i6.MacOsDeviceInfo {
-  _FakeMacOsDeviceInfo_4(Object parent, Invocation parentInvocation)
-    : super(parent, parentInvocation);
+class _FakeMacOsDeviceInfo_4 extends _i1.SmartFake implements _i6.MacOsDeviceInfo {
+  _FakeMacOsDeviceInfo_4(Object parent, Invocation parentInvocation) : super(parent, parentInvocation);
 }
 
-class _FakeWindowsDeviceInfo_5 extends _i1.SmartFake
-    implements _i7.WindowsDeviceInfo {
-  _FakeWindowsDeviceInfo_5(Object parent, Invocation parentInvocation)
-    : super(parent, parentInvocation);
+class _FakeWindowsDeviceInfo_5 extends _i1.SmartFake implements _i7.WindowsDeviceInfo {
+  _FakeWindowsDeviceInfo_5(Object parent, Invocation parentInvocation) : super(parent, parentInvocation);
 }
 
-class _FakeBaseDeviceInfo_6 extends _i1.SmartFake
-    implements _i8.BaseDeviceInfo {
-  _FakeBaseDeviceInfo_6(Object parent, Invocation parentInvocation)
-    : super(parent, parentInvocation);
+class _FakeBaseDeviceInfo_6 extends _i1.SmartFake implements _i8.BaseDeviceInfo {
+  _FakeBaseDeviceInfo_6(Object parent, Invocation parentInvocation) : super(parent, parentInvocation);
 }
 
-class _FakeAndroidBuildVersion_7 extends _i1.SmartFake
-    implements _i2.AndroidBuildVersion {
-  _FakeAndroidBuildVersion_7(Object parent, Invocation parentInvocation)
-    : super(parent, parentInvocation);
+class _FakeAndroidBuildVersion_7 extends _i1.SmartFake implements _i2.AndroidBuildVersion {
+  _FakeAndroidBuildVersion_7(Object parent, Invocation parentInvocation) : super(parent, parentInvocation);
 }
 
 class _FakeIosUtsname_8 extends _i1.SmartFake implements _i3.IosUtsname {
-  _FakeIosUtsname_8(Object parent, Invocation parentInvocation)
-    : super(parent, parentInvocation);
+  _FakeIosUtsname_8(Object parent, Invocation parentInvocation) : super(parent, parentInvocation);
 }
 
 /// A class which mocks [DeviceInfoPlugin].
@@ -377,14 +360,10 @@ class MockAndroidDeviceInfo extends _i1.Mock implements _i2.AndroidDeviceInfo {
           as bool);
 
   @override
-  int get freeDiskSize =>
-      (super.noSuchMethod(Invocation.getter(#freeDiskSize), returnValue: 0)
-          as int);
+  int get freeDiskSize => (super.noSuchMethod(Invocation.getter(#freeDiskSize), returnValue: 0) as int);
 
   @override
-  int get totalDiskSize =>
-      (super.noSuchMethod(Invocation.getter(#totalDiskSize), returnValue: 0)
-          as int);
+  int get totalDiskSize => (super.noSuchMethod(Invocation.getter(#totalDiskSize), returnValue: 0) as int);
 
   @override
   List<String> get systemFeatures =>
@@ -403,14 +382,10 @@ class MockAndroidDeviceInfo extends _i1.Mock implements _i2.AndroidDeviceInfo {
           as bool);
 
   @override
-  int get physicalRamSize =>
-      (super.noSuchMethod(Invocation.getter(#physicalRamSize), returnValue: 0)
-          as int);
+  int get physicalRamSize => (super.noSuchMethod(Invocation.getter(#physicalRamSize), returnValue: 0) as int);
 
   @override
-  int get availableRamSize =>
-      (super.noSuchMethod(Invocation.getter(#availableRamSize), returnValue: 0)
-          as int);
+  int get availableRamSize => (super.noSuchMethod(Invocation.getter(#availableRamSize), returnValue: 0) as int);
 
   @override
   Map<String, dynamic> get data =>
@@ -512,19 +487,13 @@ class MockIosDeviceInfo extends _i1.Mock implements _i3.IosDeviceInfo {
           as bool);
 
   @override
-  int get physicalRamSize =>
-      (super.noSuchMethod(Invocation.getter(#physicalRamSize), returnValue: 0)
-          as int);
+  int get physicalRamSize => (super.noSuchMethod(Invocation.getter(#physicalRamSize), returnValue: 0) as int);
 
   @override
-  int get availableRamSize =>
-      (super.noSuchMethod(Invocation.getter(#availableRamSize), returnValue: 0)
-          as int);
+  int get availableRamSize => (super.noSuchMethod(Invocation.getter(#availableRamSize), returnValue: 0) as int);
 
   @override
-  bool get isiOSAppOnMac =>
-      (super.noSuchMethod(Invocation.getter(#isiOSAppOnMac), returnValue: false)
-          as bool);
+  bool get isiOSAppOnMac => (super.noSuchMethod(Invocation.getter(#isiOSAppOnMac), returnValue: false) as bool);
 
   @override
   _i3.IosUtsname get utsname =>
@@ -535,14 +504,10 @@ class MockIosDeviceInfo extends _i1.Mock implements _i3.IosDeviceInfo {
           as _i3.IosUtsname);
 
   @override
-  int get freeDiskSize =>
-      (super.noSuchMethod(Invocation.getter(#freeDiskSize), returnValue: 0)
-          as int);
+  int get freeDiskSize => (super.noSuchMethod(Invocation.getter(#freeDiskSize), returnValue: 0) as int);
 
   @override
-  int get totalDiskSize =>
-      (super.noSuchMethod(Invocation.getter(#totalDiskSize), returnValue: 0)
-          as int);
+  int get totalDiskSize => (super.noSuchMethod(Invocation.getter(#totalDiskSize), returnValue: 0) as int);
 
   @override
   Map<String, dynamic> get data =>
@@ -570,12 +535,8 @@ class MockPlatformWrapper extends _i1.Mock implements _i12.PlatformWrapper {
   }
 
   @override
-  bool get isAndroid =>
-      (super.noSuchMethod(Invocation.getter(#isAndroid), returnValue: false)
-          as bool);
+  bool get isAndroid => (super.noSuchMethod(Invocation.getter(#isAndroid), returnValue: false) as bool);
 
   @override
-  bool get isIOS =>
-      (super.noSuchMethod(Invocation.getter(#isIOS), returnValue: false)
-          as bool);
+  bool get isIOS => (super.noSuchMethod(Invocation.getter(#isIOS), returnValue: false) as bool);
 }

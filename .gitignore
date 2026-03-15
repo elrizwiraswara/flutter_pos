@@ -37,11 +37,10 @@ migrate_working_dir/
 /build/
 
 # Secrets and env
-android/app/google-services.json
+*.json
+!config.example.json
 lib/firebase_options.dart
-.firebase.json
 .env
-config.json
 
 # Symbolication related
 app.*.symbols

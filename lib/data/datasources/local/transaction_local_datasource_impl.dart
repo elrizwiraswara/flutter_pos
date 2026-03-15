@@ -1,8 +1,8 @@
 import 'package:sqflite/sqflite.dart';
 
 import '../../../core/common/result.dart';
-import '../../../core/database/app_database.dart';
-import '../../../core/database/database_config.dart';
+import '../../../core/services/database/database_config.dart';
+import '../../../core/services/database/database_service.dart';
 import '../../models/ordered_product_model.dart';
 import '../../models/product_model.dart';
 import '../../models/transaction_model.dart';
@@ -10,14 +10,14 @@ import '../../models/user_model.dart';
 import '../interfaces/transaction_datasource.dart';
 
 class TransactionLocalDatasourceImpl extends TransactionDatasource {
-  final AppDatabase _appDatabase;
+  final DatabaseService _databaseService;
 
-  TransactionLocalDatasourceImpl(this._appDatabase);
+  TransactionLocalDatasourceImpl(this._databaseService);
 
   @override
   Future<Result<int>> createTransaction(TransactionModel transaction) async {
     try {
-      final transactionId = await _appDatabase.database.transaction((trx) async {
+      final transactionId = await _databaseService.database.transaction((trx) async {
         // Create transaction
         await trx.insert(
           DatabaseConfig.transactionTableName,
@@ -82,7 +82,7 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
   @override
   Future<Result<void>> updateTransaction(TransactionModel transaction) async {
     try {
-      await _appDatabase.database.transaction((trx) async {
+      await _databaseService.database.transaction((trx) async {
         // Update transaction
         await trx.update(
           DatabaseConfig.transactionTableName,
@@ -145,7 +145,7 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
   @override
   Future<Result<void>> deleteTransaction(int id) async {
     try {
-      await _appDatabase.database.transaction((trx) async {
+      await _databaseService.database.transaction((trx) async {
         // Get ordered products to revert stock
         var orderedProducts = await trx.query(
           DatabaseConfig.orderedProductTableName,
@@ -204,7 +204,7 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
   @override
   Future<Result<TransactionModel?>> getTransaction(int id) async {
     try {
-      final transaction = await _appDatabase.database.transaction((trx) async {
+      final transaction = await _databaseService.database.transaction((trx) async {
         // Get transaction
         var rawTransactions = await trx.query(
           DatabaseConfig.transactionTableName,
@@ -254,7 +254,7 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
   @override
   Future<Result<List<TransactionModel>>> getAllUserTransactions(String userId) async {
     try {
-      final transactions = await _appDatabase.database.transaction((trx) async {
+      final transactions = await _databaseService.database.transaction((trx) async {
         var rawTransactions = await trx.query(
           DatabaseConfig.transactionTableName,
           where: 'createdById = ?',
@@ -310,7 +310,7 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
     String? contains,
   }) async {
     try {
-      final transactions = await _appDatabase.database.transaction((trx) async {
+      final transactions = await _databaseService.database.transaction((trx) async {
         var rawTransactions = await trx.query(
           DatabaseConfig.transactionTableName,
           where: 'createdById = ? AND id LIKE ?',
