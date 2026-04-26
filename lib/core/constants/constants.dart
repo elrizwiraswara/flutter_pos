@@ -2,7 +2,9 @@ class Constants {
   // Prevents instantiation and extension
   Constants._();
 
-  static const googleServerClientId = String.fromEnvironment('GOOGLE_SERVER_CLIENT_ID');
+  // Web client ID from google-services.json (client_type: 3)
+  // This is required for Google Sign-In to return a valid ID token for Firebase Auth.
+  static const googleServerClientId = '822682936719-103eg2rvahkopk89r5fvc25ua25cqpgj.apps.googleusercontent.com';
 
   static const String selectedDeviceIdKey = 'selected_device_id';
   static const String selectedConnectionTypeKey = 'selected_connection_type';

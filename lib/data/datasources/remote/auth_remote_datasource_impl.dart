@@ -23,20 +23,32 @@ class AuthRemoteDataSourceImpl implements AuthDataSource {
     try {
       await googleSignIn.initialize(
         clientId: PlatformWrapper().isIOS ? DefaultFirebaseOptions.ios.iosClientId : null,
-        serverClientId: Constants.googleServerClientId,
+        serverClientId: Constants.googleServerClientId.isNotEmpty ? Constants.googleServerClientId : null,
       );
 
-      final googleSignInAccount = await googleSignIn.attemptLightweightAuthentication();
+      // Try lightweight (silent) auth first; if no previous session exists, fall back to interactive auth
+      GoogleSignInAccount? googleSignInAccount = await googleSignIn.attemptLightweightAuthentication();
+      googleSignInAccount ??= await googleSignIn.authenticate();
 
-      final googleSignInAuthentication = googleSignInAccount?.authentication;
+      final googleSignInAuthentication = googleSignInAccount.authentication;
 
-      final googleSignInAuthorization = await googleSignInAccount?.authorizationClient.authorizationForScopes(
+      // Validate that we received an ID token from Google Sign-In.
+      // If this is null, the serverClientId is likely misconfigured.
+      if (googleSignInAuthentication.idToken == null || googleSignInAuthentication.idToken!.isEmpty) {
+        return Result.failure(
+          error:
+              'Google Sign-In did not return an ID token. '
+              'Ensure the serverClientId matches the Web OAuth client ID in Firebase Console.',
+        );
+      }
+
+      final googleSignInAuthorization = await googleSignInAccount.authorizationClient.authorizationForScopes(
         Constants.authScopes,
       );
 
       final credential = GoogleAuthProvider.credential(
         accessToken: googleSignInAuthorization?.accessToken,
-        idToken: googleSignInAuthentication?.idToken,
+        idToken: googleSignInAuthentication.idToken,
       );
 
       final userCredential = await firebaseAuth.signInWithCredential(credential);

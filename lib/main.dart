@@ -17,15 +17,18 @@ void main() async {
 
   // Initialize Firebase (use `flutterfire configure` to generate the options)
   await Firebase.initializeApp(
-    name: DefaultFirebaseOptions.currentPlatform.projectId,
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
   // Initialize app local db
   await DatabaseService.instance.init();
 
-  // Ensure persistence is cleared
-  await FirebaseFirestore.instance.clearPersistence();
+  // Ensure persistence is cleared (safe-guarded: must not block startup)
+  try {
+    await FirebaseFirestore.instance.clearPersistence();
+  } catch (_) {
+    // Persisted data may already be in use or clearPersistence unsupported
+  }
 
   // Initialize date formatting
   await initializeDateFormatting();
